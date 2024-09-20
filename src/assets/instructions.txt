@@ -1,0 +1,1 @@
+this folder will contain the needed images, icons or anything that will be used along the development but this should not contain any programming language

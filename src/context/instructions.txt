@@ -1,0 +1,3 @@
+this folder willl contain the AuthContext.js, this file will be used all over the website for keeping the user in each pages without logging in again
+
+ask assistance for the setup
