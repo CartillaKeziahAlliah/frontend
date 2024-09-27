@@ -1,12 +1,13 @@
 // src/App.jsx
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Sample, AnotherExample } from "./pages/admin/index";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { AnotherExample } from "./pages/admin/index";
+import Dashboard from "./pages/student/dashboard";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Sample />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/anotherExample" element={<AnotherExample />} />
       </Routes>
     </Router>
