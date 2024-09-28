@@ -1,5 +1,14 @@
-import { Sort } from "@mui/icons-material"
-import AccountCircleIcon from "@mui/icons-material/AccountCircle"
+import {
+  Add,
+  DeleteForeverRounded,
+  DeleteOutline,
+  Mail,
+  PlusOneOutlined,
+  Sort,
+} from "@mui/icons-material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 import {
   Button,
   Dialog,
@@ -7,23 +16,25 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-} from "@mui/material"
-import React, { useState } from "react"
-import Swal from "sweetalert2"
-import userProfile from "../../assets/user.webp"
-import Sidebar from "../../components/sidebar"
+} from "@mui/material";
+import React, { useState } from "react";
+import Swal from "sweetalert2";
+import userProfile from "../../assets/user.webp";
+import Sidebar from "../../components/sidebar";
 
 const Dashboard = () => {
-  const [page, setPage] = useState("calendar")
+  const [value, setValue] = useState(new Date());
+
+  const [page, setPage] = useState("calendar");
   const SetCurrentPage = (currenpage) => {
-    setPage(currenpage)
-  }
+    setPage(currenpage);
+  };
   const [newAnnouncement, setNewAnnouncement] = useState({
     profile: userProfile,
     personName: "",
     role: "",
     content: "",
-  })
+  });
   const [Announcements, setAnnouncements] = useState([
     {
       profile: userProfile,
@@ -46,20 +57,20 @@ const Dashboard = () => {
       content: "this is the third announcement",
       isRead: false,
     },
-  ])
-  const [openDialog, setOpenDialog] = useState(false)
+  ]);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleDialogOpen = () => {
-    setOpenDialog(true)
-  }
+    setOpenDialog(true);
+  };
   const handleDialogClose = () => {
-    setOpenDialog(false)
-  }
+    setOpenDialog(false);
+  };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setNewAnnouncement((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setNewAnnouncement((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleAddAnnouncemet = () => {
     if (
@@ -67,23 +78,26 @@ const Dashboard = () => {
       newAnnouncement.role &&
       newAnnouncement.content
     ) {
-      Announcements((prev) => [...prev, { ...newAnnouncement, isRead: false }])
+      setAnnouncements((prev) => [
+        ...prev,
+        { ...newAnnouncement, isRead: false },
+      ]);
       setNewAnnouncement({
         profile: userProfile,
         personName: "",
         role: "",
         content: "",
-      })
-      handleDialogClose()
+      });
+      handleDialogClose();
     } else {
-      handleDialogClose()
+      handleDialogClose();
       Swal.fire({
         title: "Ooppss!",
         text: "Please input the neccesary details",
         icon: "warning",
-      })
+      });
     }
-  }
+  };
   const handleDeleteAll = () => {
     Swal.fire({
       title: "Are you sure?",
@@ -96,30 +110,50 @@ const Dashboard = () => {
       cancelButtonText: "Please cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-        Announcements([])
-        Swal.fire("Deleted", "ALl announcements have been deleted", "success")
+        setAnnouncements([]);
+        Swal.fire("Deleted", "ALl announcements have been deleted", "success");
       }
-    })
-  }
+    });
+  };
+
+  const handleDelete = (index) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "If yes, you will not be able to recover these informations!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, I am sure!",
+      cancelButtonText: "Please cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setAnnouncements((prev) =>
+          prev.filter((_, announcementIndex) => announcementIndex !== index)
+        );
+        Swal.fire("Deleted", "Announcement has been deleted.", "success");
+      }
+    });
+  };
 
   const markAsRead = (index) => {
     setAnnouncements((prev) => {
-      const updatedAnnouncements = [...prev]
-      updatedAnnouncements[index].isRead = true
-      return updatedAnnouncements
-    })
-  }
+      const updatedAnnouncements = [...prev];
+      updatedAnnouncements[index].isRead = true;
+      return updatedAnnouncements;
+    });
+  };
+
   const markAllAsRead = () => {
     setAnnouncements((prev) =>
       prev.map((announcement) => ({ ...announcement, isRead: true }))
-    )
-  }
+    );
+  };
   const unreadCount = Announcements.filter(
     (announcement) => !announcement.isRead
-  ).length
+  ).length;
   return (
-    <div className="flex flex-row">
-      <Sidebar />
+    <div>
       <div className="content w-full">
         <div className="flex justify-end px-4 text-[green] py-2">
           <AccountCircleIcon fontSize="large" />
@@ -128,30 +162,39 @@ const Dashboard = () => {
           <Button
             onClick={() => SetCurrentPage("calendar")}
             variant={page === "calendar" ? "contained" : "outlined"}
+            sx={{
+              bgcolor: page === "calendar" ? "green" : "transparent",
+              borderColor: page === "calendar" ? "none" : "green",
+            }}
           >
             Calendar
           </Button>
           <Button
             onClick={() => SetCurrentPage("Announcement")}
             variant={page === "Announcement" ? "contained" : "outlined"}
+            sx={{
+              bgcolor: page === "Announcement" ? "green" : "transparent",
+              borderColor: page === "Announcement" ? "none" : "green",
+            }}
           >
             Announcement
           </Button>
         </div>
         <div>
           {page === "Announcement" && (
-            <div className="px-10">
-              <header className="flex flex-row justify-between">
-                <h1>Announcements</h1>
+            <div className="px-10 shadow-lg m-10 py-5">
+              <header className="flex flex-row justify-between border-b border-b-black">
+                <h1 className="font-bold">ANNOUNCEMENTS</h1>
                 <div>
-                  <Button variant="contained" onClick={handleDialogOpen}>
-                    Add Announcemets
+                  <Button variant="text" onClick={handleDialogOpen}>
+                    <Add />
                   </Button>
                   <Button variant="text">
                     SORT <Sort />
                   </Button>
                 </div>
               </header>
+              <br />
               <div>
                 {Announcements.length === 0 ? (
                   <>
@@ -165,7 +208,7 @@ const Dashboard = () => {
                         key={index}
                         className={`${
                           announcement.isRead
-                            ? "bg-[gray] flex flex-row gap-2 justify-between w-full "
+                            ? "bg-[beige] flex flex-row gap-2 justify-between w-full "
                             : "bg-[white] flex flex-row gap-2 justify-between w-full "
                         }`}
                       >
@@ -177,26 +220,33 @@ const Dashboard = () => {
                               alt=""
                             />
                           </div>
-                          <div>
-                            <h1 className="text-[green] font-bold capitalize">
-                              {announcement.personName}
-                            </h1>
-                            <b>{announcement.role}</b>
-                            <p>{announcement.content}</p>
+                          <div className="border-b  border-b-black flex flex-row justify-between w-full">
+                            <div>
+                              <h1 className="text-[green] font-bold capitalize ">
+                                {announcement.personName}
+                              </h1>
+                              <b>{announcement.role}</b>
+                              <p>{announcement.content}</p>
+                            </div>
+                            <div>
+                              <Button onClick={() => handleDelete(index)}>
+                                <DeleteForeverRounded />
+                              </Button>
+                              {!announcement.isRead && (
+                                <Button
+                                  variant="text"
+                                  onClick={() => markAsRead(index)}
+                                  sx={{
+                                    padding: "10px",
+                                    width: "20%",
+                                  }}
+                                >
+                                  <Mail />
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </div>
-                        {!announcement.isRead && (
-                          <Button
-                            variant="text"
-                            onClick={() => markAsRead(index)}
-                            sx={{
-                              padding: "10px",
-                              width: "20%",
-                            }}
-                          >
-                            Mark as Read
-                          </Button>
-                        )}
                       </div>
                     ))}
                   </div>
@@ -220,7 +270,13 @@ const Dashboard = () => {
               </div>
             </div>
           )}
-          {page === "calendar" && <div>calendar</div>}
+          {page === "calendar" && (
+            <div>
+              {" "}
+              <Calendar onChange={setValue} value={value} />
+              <p>Selected date: {value.toDateString()}</p>
+            </div>
+          )}
         </div>
       </div>
       <Dialog open={openDialog} onClose={handleDialogClose}>
@@ -278,7 +334,7 @@ const Dashboard = () => {
         </DialogActions>
       </Dialog>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
