@@ -1,21 +1,21 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { AnotherExample } from "./pages/admin/index";
 import Dashboard from "./pages/student/dashboard";
-import Sidebar from "./components/sidebar";
-
+import AdminRoute from "./PrivateRoute";
+import LandingPage from "./pages/landingPage";
+import AuthPage from "./pages/AuthPage";
+import "./App.css";
 function App() {
   return (
     <Router>
-      <div className="flex">
-        <Sidebar />
-        <div className="flex-grow p-4">
-          {" "}
-          <Routes>
-            <Route path="/Dashboard" element={<Dashboard />} />
-            <Route path="/anotherExample" element={<AnotherExample />} />
-          </Routes>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/Auth" element={<AuthPage />} />
+        <Route element={<AdminRoute />}>
+          <Route path="/Dashboard" element={<Dashboard />} />
+          <Route path="/anotherExample" element={<AnotherExample />} />
+        </Route>
+      </Routes>
     </Router>
   );
 }

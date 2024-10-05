@@ -50,13 +50,6 @@ const Dashboard = () => {
       content: "this is the second announcement",
       isRead: false,
     },
-    {
-      profile: userProfile,
-      personName: "Loigen Lariosa",
-      role: "Kahoy kahoy ra",
-      content: "this is the third announcement",
-      isRead: false,
-    },
   ]);
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -258,7 +251,7 @@ const Dashboard = () => {
                   variant="contained"
                   sx={{ bgcolor: "green" }}
                 >
-                  Delete ALl
+                  Delete All
                 </Button>
                 <Button
                   variant="contained"
