@@ -21,10 +21,11 @@ import React, { useState } from "react";
 import Swal from "sweetalert2";
 import userProfile from "../../assets/user.webp";
 import Sidebar from "../../components/sidebar";
+import AnnouncementCalendar from "../../components/AnnouncementCalendar";
 
 const Dashboard = () => {
   const [value, setValue] = useState(new Date());
-
+  const [role, setRole] = useState('teacher'); // Set the role here
   const [page, setPage] = useState("calendar");
   const SetCurrentPage = (currenpage) => {
     setPage(currenpage);
@@ -65,7 +66,7 @@ const Dashboard = () => {
     setNewAnnouncement((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddAnnouncemet = () => {
+  const handleAddAnnouncement = () => {
     if (
       newAnnouncement.personName &&
       newAnnouncement.role &&
@@ -85,16 +86,17 @@ const Dashboard = () => {
     } else {
       handleDialogClose();
       Swal.fire({
-        title: "Ooppss!",
-        text: "Please input the neccesary details",
+        title: "Oops!",
+        text: "Please input the necessary details",
         icon: "warning",
       });
     }
   };
+
   const handleDeleteAll = () => {
     Swal.fire({
       title: "Are you sure?",
-      text: "If yes, you will not be able to recover these informations!",
+      text: "If yes, you will not be able to recover this information!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -104,7 +106,7 @@ const Dashboard = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         setAnnouncements([]);
-        Swal.fire("Deleted", "ALl announcements have been deleted", "success");
+        Swal.fire("Deleted", "All announcements have been deleted", "success");
       }
     });
   };
@@ -112,7 +114,7 @@ const Dashboard = () => {
   const handleDelete = (index) => {
     Swal.fire({
       title: "Are you sure?",
-      text: "If yes, you will not be able to recover these informations!",
+      text: "If yes, you will not be able to recover this information!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -142,9 +144,11 @@ const Dashboard = () => {
       prev.map((announcement) => ({ ...announcement, isRead: true }))
     );
   };
+
   const unreadCount = Announcements.filter(
     (announcement) => !announcement.isRead
   ).length;
+
   return (
     <div>
       <div className="content w-full">
@@ -190,20 +194,16 @@ const Dashboard = () => {
               <br />
               <div>
                 {Announcements.length === 0 ? (
-                  <>
-                    <p className="text-center">No announcemets</p>
-                  </>
+                  <p className="text-center">No announcements</p>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    {" "}
                     {Announcements.map((announcement, index) => (
                       <div
                         key={index}
-                        className={`${
-                          announcement.isRead
-                            ? "bg-[beige] flex flex-row gap-2 justify-between w-full "
-                            : "bg-[white] flex flex-row gap-2 justify-between w-full "
-                        }`}
+                        className={`${announcement.isRead
+                          ? "bg-[beige] flex flex-row gap-2 justify-between w-full "
+                          : "bg-[white] flex flex-row gap-2 justify-between w-full "
+                          }`}
                       >
                         <div className="flex flex-row gap-2 w-full ">
                           <div className="w-[10%]">
@@ -265,9 +265,16 @@ const Dashboard = () => {
           )}
           {page === "calendar" && (
             <div>
-              {" "}
-              <Calendar onChange={setValue} value={value} />
-              <p>Selected date: {value.toDateString()}</p>
+              {role === "teacher" ? (
+                <>
+                  <AnnouncementCalendar />
+                </>
+              ) : (
+                <>
+                  <Calendar onChange={setValue} value={value} />
+                  <p>Selected date: {value.toDateString()}</p>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -283,11 +290,10 @@ const Dashboard = () => {
             type="text"
             fullWidth
             variant="outlined"
-            value={newAnnouncement.name}
+            value={newAnnouncement.personName}
             onChange={handleInputChange}
-          ></TextField>
+          />
           <TextField
-            autoFocus
             margin="dense"
             name="role"
             label="Role"
@@ -296,9 +302,8 @@ const Dashboard = () => {
             variant="outlined"
             value={newAnnouncement.role}
             onChange={handleInputChange}
-          ></TextField>
+          />
           <TextField
-            autoFocus
             margin="dense"
             name="content"
             label="Content"
@@ -307,23 +312,11 @@ const Dashboard = () => {
             variant="outlined"
             value={newAnnouncement.content}
             onChange={handleInputChange}
-          ></TextField>
+          />
         </DialogContent>
         <DialogActions>
-          <Button
-            onClick={handleDialogClose}
-            variant="outlined"
-            color="primary"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleAddAnnouncemet}
-            variant="contained"
-            color="primary"
-          >
-            Add
-          </Button>
+          <Button onClick={handleDialogClose}>Cancel</Button>
+          <Button onClick={handleAddAnnouncement}>Add</Button>
         </DialogActions>
       </Dialog>
     </div>
