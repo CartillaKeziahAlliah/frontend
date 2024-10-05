@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Background from "../assets/building_0.png";
 
 const landingPage = () => {
   const logo =
@@ -17,6 +18,8 @@ const landingPage = () => {
           </div>
         </div>
         <Link to="/Login">LOGIN</Link>
+      </div>
+      <div className= "h-screen bg-cover bg-center" style= {{ backgroundImage: `url(${Background})`}}>
       </div>
     </div>
   );
