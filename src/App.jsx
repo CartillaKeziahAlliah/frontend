@@ -1,30 +1,26 @@
-<<<<<<< HEAD
-import { useState } from 'react';
-import Tables from './components/Tables';
-import './App.css';
-import './index.css';
+import Tables from "./components/Tables";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0);
-
-  return (
-    <div>
-      <Tables />
-    </div>
-=======
-// src/App.jsx
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Sample, AnotherExample } from "./pages/admin/index";
-
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { AnotherExample } from "./pages/admin/index";
+import Dashboard from "./pages/student/dashboard";
+import AdminRoute from "./PrivateRoute";
+import LandingPage from "./pages/landingPage";
+import AuthPage from "./pages/AuthPage";
+import "./App.css";
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Sample />} />
-        <Route path="/anotherExample" element={<AnotherExample />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/Auth" element={<AuthPage />} />
+        <Route element={<AdminRoute />}>
+          <Route path="/Dashboard" element={<Dashboard />} />
+          <Route path="/anotherExample" element={<AnotherExample />} />
+          <Route path="/table" element={<Tables />} />
+        </Route>
       </Routes>
     </Router>
->>>>>>> 8b97168a7f53eded53715478c8fb8487d548c5a6
   );
 }
 
