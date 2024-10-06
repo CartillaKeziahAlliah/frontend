@@ -5,13 +5,13 @@ import GradeTable from "./GradeTable";
 import SectionTable from "./SectionTable";
 import AddTable from "./AddTable"; // Import AddTable component
 
-export default function Tables() {
+const TablePages = () => {
   return (
-    <div className="p-4 bg-green-500 h-screen w-screen overflow-auto">
+    <div className="p-4  h-screen w-full">
       {" "}
       {/* Full height & width container with green background */}
       {/* Top row: AddTable, GradeTable, and SectionTable beside each other */}
-      <div className="flex justify-between mb-4 h-1/2 space-x-4">
+      <div className="flex justify-around items-center">
         {" "}
         {/* Flexbox layout with gap */}
         <div className="flex-1 overflow-hidden">
@@ -26,8 +26,6 @@ export default function Tables() {
       </div>
       {/* Bottom row: StudentTable and TeacherTable beside each other */}
       <div className="flex justify-between h-1/2 space-x-4">
-        {" "}
-        {/* Flexbox layout with gap */}
         <div className="flex-1 overflow-hidden">
           <StudentTable />
         </div>
@@ -37,4 +35,5 @@ export default function Tables() {
       </div>
     </div>
   );
-}
+};
+export default TablePages;

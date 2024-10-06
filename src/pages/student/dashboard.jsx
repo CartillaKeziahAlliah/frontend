@@ -25,7 +25,7 @@ import AnnouncementCalendar from "../../components/AnnouncementCalendar";
 
 const Dashboard = () => {
   const [value, setValue] = useState(new Date());
-  const [role, setRole] = useState('teacher'); // Set the role here
+  const [role, setRole] = useState("teacher"); // Set the role here
   const [page, setPage] = useState("calendar");
   const SetCurrentPage = (currenpage) => {
     setPage(currenpage);
@@ -200,10 +200,11 @@ const Dashboard = () => {
                     {Announcements.map((announcement, index) => (
                       <div
                         key={index}
-                        className={`${announcement.isRead
-                          ? "bg-[beige] flex flex-row gap-2 justify-between w-full "
-                          : "bg-[white] flex flex-row gap-2 justify-between w-full "
-                          }`}
+                        className={`${
+                          announcement.isRead
+                            ? "bg-[beige] flex flex-row gap-2 justify-between w-full "
+                            : "bg-[white] flex flex-row gap-2 justify-between w-full "
+                        }`}
                       >
                         <div className="flex flex-row gap-2 w-full ">
                           <div className="w-[10%]">

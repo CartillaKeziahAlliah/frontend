@@ -1,17 +1,17 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Button from '@mui/material/Button';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Button from "@mui/material/Button";
 
 export default function MultilineTextFields() {
-  const [section, setSection] = React.useState('');
-  const [gradeLevel, setGradeLevel] = React.useState('');
-  const [studentName, setStudentName] = React.useState('');
-  const [LRN, setLRN] = React.useState('');
+  const [section, setSection] = React.useState("");
+  const [gradeLevel, setGradeLevel] = React.useState("");
+  const [studentName, setStudentName] = React.useState("");
+  const [LRN, setLRN] = React.useState("");
 
   const handleSectionChange = (event) => {
     setSection(event.target.value);
@@ -32,30 +32,36 @@ export default function MultilineTextFields() {
   const handleSubmit = (event) => {
     event.preventDefault(); // Prevent the default form submission
     // Add your submission logic here
-    console.log('Submitted:', { studentName, LRN, section, gradeLevel });
+    console.log("Submitted:", { studentName, LRN, section, gradeLevel });
     // Optionally reset the form fields
-    setStudentName('');
-    setLRN('');
-    setSection('');
-    setGradeLevel('');
+    setStudentName("");
+    setLRN("");
+    setSection("");
+    setGradeLevel("");
   };
 
   return (
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{ 
-        '& .MuiTextField-root': { m: 0.5, width: '20ch' }, 
-        '& .MuiFormControl-root': { m: 0.5, width: '20ch' },
-        width: '100%',
-        maxWidth: '600px',
-        margin: 'auto'
+      sx={{
+        "& .MuiTextField-root": { m: 0.5, width: "20ch" },
+        "& .MuiFormControl-root": { m: 0.5, width: "20ch" },
+        width: "100%",
+        maxWidth: "600px",
+        margin: "auto",
       }}
       noValidate
       autoComplete="off"
     >
       {/* Flex container for Student Name and LRN */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+        }}
+      >
         <TextField
           id="outlined-student-name"
           label="Student Name"
@@ -79,7 +85,13 @@ export default function MultilineTextFields() {
       </Box>
 
       {/* Flex container for Section and Grade Level */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+        }}
+      >
         <FormControl variant="filled" size="small">
           <InputLabel id="section-label">Section</InputLabel>
           <Select
@@ -118,10 +130,10 @@ export default function MultilineTextFields() {
       </Box>
 
       {/* Submit Button */}
-      <Button 
-        variant="contained" 
-        type="submit" 
-        sx={{ mt: 2 }} 
+      <Button
+        variant="contained"
+        type="submit"
+        sx={{ mt: 2 }}
         color="primary"
         size="small"
       >

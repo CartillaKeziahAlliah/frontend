@@ -19,8 +19,10 @@ const landingPage = () => {
         </div>
         <Link to="/Login">LOGIN</Link>
       </div>
-      <div className= "h-screen bg-cover bg-center" style= {{ backgroundImage: `url(${Background})`}}>
-      </div>
+      <div
+        className="h-screen bg-cover bg-center"
+        style={{ backgroundImage: `url(${Background})` }}
+      ></div>
     </div>
   );
 };

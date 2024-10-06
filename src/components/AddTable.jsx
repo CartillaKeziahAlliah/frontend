@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import Box from '@mui/material/Box';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import AddGrade from './AddGrade';
-import AddSection from './AddSection';
-import AddStudent from './AddStudent';
-import AddTeacher from './AddTeacher';
+import React, { useState } from "react";
+import Box from "@mui/material/Box";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import AddGrade from "./AddGrade";
+import AddSection from "./AddSection";
+import AddStudent from "./AddStudent";
+import AddTeacher from "./AddTeacher";
 
 export default function AddTable() {
   const [activeTab, setActiveTab] = useState(0);
@@ -15,12 +15,12 @@ export default function AddTable() {
   };
 
   return (
-    <Box 
-      sx={{ 
-        width: '100%', 
+    <Box
+      sx={{
+        width: "100%",
         p: { xs: 1, sm: 2 }, // Responsive padding
-        display: 'flex', 
-        flexDirection: 'column' 
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Tabs
@@ -29,9 +29,9 @@ export default function AddTable() {
         variant="scrollable"
         scrollButtons="auto"
         aria-label="add table tabs"
-        sx={{ 
+        sx={{
           flexGrow: 1,
-          justifyContent: 'center' // Center tabs
+          justifyContent: "center", // Center tabs
         }}
       >
         <Tab label="Add Grade" />
@@ -40,14 +40,14 @@ export default function AddTable() {
         <Tab label="Add Teacher" />
       </Tabs>
 
-      <Box 
-        sx={{ 
+      <Box
+        sx={{
           mt: 2,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexDirection: { xs: 'column', sm: 'row' }, // Stack vertically on small screens
-          gap: 2 // Space between components
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: { xs: "column", sm: "row" }, // Stack vertically on small screens
+          gap: 2, // Space between components
         }}
       >
         {activeTab === 0 && <AddGrade />}
