@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import LoginForm from "./login";
 import RegisterForm from "./signup";
-import Background from "../assets/Login1.svg"; 
+import Background from "../assets/Login1.svg";
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
 
@@ -11,7 +11,14 @@ const AuthPage = () => {
   };
 
   return (
-    <div style={{background:`url(${Background})`, backgroundRepeat:'no-repeat', backgroundSize:'cover'}} className="flex min-h-screen">
+    <div
+      style={{
+        background: `url(${Background})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+      }}
+      className="flex min-h-screen"
+    >
       {/* Left Side - Logo Section */}
       <div className="flex-1 flex items-center justify-center">
         <div className="flex w-[80%] h-[80%] flex-col items-center justify-center">
