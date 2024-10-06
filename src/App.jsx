@@ -1,3 +1,6 @@
+import Tables from "./components/Tables";
+import "./App.css";
+
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { AnotherExample } from "./pages/admin/index";
 import Dashboard from "./pages/student/dashboard";
@@ -14,6 +17,7 @@ function App() {
         <Route element={<AdminRoute />}>
           <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/anotherExample" element={<AnotherExample />} />
+          <Route path="/table" element={<Tables />} />
         </Route>
       </Routes>
     </Router>
