@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, TextField, Typography, Container } from "@mui/material";
 import axios from "axios";
+import { color } from "framer-motion";
 
 const apiUrl = "http://localhost:5000";
 
@@ -43,7 +44,11 @@ const LoginForm = () => {
           marginTop: 8,
         }}
       >
-        <Typography component="h1" variant="h5">
+        <Typography
+          component="h1"
+          variant="h2"
+          sx={{ color: "#207E68", fontWeight: "bold" }}
+        >
           Login
         </Typography>
         {error && <Typography color="error">{error}</Typography>}
@@ -57,6 +62,24 @@ const LoginForm = () => {
             autoFocus
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "#60a894",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#207E68",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&:hover": {
+                  color: "#60a894",
+                },
+                "&.Mui-focused": {
+                  color: "#207E68",
+                },
+              },
+            }}
           />
           <TextField
             margin="normal"
@@ -67,12 +90,36 @@ const LoginForm = () => {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "#60a894",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#207E68",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&:hover": {
+                  color: "#60a894",
+                },
+                "&.Mui-focused": {
+                  color: "#207e68",
+                },
+              },
+            }}
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            sx={{
+              mt: 3,
+              mb: 2,
+              background: "#207e68",
+              "&:hover": { background: "#1b5e50" },
+            }}
+            disabled={!email || !password}
           >
             Login
           </Button>

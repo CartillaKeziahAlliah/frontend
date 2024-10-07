@@ -93,7 +93,11 @@ const RegisterForm = () => {
           marginTop: 8,
         }}
       >
-        <Typography component="h1" variant="h5">
+        <Typography
+          component="h1"
+          variant="h2"
+          sx={{ color: "#207E68", fontWeight: "bold" }}
+        >
           Sign Up
         </Typography>
         {error && <Typography color="error">{error}</Typography>}
@@ -104,6 +108,24 @@ const RegisterForm = () => {
             fullWidth
             label="Name"
             value={name}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "#60a894",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#207E68",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&:hover": {
+                  color: "#60a894",
+                },
+                "&.Mui-focused": {
+                  color: "#207e68",
+                },
+              },
+            }}
             onChange={(e) => setName(e.target.value)}
           />
           <TextField
@@ -113,6 +135,24 @@ const RegisterForm = () => {
             label="Email Address"
             autoComplete="email"
             value={email}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "#60a894",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#207E68",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&:hover": {
+                  color: "#60a894",
+                },
+                "&.Mui-focused": {
+                  color: "#207e68",
+                },
+              },
+            }}
             onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
@@ -123,6 +163,24 @@ const RegisterForm = () => {
             type="password"
             autoComplete="current-password"
             value={password}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "#60a894",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#207E68",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&:hover": {
+                  color: "#60a894",
+                },
+                "&.Mui-focused": {
+                  color: "#207e68",
+                },
+              },
+            }}
             onChange={(e) => {
               setPassword(e.target.value);
               validatePassword(e.target.value);
@@ -135,6 +193,24 @@ const RegisterForm = () => {
             label="Confirm Password"
             type="password"
             value={confirmPassword}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&:hover fieldset": {
+                  borderColor: "#60a894",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#207E68",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&:hover": {
+                  color: "#60a894",
+                },
+                "&.Mui-focused": {
+                  color: "#207e68",
+                },
+              },
+            }}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
           {password && confirmPassword && password !== confirmPassword && (
@@ -196,7 +272,12 @@ const RegisterForm = () => {
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            sx={{
+              mt: 3,
+              mb: 2,
+              background: "#207e68",
+              "&:hover": { background: "#1b5e50" },
+            }}
             disabled={!isFormValid}
           >
             Sign Up
