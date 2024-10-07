@@ -1,7 +1,13 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, Container } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Container,
+  Alert,
+} from "@mui/material";
 import axios from "axios";
-import { color } from "framer-motion";
 
 const apiUrl = "http://localhost:5000";
 
@@ -30,7 +36,18 @@ const LoginForm = () => {
       }
     } catch (err) {
       console.error("Login error:", err);
-      setError(err.response?.data?.error || "Login failed");
+
+      if (err.response) {
+        if (err.response.status === 400) {
+          setError("User doesn't exist");
+        } else if (err.response.status === 401) {
+          setError("Wrong password");
+        } else {
+          setError("Login faild");
+        }
+      } else {
+        setError("Login faile");
+      }
     }
   };
 
@@ -51,7 +68,19 @@ const LoginForm = () => {
         >
           Login
         </Typography>
-        {error && <Typography color="error">{error}</Typography>}
+        {error && (
+          <Alert
+            severity="error"
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              mb: 2,
+            }}
+          >
+            {error}
+          </Alert>
+        )}{" "}
         <Box component="form" onSubmit={handleLogin} sx={{ mt: 1 }}>
           <TextField
             margin="normal"

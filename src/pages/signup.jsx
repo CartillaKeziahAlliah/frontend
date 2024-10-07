@@ -6,6 +6,7 @@ import {
   Typography,
   Container,
   Divider,
+  Alert,
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -100,7 +101,19 @@ const RegisterForm = () => {
         >
           Sign Up
         </Typography>
-        {error && <Typography color="error">{error}</Typography>}
+        {error && (
+          <Alert
+            severity="error"
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              mb: 2,
+            }}
+          >
+            {error}
+          </Alert>
+        )}{" "}
         <Box component="form" onSubmit={handleSignup} sx={{ mt: 1 }}>
           <TextField
             margin="normal"
@@ -214,14 +227,10 @@ const RegisterForm = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
           {password && confirmPassword && password !== confirmPassword && (
-            <Typography color="error" variant="body2">
-              ❌ Passwords do not match
-            </Typography>
+            <Alert severity="error">Passwords do not match</Alert>
           )}
           {password && confirmPassword && password === confirmPassword && (
-            <Typography color="success" variant="body2">
-              ✔️ Passwords match
-            </Typography>
+            <Alert>Passwords match</Alert>
           )}
           <Box sx={{ mt: 2 }}>
             <Typography variant="subtitle1">Password Requirements:</Typography>
