@@ -1,18 +1,28 @@
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import React from "react";
+import { Outlet, Navigate } from "react-router-dom";
 import Sidebar from "./components/sidebar";
+import { useAuth } from "./context/AuthContext";
 
-const AdminRoute = () => {
-  const [role, setRole] = useState("student");
+const ProtectedRoute = () => {
+  const { user, loading, logout } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
   return (
     <div style={{ display: "flex", width: "100%" }}>
-      <Sidebar userRole={role} />
+      <Sidebar user={user} logout={logout} />
       <div
         style={{
           flex: 1,
           height: "99vh",
-          overflowY: "scroll", // allows vertical scrolling
-          overflowX: "hidden", // hides horizontal scroll
+          overflowY: "scroll",
+          overflowX: "hidden",
         }}
       >
         <Outlet />
@@ -21,4 +31,4 @@ const AdminRoute = () => {
   );
 };
 
-export default AdminRoute;
+export default ProtectedRoute;

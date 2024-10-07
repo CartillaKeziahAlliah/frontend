@@ -1,80 +1,84 @@
-import { TextField, Button } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
+import { Box, Button, TextField, Typography, Container } from "@mui/material";
+import axios from "axios";
+
+const apiUrl = "http://localhost:5000";
 
 const LoginForm = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const response = await axios.post(`${apiUrl}/api/users/login`, {
+        email,
+        password,
+      });
+
+      console.log("Response from login:", response.data);
+      localStorage.setItem("token", response.data.token);
+
+      if (response.data.role === "student") {
+        window.location.href = "/Table";
+      } else {
+        window.location.href = "/Dashboard";
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(err.response?.data?.error || "Login failed");
+    }
+  };
+
   return (
-    <div className="w-full max-w-sm">
-      <h2 className="text-5xl font-bold text-[#207E68] uppercase mb-6 text-center">
-        Login
-      </h2>
-      <form className="bg-white rounded px-8 pt-6 pb-8 mb-4">
-        <div className="mb-4">
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          marginTop: 8,
+        }}
+      >
+        <Typography component="h1" variant="h5">
+          Login
+        </Typography>
+        {error && <Typography color="error">{error}</Typography>}
+        <Box component="form" onSubmit={handleLogin} sx={{ mt: 1 }}>
           <TextField
-            id="username"
-            label="Username"
-            variant="outlined"
+            margin="normal"
+            required
             fullWidth
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#207E68",
-                },
-                "&:hover fieldset": {
-                  borderColor: "#90ee90",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#207E68",
-                },
-              },
-              "& label": {
-                color: "#207E68",
-              },
-              "& .MuiInputLabel-root.Mui-focused": {
-                color: "#207E68",
-              },
-              borderRadius: "10px",
-            }}
+            label="Email Address"
+            autoComplete="email"
+            autoFocus
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
-        </div>
-        <div className="mb-6">
           <TextField
-            id="password"
+            margin="normal"
+            required
+            fullWidth
             label="Password"
-            variant="outlined"
             type="password"
-            fullWidth
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: "#207E68",
-                },
-                "&:hover fieldset": {
-                  borderColor: "#90ee90",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#207E68",
-                },
-              },
-              "& label": {
-                color: "#207E68",
-              },
-              "& .MuiInputLabel-root.Mui-focused": {
-                color: "#207E68",
-              },
-              borderRadius: "10px",
-            }}
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
-          <p className="text-right text-blue-500 text-sm hover:underline cursor-pointer">
-            Forgot Password?
-          </p>
-        </div>
-        <div className="flex items-center justify-end">
-          <Button variant="contained" sx={{ bgcolor: "#207E68" }}>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
             Login
           </Button>
-        </div>
-      </form>
-    </div>
+        </Box>
+      </Box>
+    </Container>
   );
 };
 
