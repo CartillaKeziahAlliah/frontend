@@ -3,6 +3,7 @@ import { Outlet, Navigate } from "react-router-dom";
 import Sidebar from "./components/sidebar";
 import { useAuth } from "./context/AuthContext";
 
+//please ayaw hilabti
 const ProtectedRoute = () => {
   const { user, loading, logout } = useAuth();
 

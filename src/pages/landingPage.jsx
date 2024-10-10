@@ -17,7 +17,7 @@ const landingPage = () => {
             <h2>Spirituality - Responsibility - Integrity</h2>
           </div>
         </div>
-        <Link to="/Login">LOGIN</Link>
+        <Link to="/Auth">LOGIN</Link>
       </div>
       <div
         className="h-screen bg-cover bg-center"

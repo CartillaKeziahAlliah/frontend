@@ -8,7 +8,7 @@ import {
   TextField,
 } from "@mui/material";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import BookIcon from "@mui/icons-material/Book";
 import GridViewIcon from "@mui/icons-material/GridView";
@@ -48,7 +48,9 @@ const SidebarOption = ({
   <div onClick={() => setIsActive(title)}>
     <Link
       to={to}
-      className="flex hover:bg-gray-700 flex-row gap-2 items-center"
+      className={`flex hover:bg-gray-700 flex-row gap-2 items-center ${
+        active === title ? "bg-[#4a8e8b] text-white" : "text-white"
+      } p-2 rounded-md`}
     >
       {icon}
       {!isCollapsed && <p className="capitalize">{title}</p>}
@@ -57,6 +59,7 @@ const SidebarOption = ({
 );
 
 const Sidebar = ({ user, logout }) => {
+  const navigate = useNavigate();
   const [active, setIsActive] = useState("Dashboard");
   const [showCourses, setShowCourses] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -79,6 +82,11 @@ const Sidebar = ({ user, logout }) => {
     setIsActive("Courses");
   };
 
+  const handleCourseSelect = (course) => {
+    setIsActive(course);
+    navigate(`/course/${course}`);
+  };
+
   const toggleMenu = () => {
     setIsCollapsed((prev) => !prev);
   };
@@ -90,6 +98,7 @@ const Sidebar = ({ user, logout }) => {
       setOpen(false);
     }
   };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -98,6 +107,7 @@ const Sidebar = ({ user, logout }) => {
       console.error("Logout Failed", error);
     }
   };
+
   return (
     <div className="flex items-center">
       <div
@@ -112,9 +122,9 @@ const Sidebar = ({ user, logout }) => {
         >
           <MenuIcon onClick={toggleMenu} className="cursor-pointer" />
         </div>
-        <div className="flex flex-row items-center justify-center w-[80%] p-2 rounded-md border border-white">
+        <div className="flex flex-row items-center justify-center w-[90%] gap-1 p-2 rounded-md border border-white">
           <Avatar />
-          {!isCollapsed && <p>{user.name}</p>}
+          {!isCollapsed && <p className="capitalize text-white">{user.name}</p>}
         </div>
 
         <div
@@ -133,8 +143,8 @@ const Sidebar = ({ user, logout }) => {
           <div
             onClick={handleCoursesClick}
             className={`flex flex-row hover:bg-gray-700 gap-2 items-center ${
-              active === "Courses" ? "bg-red" : ""
-            }`}
+              active === "Courses" ? "bg-[#4a8e8b] text-white" : "text-white"
+            } p-2 rounded-md`}
           >
             <BookIcon />
             {!isCollapsed && <p className="capitalize">courses</p>}
@@ -153,7 +163,7 @@ const Sidebar = ({ user, logout }) => {
           <Logout
             onClick={handleLogout}
             fontSize="large"
-            className="hover:bg-gray-700"
+            className="hover:bg-gray-700 cursor-pointer"
           />
         </div>
       </div>
@@ -165,9 +175,9 @@ const Sidebar = ({ user, logout }) => {
           {courses.map((course) => (
             <div
               key={course}
-              onClick={() => setIsActive(course)}
+              onClick={() => handleCourseSelect(course)}
               className={`p-2 hover:bg-gray-300 rounded ${
-                active === course ? "bg-[#207e68]" : ""
+                active === course ? "bg-[#4a8e8b]" : ""
               }`}
             >
               <p

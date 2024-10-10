@@ -3,10 +3,11 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import LandingPage from "./pages/landingPage";
 import AuthPage from "./pages/AuthPage";
 import "./App.css";
-import ProtectedRoute from "./PrivateRoute";
+import ProtectedRoute from "./Privateroute";
 import Dashboard from "./pages/student/dashboard";
 import { AnotherExample } from "./pages/admin/index";
 import TablePages from "./components/TablePages";
+import CourseDetail from "./components/CourseDetail";
 
 function App() {
   return (
@@ -19,7 +20,9 @@ function App() {
             <Route path="/anotherExample" element={<AnotherExample />} />
             <Route path="/table" element={<TablePages />} />
             <Route path="/Dashboard" element={<Dashboard />} />
+            <Route path="/course/:courseName" element={<CourseDetail />} />
           </Route>
+          <Route path="*" element={<div>Not found</div>} />
         </Routes>
       </Router>
     </>
