@@ -1,4 +1,3 @@
-// Quiz.js
 import React, { useState } from "react";
 import {
   Button,
@@ -41,11 +40,11 @@ const Quiz = ({ courseName, user }) => {
   };
 
   const handleSubmit = () => {
-    const updatedQuizzes = quizzes.map(
-      (quiz) => (quiz.id === currentQuiz.id ? { ...quiz, score: 85 } : quiz) // Example score
+    const updatedQuizzes = quizzes.map((quiz) =>
+      quiz.id === currentQuiz.id ? { ...quiz, score: 85 } : quiz
     );
     setQuizzes(updatedQuizzes);
-    setCurrentQuiz(null); // Reset to show the list again
+    setCurrentQuiz(null);
   };
 
   const handleViewScore = (quiz) => {
@@ -57,7 +56,6 @@ const Quiz = ({ courseName, user }) => {
       <h2>Quizzes for {courseName}</h2>
       {user && <p>Student: {user.name}</p>}
 
-      {/* Conditionally render the quizzes or the current quiz form */}
       {!currentQuiz ? (
         <Grid container spacing={2}>
           {quizzes.map((quiz) => (
@@ -69,19 +67,20 @@ const Quiz = ({ courseName, user }) => {
                 <CardContent>
                   <Typography variant="h6">{quiz.title}</Typography>
                   <div className="flex gap-2 mt-2">
-                    <Button
-                      variant="contained"
-                      onClick={() => handleTakeQuiz(quiz)}
-                      sx={{
-                        mt: 2,
-                        bgcolor: "#207E68",
-                        borderColor: "#207E68",
-                        "&:hover": { bgcolor: "#1a5b4f" },
-                      }}
-                    >
-                      Take Quiz
-                    </Button>
-                    {quiz.score !== null && (
+                    {quiz.score === null ? (
+                      <Button
+                        variant="contained"
+                        onClick={() => handleTakeQuiz(quiz)}
+                        sx={{
+                          mt: 2,
+                          bgcolor: "#207E68",
+                          borderColor: "#207E68",
+                          "&:hover": { bgcolor: "#1a5b4f" },
+                        }}
+                      >
+                        Take Quiz
+                      </Button>
+                    ) : (
                       <Button
                         variant="outlined"
                         onClick={() => handleViewScore(quiz)}

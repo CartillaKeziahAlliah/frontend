@@ -1,4 +1,3 @@
-// Exam.js
 import React, { useState } from "react";
 import {
   Button,
@@ -12,7 +11,6 @@ import {
   Typography,
   Grid,
 } from "@mui/material";
-import { color } from "framer-motion";
 
 const Exam = ({ courseName, user }) => {
   const [exams, setExams] = useState([
@@ -68,11 +66,11 @@ const Exam = ({ courseName, user }) => {
   };
 
   const handleSubmit = () => {
-    const updatedExams = exams.map(
-      (exam) => (exam.id === currentExam.id ? { ...exam, score: 90 } : exam) // Example score
+    const updatedExams = exams.map((exam) =>
+      exam.id === currentExam.id ? { ...exam, score: 90 } : exam
     );
     setExams(updatedExams);
-    setCurrentExam(null); // Reset the current exam after submission
+    setCurrentExam(null);
   };
 
   const handleViewScore = (exam) => {
@@ -140,19 +138,20 @@ const Exam = ({ courseName, user }) => {
                 <CardContent>
                   <Typography variant="h6">{exam.title}</Typography>
                   <div className="flex gap-2 mt-2">
-                    <Button
-                      variant="contained"
-                      onClick={() => handleTakeExam(exam)}
-                      sx={{
-                        mt: 2,
-                        bgcolor: "#207E68",
-                        borderColor: "#207E68",
-                        "&:hover": { bgcolor: "#1a5b4f" },
-                      }}
-                    >
-                      Take Exam
-                    </Button>
-                    {exam.score !== null && (
+                    {exam.score === null ? (
+                      <Button
+                        variant="contained"
+                        onClick={() => handleTakeExam(exam)}
+                        sx={{
+                          mt: 2,
+                          bgcolor: "#207E68",
+                          borderColor: "#207E68",
+                          "&:hover": { bgcolor: "#1a5b4f" },
+                        }}
+                      >
+                        Take Exam
+                      </Button>
+                    ) : (
                       <Button
                         variant="outlined"
                         onClick={() => handleViewScore(exam)}

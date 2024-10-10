@@ -42,11 +42,11 @@ const Assignment = ({ courseName, user }) => {
   const handleSubmit = () => {
     const updatedAssignments = assignments.map((assignment) =>
       assignment.id === currentAssignment.id
-        ? { ...assignment, score: 75 } // Example score
+        ? { ...assignment, score: 75 }
         : assignment
     );
     setAssignments(updatedAssignments);
-    setCurrentAssignment(null); // Reset to show the list again
+    setCurrentAssignment(null);
   };
 
   const handleViewScore = (assignment) => {
@@ -62,7 +62,6 @@ const Assignment = ({ courseName, user }) => {
       <h2>Assignments for {courseName}</h2>
       {user && <p>Student: {user.name}</p>}
 
-      {/* Conditionally render the assignments or the current assignment form */}
       {!currentAssignment ? (
         <Grid container spacing={2}>
           {assignments.map((assignment) => (
@@ -74,17 +73,18 @@ const Assignment = ({ courseName, user }) => {
                 <CardContent>
                   <Typography variant="h6">{assignment.title}</Typography>
                   <div className="flex gap-2 mt-2">
-                    <Button
-                      variant="contained"
-                      sx={{
-                        bgcolor: "#207E68",
-                        "&:hover": { bgcolor: "#1a5b4f" },
-                      }}
-                      onClick={() => handleTakeAssignment(assignment)}
-                    >
-                      Take Assignment
-                    </Button>
-                    {assignment.score !== null && (
+                    {assignment.score === null ? (
+                      <Button
+                        variant="contained"
+                        sx={{
+                          bgcolor: "#207E68",
+                          "&:hover": { bgcolor: "#1a5b4f" },
+                        }}
+                        onClick={() => handleTakeAssignment(assignment)}
+                      >
+                        Take Assignment
+                      </Button>
+                    ) : (
                       <Button
                         variant="outlined"
                         onClick={() => handleViewScore(assignment)}
@@ -117,10 +117,7 @@ const Assignment = ({ courseName, user }) => {
               bgcolor: "#207E68",
               mt: 2,
               borderColor: "#207E68",
-              "&:hover": {
-                backgroundColor: "#f0f0f0",
-                borderColor: "#1a5b4f",
-              },
+              "&:hover": { bgcolor: "#1a5b4f" },
             }}
           >
             Submit Assignment
