@@ -31,7 +31,7 @@ const AuthPage = () => {
       </div>
 
       {/* Right Side - Form Section */}
-      <div className="flex-1 flex flex-col items-center justify-center">
+      <div className="flex-1 h-[100vh] py-4 overflow-auto flex flex-col items-center justify-center">
         <AnimatePresence mode="wait">
           {isLogin ? (
             <motion.div

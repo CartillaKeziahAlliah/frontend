@@ -85,7 +85,7 @@ const RegisterForm = () => {
     password === confirmPassword;
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" sx={{ bgcolor: "white" }} maxWidth="xs">
       <Box
         sx={{
           display: "flex",

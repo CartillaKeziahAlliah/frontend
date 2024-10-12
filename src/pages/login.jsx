@@ -43,10 +43,10 @@ const LoginForm = () => {
         } else if (err.response.status === 401) {
           setError("Wrong password");
         } else {
-          setError("Login faild");
+          setError("Login failed");
         }
       } else {
-        setError("Login faile");
+        setError("Login failed");
       }
     }
   };
