@@ -7,7 +7,10 @@ const landingPage = () => {
     "https://static.wixstatic.com/media/a7269e_9526c565a65f452ab7ab04f1fb03b196~mv2.png/v1/fit/w_2500,h_1330,al_c/a7269e_9526c565a65f452ab7ab04f1fb03b196~mv2.png";
 
   return (
-    <div>
+    <div
+      className="h-screen bg-cover bg-center"
+      style={{ backgroundImage: `url(${Background})` }}
+    >
       <div className="flex  p-2 text-white font-bold w-full bg-[#207E68] flex-row items-center justify-between">
         <div className="flex gap-2 flex-row">
           <img src={logo} alt="School Logo" className="w-20" />
@@ -19,10 +22,7 @@ const landingPage = () => {
         </div>
         <Link to="/Auth">LOGIN</Link>
       </div>
-      <div
-        className="h-screen bg-cover bg-center"
-        style={{ backgroundImage: `url(${Background})` }}
-      ></div>
+      <div></div>
     </div>
   );
 };
