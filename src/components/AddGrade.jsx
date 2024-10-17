@@ -1,15 +1,15 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Button from '@mui/material/Button';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Button from "@mui/material/Button";
 
 export default function MultilineTextFields() {
-  const [gradeID, setGradeID] = React.useState('');
-  const [gradeLevel, setGradeLevel] = React.useState('');
+  const [gradeID, setGradeID] = React.useState("");
+  const [gradeLevel, setGradeLevel] = React.useState("");
 
   const handleGradeIDChange = (event) => {
     setGradeID(event.target.value);
@@ -22,17 +22,17 @@ export default function MultilineTextFields() {
   const handleSubmit = (event) => {
     event.preventDefault(); // Prevent the default form submission
     // Add your submission logic here
-    console.log('Submitted:', { gradeID, gradeLevel });
+    console.log("Submitted:", { gradeID, gradeLevel });
     // Optionally reset the form fields
-    setGradeID('');
-    setGradeLevel('');
+    setGradeID("");
+    setGradeLevel("");
   };
 
   return (
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{ '& .MuiTextField-root': { m: 1, width: '25ch' } }}
+      sx={{ "& .MuiTextField-root": { m: 1, width: "25ch" } }}
       noValidate
       autoComplete="off"
     >
@@ -46,7 +46,7 @@ export default function MultilineTextFields() {
           maxRows={4}
           variant="outlined"
         />
-         <TextField
+        <TextField
           id="outlined-section-name"
           label="Grade Level"
           value={gradeLevel}
@@ -56,15 +56,9 @@ export default function MultilineTextFields() {
           variant="outlined"
         />
       </div>
-    
 
       {/* Submit Button */}
-      <Button 
-        variant="contained" 
-        type="submit" 
-        sx={{ m: 1 }} 
-        color="primary"
-      >
+      <Button variant="contained" type="submit" sx={{ m: 1 }} color="primary">
         Add Section
       </Button>
     </Box>

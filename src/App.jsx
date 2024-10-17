@@ -4,10 +4,10 @@ import LandingPage from "./pages/landingPage";
 import AuthPage from "./pages/AuthPage";
 import "./App.css";
 import ProtectedRoute from "./Privateroute";
-import Dashboard from "./pages/student/dashboard";
 import { AnotherExample } from "./pages/admin/index";
 import TablePages from "./components/TablePages";
 import CourseDetail from "./components/CourseDetail";
+import Dashboard from "./components/dashboard";
 
 function App() {
   return (
