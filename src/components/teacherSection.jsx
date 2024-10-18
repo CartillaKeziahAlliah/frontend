@@ -21,6 +21,7 @@ const getRandomPastelColor = () => {
   ];
   return colors[Math.floor(Math.random() * colors.length)];
 };
+const apiUrl = "https://backend-production-55e3.up.railway.app";
 
 const SubjectsList = ({ teacherId }) => {
   const [subjects, setSubjects] = useState([]);
