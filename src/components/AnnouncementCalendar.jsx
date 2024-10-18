@@ -22,23 +22,23 @@ const EventCalendar = () => {
   const [eventTime, setEventTime] = useState("");
   const [note, setNote] = useState("");
   const [editingEventId, setEditingEventId] = useState(null);
-  const { user } = useAuth();
+  const { user } = useAuth(); // Assuming useAuth gives you the user role
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
+  // Fetch events when the component loads and when the selected date changes
   useEffect(() => {
     fetchEvents(selectedDate);
   }, [selectedDate]);
 
   const fetchEvents = async (date) => {
     try {
-      const formattedDate = date.toISOString().split("T")[0];
+      const formattedDate = date.toISOString().split("T")[0]; // Format date to 'YYYY-MM-DD'
       const response = await axios.get(
         `http://localhost:5000/api/calendar/events/${formattedDate}`
       );
       setEvents(response.data);
-      console.log(response.data);
     } catch (error) {
       console.error("Error fetching events:", error);
       showSnackbar("Error fetching events", "error");
@@ -46,7 +46,7 @@ const EventCalendar = () => {
   };
 
   const handleDateClick = (date) => {
-    setSelectedDate(date);
+    setSelectedDate(date); // Set the selected date when the user clicks on a day
   };
 
   const handleOpenDialog = () => {
@@ -67,35 +67,40 @@ const EventCalendar = () => {
     setSnackbarOpen(true);
   };
 
-  const handleAddOrEditEvent = async () => {
-    try {
-      const eventData = {
-        event_title: eventTitle,
-        event_date: selectedDate.toISOString().split("T")[0],
-        event_time: eventTime,
-        note,
-      };
+  const handleSubmitEvent = async () => {
+    if (!eventTitle || !eventTime) {
+      showSnackbar("Please provide both event title and time", "error");
+      return;
+    }
 
+    const eventData = {
+      event_title: eventTitle,
+      event_time: eventTime,
+      note: note,
+      event_date: selectedDate.toISOString().split("T")[0],
+    };
+
+    try {
       if (editingEventId) {
+        // Update existing event
         await axios.put(
           `http://localhost:5000/api/calendar/events/${editingEventId}`,
           eventData
         );
         showSnackbar("Event updated successfully!", "success");
       } else {
+        // Add new event
         await axios.post(
           "http://localhost:5000/api/calendar/events",
           eventData
         );
         showSnackbar("Event added successfully!", "success");
       }
-
-      fetchEvents(selectedDate);
-      resetForm();
-      setIsDialogOpen(false);
+      fetchEvents(selectedDate); // Refresh events after adding/updating
+      setIsDialogOpen(false); // Close dialog
     } catch (error) {
-      console.error("Error adding/editing event:", error);
-      showSnackbar("Error adding/editing event", "error");
+      console.error("Error adding/updating event:", error);
+      showSnackbar("Error adding/updating event", "error");
     }
   };
 
@@ -103,7 +108,7 @@ const EventCalendar = () => {
     try {
       await axios.delete(`http://localhost:5000/api/calendar/events/${id}`);
       showSnackbar("Event deleted successfully!", "success");
-      fetchEvents(selectedDate);
+      fetchEvents(selectedDate); // Refresh events after deletion
     } catch (error) {
       console.error("Error deleting event:", error);
       showSnackbar("Error deleting event", "error");
@@ -158,40 +163,41 @@ const EventCalendar = () => {
         className="react-calendar"
       />
 
-      {/* Modal for adding/editing events */}
+      {/* Dialog for adding/editing events */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
         <DialogTitle>{editingEventId ? "Edit Event" : "Add Event"}</DialogTitle>
-        <DialogContent className="flex flex-col space-y-4">
+        <DialogContent>
           <TextField
             label="Event Title"
-            variant="outlined"
+            fullWidth
             value={eventTitle}
             onChange={(e) => setEventTitle(e.target.value)}
-            className="w-full"
+            margin="dense"
+            required
           />
           <TextField
             label="Event Time"
-            variant="outlined"
+            fullWidth
             value={eventTime}
             onChange={(e) => setEventTime(e.target.value)}
-            className="w-full"
+            margin="dense"
+            type="time" // Allows time selection in a standard time picker
+            required
           />
           <TextField
             label="Note"
-            variant="outlined"
-            multiline
-            rows={4}
+            fullWidth
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="w-full"
+            margin="dense"
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsDialogOpen(false)} color="secondary">
+          <Button onClick={() => setIsDialogOpen(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleAddOrEditEvent} color="primary">
-            {editingEventId ? "Update Event" : "Add Event"}
+          <Button onClick={handleSubmitEvent} color="primary">
+            {editingEventId ? "Update" : "Add"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -218,7 +224,17 @@ const EventCalendar = () => {
               className="flex justify-between items-center p-2 border-b"
             >
               <div>
-                <strong>{event.event_title}</strong> - {event.event_time}
+                <strong>{event.event_title}</strong> -{" "}
+                {new Date(event.event_datetime).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}{" "}
+                at{" "}
+                {new Date(event.event_datetime).toLocaleTimeString("en-US", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
                 <br />
                 <span className="text-gray-600">{event.note}</span>
               </div>
@@ -245,7 +261,7 @@ const EventCalendar = () => {
         </ul>
       </div>
 
-      {/* Snackbar for alerts */}
+      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

@@ -1,31 +1,22 @@
-// Sidebar.jsx
-
 import React, { useState } from "react";
 import { Avatar, Tooltip } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
-import BookIcon from "@mui/icons-material/Book";
-import GridViewIcon from "@mui/icons-material/GridView";
+import { Link, useNavigate } from "react-router-dom";
+
 import Logout from "@mui/icons-material/Logout";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import MenuIcon from "@mui/icons-material/Menu";
-import SidebarOption from "./SidebarOption";
-import AdminOptions from "./AdminOptions";
 import CoursesSidebar from "./CoursesSidebar";
 import SectionsSidebar from "./SectionsSidebar";
-import { img } from "framer-motion/client";
 import {
   AdminPanelSettingsOutlined,
   ClassOutlined,
-  Home,
-  HomeMiniOutlined,
   HomeOutlined,
+  ManageAccountsOutlined,
   MenuBookOutlined,
 } from "@mui/icons-material";
 
 const Sidebar = ({ user, logout }) => {
   const navigate = useNavigate();
-  const [active, setIsActive] = useState("Dashboard");
+  const [active, setActive] = useState("Dashboard");
   const [showCourses, setShowCourses] = useState(false);
   const [showSections, setShowSections] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -45,23 +36,37 @@ const Sidebar = ({ user, logout }) => {
 
   const handleCoursesClick = () => {
     setShowCourses((prev) => !prev);
-    setShowSections(false); // Ensure only one sidebar is open at a time
-    setIsActive("Courses");
+    setShowSections(false);
+    setActive("Courses");
   };
-
+  const handleAdminClick = () => {
+    setShowCourses(false);
+    setShowSections(false);
+    setActive("Admin");
+  };
+  const handleManageClick = () => {
+    setShowCourses(false);
+    setShowSections(false);
+    setActive("Manage");
+  };
+  const handleDashboardClick = () => {
+    setShowCourses(false);
+    setShowSections(false);
+    setActive("Dashboard");
+  };
   const handleSectionsClick = () => {
     setShowSections((prev) => !prev);
-    setShowCourses(false); // Ensure only one sidebar is open at a time
-    setIsActive("Sections");
+    setShowCourses(false);
+    setActive("Sections");
   };
 
   const handleCourseSelect = (course) => {
-    setIsActive(course);
+    setActive(course);
     navigate(`/course/${course}`);
   };
 
   const handleSectionSelect = (section) => {
-    setIsActive(section);
+    setActive(section);
     navigate(`/section/${section}`);
   };
 
@@ -95,7 +100,15 @@ const Sidebar = ({ user, logout }) => {
           </Tooltip>
         </div>
         <div className="flex flex-row items-center justify-center w-[90%] gap-1 p-2 rounded-md border border-white">
-          {user.avatar ? <img src={user.avatar} /> : <Avatar />}
+          {user.avatar ? (
+            <img
+              src={user.avatar}
+              alt="User Avatar"
+              className="w-10 h-10 rounded-full"
+            />
+          ) : (
+            <Avatar sx={{ width: 40, height: 40 }} />
+          )}
           <div className="flex flex-col items-center justify-center">
             {!isCollapsed && (
               <Tooltip title="User Name">
@@ -115,44 +128,72 @@ const Sidebar = ({ user, logout }) => {
             isCollapsed ? "items-center" : ""
           } w-full text-white text-lg h-full`}
         >
-          <SidebarOption
-            title="dashboard"
+          <Link
+            onClick={handleDashboardClick}
             to="/Dashboard"
-            icon={<HomeOutlined />}
-            isCollapsed={isCollapsed}
-            active={active}
-            setIsActive={setIsActive}
-          />
+            className={`flex flex-row hover:bg-gray-800 gap-2 items-center ${
+              active === "Dashboard"
+                ? "bg-[#000] text-white"
+                : "text-black bg-[#C2E8F8]"
+            } p-3 rounded-md`}
+          >
+            <HomeOutlined />
+            {!isCollapsed && <p className="capitalize">Dashboard</p>}
+          </Link>
           {user.role === "student" && (
             <div
               onClick={handleCoursesClick}
-              className={`flex bg-[#C2E8F8] flex-row hover:bg-gray-800 gap-2 items-center ${
-                active === "Courses" ? "bg-[#000] text-white" : "text-black"
+              className={`flex flex-row hover:bg-gray-800 gap-2 items-center ${
+                active === "Courses"
+                  ? "bg-[#000] text-white"
+                  : "text-black bg-[#C2E8F8]"
               } p-3 rounded-md`}
             >
               <MenuBookOutlined />
-              {!isCollapsed && <p className="capitalize">courses</p>}
+              {!isCollapsed && <p className="capitalize">Courses</p>}
             </div>
           )}
 
           {user.role === "teacher" && (
             <div
               onClick={handleSectionsClick}
-              className={`flex bg-[#C2E8F8] flex-row hover:bg-gray-800 gap-2 items-center ${
-                active === "Sections" ? "bg-[#000] text-white" : "text-black"
+              className={`flex flex-row hover:bg-gray-800 gap-2 items-center ${
+                active === "Sections"
+                  ? "bg-[#000] text-white"
+                  : "text-black bg-[#C2E8F8]"
               } p-3 rounded-md`}
             >
               <ClassOutlined />
-              {!isCollapsed && <p className="capitalize">sections</p>}
+              {!isCollapsed && <p className="capitalize">Sections</p>}
             </div>
           )}
 
           {user.role !== "student" && user.role !== "teacher" && (
-            <AdminOptions
-              isCollapsed={isCollapsed}
-              active={active}
-              setIsActive={setIsActive}
-            />
+            <>
+              <Link
+                onClick={handleAdminClick}
+                className={`flex flex-row hover:bg-gray-800 gap-2 items-center ${
+                  active === "Admin"
+                    ? "bg-[#000] text-white"
+                    : "text-black bg-[#C2E8F8]"
+                } p-3 rounded-md`}
+              >
+                <AdminPanelSettingsOutlined />
+                {!isCollapsed && <p className="capitalize">Admin</p>}
+              </Link>
+
+              <Link
+                onClick={handleManageClick}
+                className={`flex flex-row hover:bg-gray-800 gap-2 items-center ${
+                  active === "Manage"
+                    ? "bg-[#000] text-white"
+                    : "text-black bg-[#C2E8F8]"
+                } p-3 rounded-md`}
+              >
+                <ManageAccountsOutlined />
+                {!isCollapsed && <p className="capitalize">Manage</p>}
+              </Link>
+            </>
           )}
         </div>
 
@@ -171,7 +212,7 @@ const Sidebar = ({ user, logout }) => {
         <CoursesSidebar
           courses={courses}
           active={active}
-          setIsActive={setIsActive}
+          setActive={setActive}
           handleCourseSelect={handleCourseSelect}
           setOpen={setOpen}
         />
@@ -181,7 +222,7 @@ const Sidebar = ({ user, logout }) => {
         <SectionsSidebar
           teacherId={user._id}
           active={active}
-          setIsActive={setIsActive}
+          setActive={setActive}
           handleSectionSelect={handleSectionSelect}
           setOpen={setOpen}
         />

@@ -8,6 +8,7 @@ import { AnotherExample } from "./pages/admin/index";
 import TablePages from "./components/TablePages";
 import CourseDetail from "./components/CourseDetail";
 import Dashboard from "./components/dashboard";
+import UpdateProfile from "./components/UpdateProfile";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path="/anotherExample" element={<AnotherExample />} />
             <Route path="/table" element={<TablePages />} />
             <Route path="/Dashboard" element={<Dashboard />} />
+            <Route path="/updateprofile" element={<UpdateProfile />} />
             <Route path="/course/:courseName" element={<CourseDetail />} />
           </Route>
           <Route path="*" element={<div>Not found</div>} />
