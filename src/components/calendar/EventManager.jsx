@@ -5,6 +5,7 @@ import AddEvent from "./AddEvent";
 import EditEvent from "./EditEvent";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+const apiUrl = "https://backend-production-55e3.up.railway.app";
 
 const EventManager = () => {
   const [events, setEvents] = useState([]);
@@ -18,9 +19,7 @@ const EventManager = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/calendar/events"
-      );
+      const response = await axios.get(`${apiUrl}/api/calendar/events`);
       const filteredEvents = response.data.events.filter(
         (event) =>
           new Date(event.event_date).toDateString() ===
@@ -34,7 +33,7 @@ const EventManager = () => {
 
   const addEvent = async (newEvent) => {
     try {
-      await axios.post("http://localhost:5000/api/calendar/events", {
+      await axios.post(`${apiUrl}/api/calendar/events`, {
         ...newEvent,
         event_date: selectedDate,
       });
@@ -46,10 +45,7 @@ const EventManager = () => {
 
   const updateEvent = async (id, updatedEvent) => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/calendar/events/${id}`,
-        updatedEvent
-      );
+      await axios.put(`${apiUrl}/api/calendar/events/${id}`, updatedEvent);
       fetchEvents();
       setIsEditing(false);
       setCurrentEvent(null);
@@ -60,7 +56,7 @@ const EventManager = () => {
 
   const deleteEvent = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/calendar/events/${id}`);
+      await axios.delete(`${apiUrl}/api/calendar/events/${id}`);
       fetchEvents();
     } catch (error) {
       console.error("Error deleting event", error);

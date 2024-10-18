@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+const apiUrl = "https://backend-production-55e3.up.railway.app";
+
 const SectionsSidebar = ({
   teacherId,
   active,
@@ -15,9 +17,7 @@ const SectionsSidebar = ({
     const fetchSections = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `http://localhost:5000/api/section/${teacherId}`
-        );
+        const response = await axios.get(`${apiUrl}/api/section/${teacherId}`);
         setSections(response.data);
       } catch (err) {
         setError("Error fetching sections");

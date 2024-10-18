@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+const apiUrl = "https://backend-production-55e3.up.railway.app";
 
 const EventCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -36,7 +37,7 @@ const EventCalendar = () => {
     try {
       const formattedDate = date.toISOString().split("T")[0]; // Format date to 'YYYY-MM-DD'
       const response = await axios.get(
-        `http://localhost:5000/api/calendar/events/${formattedDate}`
+        `${apiUrl}/api/calendar/events/${formattedDate}`
       );
       setEvents(response.data);
     } catch (error) {
@@ -46,7 +47,7 @@ const EventCalendar = () => {
   };
 
   const handleDateClick = (date) => {
-    setSelectedDate(date); // Set the selected date when the user clicks on a day
+    setSelectedDate(date);
   };
 
   const handleOpenDialog = () => {
@@ -82,22 +83,17 @@ const EventCalendar = () => {
 
     try {
       if (editingEventId) {
-        // Update existing event
         await axios.put(
-          `http://localhost:5000/api/calendar/events/${editingEventId}`,
+          `${apiUrl}/api/calendar/events/${editingEventId}`,
           eventData
         );
         showSnackbar("Event updated successfully!", "success");
       } else {
-        // Add new event
-        await axios.post(
-          "http://localhost:5000/api/calendar/events",
-          eventData
-        );
+        await axios.post(`${apiUrl}/api/calendar/events`, eventData);
         showSnackbar("Event added successfully!", "success");
       }
-      fetchEvents(selectedDate); // Refresh events after adding/updating
-      setIsDialogOpen(false); // Close dialog
+      fetchEvents(selectedDate);
+      setIsDialogOpen(false);
     } catch (error) {
       console.error("Error adding/updating event:", error);
       showSnackbar("Error adding/updating event", "error");
@@ -106,9 +102,9 @@ const EventCalendar = () => {
 
   const handleDeleteEvent = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/calendar/events/${id}`);
+      await axios.delete(`${apiUrl}/api/calendar/events/${id}`);
       showSnackbar("Event deleted successfully!", "success");
-      fetchEvents(selectedDate); // Refresh events after deletion
+      fetchEvents(selectedDate);
     } catch (error) {
       console.error("Error deleting event:", error);
       showSnackbar("Error deleting event", "error");
@@ -136,7 +132,7 @@ const EventCalendar = () => {
     const eventCount = getEventCountForDate(date);
     if (eventCount === 0) return null;
 
-    const colors = ["#FF6347", "#FFD700", "#4CAF50"]; // Define colors for dots
+    const colors = ["#FF6347", "#FFD700", "#4CAF50"];
     const dots = Array.from({ length: Math.min(eventCount, 3) }, (_, i) => (
       <span
         key={i}
@@ -163,7 +159,6 @@ const EventCalendar = () => {
         className="react-calendar"
       />
 
-      {/* Dialog for adding/editing events */}
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
         <DialogTitle>{editingEventId ? "Edit Event" : "Add Event"}</DialogTitle>
         <DialogContent>
@@ -181,7 +176,7 @@ const EventCalendar = () => {
             value={eventTime}
             onChange={(e) => setEventTime(e.target.value)}
             margin="dense"
-            type="time" // Allows time selection in a standard time picker
+            type="time"
             required
           />
           <TextField
@@ -202,7 +197,6 @@ const EventCalendar = () => {
         </DialogActions>
       </Dialog>
 
-      {/* List of events for the selected date */}
       <div className="mt-4 w-full">
         <h3 className="text-lg font-bold text-white">
           {selectedDate.toDateString()}
@@ -261,7 +255,6 @@ const EventCalendar = () => {
         </ul>
       </div>
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

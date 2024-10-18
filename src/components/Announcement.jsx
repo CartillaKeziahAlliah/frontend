@@ -31,6 +31,7 @@ import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
 
 import Swal from "sweetalert2";
+const apiUrl = "https://backend-production-55e3.up.railway.app";
 
 const AnnouncementApp = () => {
   const [title, setTitle] = useState("");
@@ -52,16 +53,13 @@ const AnnouncementApp = () => {
     };
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/announcements/${user._id}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(announcementData),
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/announcements/${user._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(announcementData),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to create announcement");
@@ -84,9 +82,7 @@ const AnnouncementApp = () => {
 
   const fetchSections = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/section/${user._id}`
-      );
+      const response = await axios.get(`${apiUrl}/api/section/${user._id}`);
       console.log("Sections", response.data);
       setSections(response.data);
     } catch (error) {
@@ -96,7 +92,7 @@ const AnnouncementApp = () => {
 
   const fetchAnnouncements = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/announcements`);
+      const response = await fetch(`${apiUrl}/api/announcements`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch announcements");
@@ -121,12 +117,9 @@ const AnnouncementApp = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(
-            `http://localhost:5000/api/announcements/${id}`,
-            {
-              method: "DELETE",
-            }
-          );
+          const response = await fetch(`${apiUrl}/api/announcements/${id}`, {
+            method: "DELETE",
+          });
 
           if (!response.ok) {
             throw new Error("Failed to delete announcement");
@@ -148,12 +141,9 @@ const AnnouncementApp = () => {
 
   const handleMarkAsRead = async (id) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/announcements/read/${id}`,
-        {
-          method: "PATCH",
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/announcements/read/${id}`, {
+        method: "PATCH",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to mark announcement as read");
@@ -169,12 +159,9 @@ const AnnouncementApp = () => {
 
   const handleMarkAllAsRead = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/announcements/readAll`,
-        {
-          method: "PATCH",
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/announcements/readAll`, {
+        method: "PATCH",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to mark all announcements as read");

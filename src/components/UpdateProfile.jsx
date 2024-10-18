@@ -61,7 +61,7 @@ const UpdateProfile = () => {
       if (avatar) formDataToSubmit.append("avatar", avatar);
 
       const response = await axios.put(
-        "http://localhost:5000/api/users/updateprofile",
+        `${apiUrl}/api/users/updateprofile`,
         formDataToSubmit,
         config
       );

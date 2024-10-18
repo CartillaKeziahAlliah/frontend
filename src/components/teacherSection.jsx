@@ -31,9 +31,7 @@ const SubjectsList = ({ teacherId }) => {
     const fetchSubjects = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `http://localhost:5000/api/subject/${teacherId}`
-        );
+        const response = await axios.get(`${apiUrl}/api/subject/${teacherId}`);
         setSubjects(response.data);
       } catch (err) {
         setError("Error fetching subjects");
