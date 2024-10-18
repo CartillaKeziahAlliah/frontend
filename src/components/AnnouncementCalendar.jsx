@@ -23,19 +23,18 @@ const EventCalendar = () => {
   const [eventTime, setEventTime] = useState("");
   const [note, setNote] = useState("");
   const [editingEventId, setEditingEventId] = useState(null);
-  const { user } = useAuth(); // Assuming useAuth gives you the user role
+  const { user } = useAuth();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
-  // Fetch events when the component loads and when the selected date changes
   useEffect(() => {
     fetchEvents(selectedDate);
   }, [selectedDate]);
 
   const fetchEvents = async (date) => {
     try {
-      const formattedDate = date.toISOString().split("T")[0]; // Format date to 'YYYY-MM-DD'
+      const formattedDate = date.toISOString().split("T")[0];
       const response = await axios.get(
         `${apiUrl}/api/calendar/events/${formattedDate}`
       );
@@ -212,46 +211,58 @@ const EventCalendar = () => {
           </Button>
         )}
         <ul className="mt-2 bg-white rounded-lg shadow-md p-4">
-          {events.map((event) => (
-            <li
-              key={event._id}
-              className="flex justify-between items-center p-2 border-b"
-            >
-              <div>
-                <strong>{event.event_title}</strong> -{" "}
-                {new Date(event.event_datetime).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}{" "}
-                at{" "}
-                {new Date(event.event_datetime).toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-                <br />
-                <span className="text-gray-600">{event.note}</span>
-              </div>
-              {user.role !== "student" && (
-                <div className="flex flex-row">
-                  <Button
-                    onClick={() => handleEditEvent(event)}
-                    color="primary"
-                    size="small"
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    onClick={() => handleDeleteEvent(event._id)}
-                    color="secondary"
-                    size="small"
-                  >
-                    Delete
-                  </Button>
-                </div>
-              )}
-            </li>
-          ))}
+          {events.length === 0 ? (
+            <div className="text-center">No events for the selected date!</div>
+          ) : (
+            <>
+              {events.map((event) => (
+                <li
+                  key={event._id}
+                  className="flex justify-between items-center p-2 border-b"
+                >
+                  <div>
+                    <strong>{event.event_title}</strong> -{" "}
+                    {new Date(event.event_datetime).toLocaleDateString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }
+                    )}{" "}
+                    at{" "}
+                    {new Date(event.event_datetime).toLocaleTimeString(
+                      "en-US",
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    )}
+                    <br />
+                    <span className="text-gray-600">{event.note}</span>
+                  </div>
+                  {user.role !== "student" && (
+                    <div className="flex flex-row">
+                      <Button
+                        onClick={() => handleEditEvent(event)}
+                        color="primary"
+                        size="small"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteEvent(event._id)}
+                        color="secondary"
+                        size="small"
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </>
+          )}
         </ul>
       </div>
 

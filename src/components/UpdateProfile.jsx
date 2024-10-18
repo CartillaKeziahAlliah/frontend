@@ -1,5 +1,18 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
+import { FaEdit } from "react-icons/fa";
+import {
+  Box,
+  TextField,
+  Button,
+  Avatar,
+  IconButton,
+  CircularProgress,
+  Typography,
+  Alert,
+} from "@mui/material";
+const apiUrl = "https://backend-production-55e3.up.railway.app";
 
 const UpdateProfile = () => {
   const [formData, setFormData] = useState({
@@ -8,12 +21,14 @@ const UpdateProfile = () => {
     password: "",
     avatar: null,
   });
-
+  const { user } = useAuth();
   const { name, email, password, avatar } = formData;
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [preview, setPreview] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false); // Toggle for edit mode
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -68,6 +83,8 @@ const UpdateProfile = () => {
 
       setSuccessMessage("Profile updated successfully!");
       setPreview(null);
+      setIsEditMode(false); // Exit edit mode on success
+      window.location.reload();
     } catch (error) {
       console.error(error);
       setErrorMessage(error.response?.data?.error || "Error updating profile");
@@ -76,115 +93,149 @@ const UpdateProfile = () => {
     }
   };
 
+  const triggerEditMode = () => {
+    setFormData({
+      ...formData,
+      name: user.name || "",
+      email: user.email || "",
+    });
+    setIsEditMode(true);
+  };
+
   return (
-    <div className="update-profile-form">
-      <h2>Update Profile</h2>
-      {errorMessage && <p className="error">{errorMessage}</p>}
-      {successMessage && <p className="success">{successMessage}</p>}
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      mt={10}
+      p={3}
+    >
+      {isEditMode ? (
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            backgroundColor: "white",
+            p: 4,
+            borderRadius: 2,
+            boxShadow: 2,
+            width: "100%",
+            maxWidth: "500px",
+          }}
+        >
+          <Typography variant="h4" fontWeight="bold" mb={2}>
+            Update Profile
+          </Typography>
 
-      <form onSubmit={handleSubmit}>
-        {/* Name Input */}
-        <div>
-          <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={name}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+          {successMessage && <Alert severity="success">{successMessage}</Alert>}
 
-        {/* Email Input */}
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Password Input */}
-        <div>
-          <label htmlFor="password">Password (Optional)</label>
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Profile Picture Input */}
-        <div>
-          <label htmlFor="profilePicture">Profile Picture (Optional)</label>
-          <input type="file" name="avatar" onChange={handleFileChange} />
-        </div>
-
-        {/* Profile Picture Preview */}
-        {preview && (
-          <div>
-            <img
-              src={preview}
-              alt="Profile Preview"
-              style={{
-                width: "150px",
-                height: "150px",
-                borderRadius: "50%",
-                objectFit: "cover",
-                margin: "10px 0",
-              }}
+          <Box mb={2}>
+            <TextField
+              fullWidth
+              label="Name"
+              name="name"
+              value={name}
+              onChange={handleChange}
+              required
+              variant="outlined"
             />
-          </div>
-        )}
+          </Box>
 
-        {/* Submit Button */}
-        <button type="submit" disabled={loading}>
-          {loading ? (
-            <span>
-              <span className="spinner"></span> Updating...
-            </span>
-          ) : (
-            "Update Profile"
+          <Box mb={2}>
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              value={email}
+              onChange={handleChange}
+              required
+              type="email"
+              variant="outlined"
+            />
+          </Box>
+
+          <Box mb={2}>
+            <TextField
+              fullWidth
+              label="Password (Optional)"
+              name="password"
+              value={password}
+              onChange={handleChange}
+              type="password"
+              variant="outlined"
+            />
+          </Box>
+
+          <Box mb={2}>
+            <Button variant="contained" component="label">
+              Upload Profile Picture (Optional)
+              <input type="file" hidden onChange={handleFileChange} />
+            </Button>
+          </Box>
+
+          {preview && (
+            <Box textAlign="center" mb={2}>
+              <Avatar
+                src={preview}
+                sx={{ width: 100, height: 100, mx: "auto" }}
+              />
+            </Box>
           )}
-        </button>
-      </form>
 
-      <style>
-        {`
-          .spinner {
-            border: 3px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #09f;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            display: inline-block;
-            margin-right: 5px;
-            animation: spin 0.6s linear infinite;
-          }
-
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-
-          .error {
-            color: red;
-            font-size: 14px;
-            margin-bottom: 10px;
-          }
-
-          .success {
-            color: green;
-            font-size: 14px;
-            margin-bottom: 10px;
-          }
-        `}
-      </style>
-    </div>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            disabled={loading}
+            sx={{ mt: 2 }}
+          >
+            {loading ? <CircularProgress size={24} /> : "Update Profile"}
+          </Button>
+        </Box>
+      ) : (
+        <Box textAlign="center">
+          <Box position="relative">
+            {user?.avatar ? (
+              <Avatar
+                src={user.avatar}
+                sx={{ width: 128, height: 128, mx: "auto" }}
+              />
+            ) : (
+              <Avatar
+                sx={{
+                  width: 128,
+                  height: 128,
+                  mx: "auto",
+                  backgroundColor: "grey.300",
+                }}
+              />
+            )}
+            <IconButton
+              onClick={triggerEditMode}
+              sx={{
+                position: "absolute",
+                bottom: 0,
+                right: 0,
+                bgcolor: "primary.main",
+                color: "white",
+                "&:hover": { bgcolor: "primary.dark" },
+              }}
+            >
+              <FaEdit />
+            </IconButton>
+          </Box>
+          <Typography variant="h6" mt={2}>
+            {user?.name || "Your Name"}
+          </Typography>
+          <Typography variant="body1" color="textSecondary">
+            {user?.email || "your.email@example.com"}
+          </Typography>
+        </Box>
+      )}
+    </Box>
   );
 };
 

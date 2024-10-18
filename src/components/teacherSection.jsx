@@ -6,6 +6,7 @@ import {
   CardContent,
   Typography,
   CircularProgress,
+  Box,
 } from "@mui/material";
 
 const getRandomPastelColor = () => {
@@ -21,6 +22,7 @@ const getRandomPastelColor = () => {
   ];
   return colors[Math.floor(Math.random() * colors.length)];
 };
+
 const apiUrl = "https://backend-production-55e3.up.railway.app";
 
 const SubjectsList = ({ teacherId }) => {
@@ -35,7 +37,7 @@ const SubjectsList = ({ teacherId }) => {
         const response = await axios.get(`${apiUrl}/api/subject/${teacherId}`);
         setSubjects(response.data);
       } catch (err) {
-        setError("Error fetching subjects");
+        setError();
         console.error(err);
       } finally {
         setLoading(false);
@@ -51,14 +53,21 @@ const SubjectsList = ({ teacherId }) => {
   return (
     <div className="flex-1 p-4">
       {subjects.length === 0 ? (
-        <Typography>No subjects found.</Typography>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          height="100%"
+          sx={{ boxShadow: "0 2px 2px gray" }}
+        >
+          <Typography variant="h6">No subjects found for this user</Typography>
+        </Box>
       ) : (
         <Grid container spacing={2}>
           {subjects.map((subject) => {
             const cardColor = getRandomPastelColor();
             return (
               <Grid item xs={12} sm={6} md={4} key={subject._id}>
-                {" "}
                 <Card
                   style={{
                     backgroundColor: cardColor,
@@ -66,24 +75,21 @@ const SubjectsList = ({ teacherId }) => {
                   }}
                 >
                   <CardContent>
-                    <Typography variant="h5">{subject.subject_name}</Typography>{" "}
+                    <Typography variant="h5">{subject.subject_name}</Typography>
                     <Typography variant="body2">
                       Section:{" "}
                       {subject.section ? subject.section.section_name : "N/A"}{" "}
                     </Typography>
                     <Typography variant="body2">
-                      Start:
-                      {subject.section
-                        ? subject.section.start_time
-                        : "N/A"}{" "}
+                      Start:{" "}
+                      {subject.section ? subject.section.start_time : "N/A"}
                     </Typography>
                     <Typography variant="body2">
-                      End:
-                      {subject.section ? subject.section.end_time : "N/A"}{" "}
+                      End: {subject.section ? subject.section.end_time : "N/A"}
                     </Typography>
                     <Typography variant="body2">
-                      Schedule:
-                      {subject.section ? subject.section.schedule : "N/A"}{" "}
+                      Schedule:{" "}
+                      {subject.section ? subject.section.schedule : "N/A"}
                     </Typography>
                   </CardContent>
                 </Card>

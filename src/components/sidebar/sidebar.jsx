@@ -12,6 +12,7 @@ import {
   HomeOutlined,
   ManageAccountsOutlined,
   MenuBookOutlined,
+  Person2Outlined,
 } from "@mui/icons-material";
 
 const Sidebar = ({ user, logout }) => {
@@ -33,7 +34,11 @@ const Sidebar = ({ user, logout }) => {
     "Arts",
     "Physical Education",
   ]);
-
+  const handleAccountClick = () => {
+    setShowCourses(false);
+    setShowSections(false);
+    setActive("Account");
+  };
   const handleCoursesClick = () => {
     setShowCourses((prev) => !prev);
     setShowSections(false);
@@ -195,6 +200,18 @@ const Sidebar = ({ user, logout }) => {
               </Link>
             </>
           )}
+          <Link
+            onClick={handleAccountClick}
+            to="/updateprofile"
+            className={`flex flex-row hover:bg-gray-800 gap-2 items-center ${
+              active === "Account"
+                ? "bg-[#000] text-white"
+                : "text-black bg-[#C2E8F8]"
+            } p-3 rounded-md`}
+          >
+            <Person2Outlined />
+            {!isCollapsed && <p className="capitalize">My Account</p>}
+          </Link>
         </div>
 
         <div className="text-white w-full px-4 pb-4">
