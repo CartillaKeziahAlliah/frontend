@@ -13,15 +13,12 @@ const UpdateProfile = () => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [preview, setPreview] = useState(null); // For profile picture preview
-
-  // Handle form input changes
+  const [preview, setPreview] = useState(null);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle profile picture change and preview
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -33,18 +30,16 @@ const UpdateProfile = () => {
       }
 
       setFormData({ ...formData, avatar: file });
-      setPreview(URL.createObjectURL(file)); // Set the preview
+      setPreview(URL.createObjectURL(file));
     }
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setErrorMessage("");
     setSuccessMessage("");
 
-    // Basic form validation
     if (!name || !email) {
       setErrorMessage("Name and email are required.");
       setLoading(false);
@@ -72,9 +67,9 @@ const UpdateProfile = () => {
       );
 
       setSuccessMessage("Profile updated successfully!");
-      setPreview(null); // Clear preview on success
+      setPreview(null);
     } catch (error) {
-      console.error(error); // Log the full error
+      console.error(error);
       setErrorMessage(error.response?.data?.error || "Error updating profile");
     } finally {
       setLoading(false);

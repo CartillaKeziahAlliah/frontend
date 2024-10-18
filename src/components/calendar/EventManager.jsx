@@ -14,13 +14,13 @@ const EventManager = () => {
 
   useEffect(() => {
     fetchEvents();
-  }, [selectedDate]); // Fetch events whenever the selected date changes
+  }, [selectedDate]);
 
   const fetchEvents = async () => {
     try {
       const response = await axios.get(
         "http://localhost:5000/api/calendar/events"
-      ); // Adjust the API endpoint as necessary
+      );
       const filteredEvents = response.data.events.filter(
         (event) =>
           new Date(event.event_date).toDateString() ===
@@ -52,7 +52,7 @@ const EventManager = () => {
       );
       fetchEvents();
       setIsEditing(false);
-      setCurrentEvent(null); // Clear the current event after editing
+      setCurrentEvent(null);
     } catch (error) {
       console.error("Error updating event", error);
     }
@@ -84,7 +84,7 @@ const EventManager = () => {
         <Calendar
           onChange={setSelectedDate}
           value={selectedDate}
-          className="mx-auto" // Center the calendar
+          className="mx-auto"
         />
       </div>
       <div className="mb-5">

@@ -35,7 +35,7 @@ export default function MultilineTextFields() {
   };
 
   const handleSubmit = (event) => {
-    event.preventDefault(); // Prevent the default form submission
+    event.preventDefault();
     console.log("Submitted:", {
       teacherName,
       TRN,
@@ -65,7 +65,6 @@ export default function MultilineTextFields() {
       noValidate
       autoComplete="off"
     >
-      {/* Flex container for Teacher Name and TRN */}
       <Box
         sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}
       >
@@ -89,7 +88,6 @@ export default function MultilineTextFields() {
         />
       </Box>
 
-      {/* Flex container for Section, Subject, and Grade Level */}
       <Box
         sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}
       >

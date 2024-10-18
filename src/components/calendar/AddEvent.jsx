@@ -16,7 +16,7 @@ const AddEvent = ({ addEvent }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     addEvent(event);
-    setEvent({ event_title: "", event_time: "", note: "", student: "" }); // Reset form
+    setEvent({ event_title: "", event_time: "", note: "", student: "" });
   };
 
   return (

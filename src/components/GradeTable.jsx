@@ -5,12 +5,11 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 
-// Define your columns
 const columns = [
-  { field: "gradeid", headerName: "ID", flex: 0.3 }, // Use flex for responsive width
-  { field: "gradeLevel", headerName: "Grade", flex: 0.7 }, // Use flex for responsive width
+  { field: "gradeid", headerName: "ID", flex: 0.3 },
+  { field: "gradeLevel", headerName: "Grade", flex: 0.7 },
   {
-    field: "actions", // New column for actions
+    field: "actions",
     headerName: "Actions",
     flex: 1,
     renderCell: (params) => (
@@ -21,17 +20,16 @@ const columns = [
           color="primary"
           size="small"
           onClick={() => handleEdit(params.id)}
-          sx={{ mr: 1, minWidth: 70 }} // Ensure button has a minimum width
+          sx={{ mr: 1, minWidth: 70 }}
         >
           Edit
         </Button>
-        {/* Delete Button */}
         <Button
           variant="contained"
           color="secondary"
           size="small"
           onClick={() => handleDelete(params.id)}
-          sx={{ minWidth: 70 }} // Ensure button has a minimum width
+          sx={{ minWidth: 70 }}
         >
           Delete
         </Button>
@@ -40,14 +38,10 @@ const columns = [
   },
 ];
 
-// Define your rows
-const rows = [
-  { id: 1, gradeLevel: 10 }, // Update your data according to the grades
-];
+const rows = [{ id: 1, gradeLevel: 10 }];
 
 const paginationModel = { page: 0, pageSize: 2 };
 
-// Define the event handlers
 const handleEdit = (id) => {
   console.log(`Edit row with id: ${id}`);
 };
@@ -59,9 +53,6 @@ const handleDelete = (id) => {
 export default function GradeTable() {
   return (
     <div className="w-full">
-      {" "}
-      {/* Tailwind CSS for full width and padding */}
-      {/* Title outside of the Paper component */}
       <Typography
         variant="h4"
         component="div"
@@ -76,11 +67,11 @@ export default function GradeTable() {
           initialState={{ pagination: { paginationModel } }}
           pageSizeOptions={[1, 2]}
           checkboxSelection
-          autoHeight // Automatically adjusts height based on content
+          autoHeight
           sx={{
             border: 0,
             "@media (max-width: 600px)": {
-              ".MuiDataGrid-columnHeader": { fontSize: "0.8rem" }, // Smaller font on small screens
+              ".MuiDataGrid-columnHeader": { fontSize: "0.8rem" },
               ".MuiDataGrid-cell": { fontSize: "0.8rem" },
             },
           }}
