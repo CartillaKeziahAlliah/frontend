@@ -71,8 +71,8 @@ const Sidebar = ({ user, logout }) => {
   };
 
   const handleSectionSelect = (section) => {
-    setActive(section);
-    navigate(`/section/${section}`);
+    setActive(section.section_name);
+    navigate(`/section/${section._id}`);
   };
 
   const toggleMenu = () => {

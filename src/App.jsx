@@ -9,6 +9,7 @@ import TablePages from "./components/TablePages";
 import CourseDetail from "./components/CourseDetail";
 import Dashboard from "./components/dashboard";
 import UpdateProfile from "./components/UpdateProfile";
+import SectionDetail from "./components/SectionsDetails";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/Dashboard" element={<Dashboard />} />
             <Route path="/updateprofile" element={<UpdateProfile />} />
             <Route path="/course/:courseName" element={<CourseDetail />} />
+            <Route path="/section/:sectionName" element={<SectionDetail />} />
           </Route>
           <Route path="*" element={<div>Not found</div>} />
         </Routes>

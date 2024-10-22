@@ -39,7 +39,7 @@ const SectionsSidebar = ({
         <div>
           {sections.map((section) => (
             <div
-              key={section._id}
+              key={section}
               onClick={() => handleSectionSelect(section)}
               className={`p-2 hover:bg-gray-300 rounded flex items-center gap-2 ${
                 active === section ? "bg-[#4a8e8b]" : ""
