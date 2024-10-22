@@ -30,10 +30,8 @@ export default function MultilineTextFields() {
   };
 
   const handleSubmit = (event) => {
-    event.preventDefault(); // Prevent the default form submission
-    // Add your submission logic here
+    event.preventDefault(); 
     console.log("Submitted:", { studentName, LRN, section, gradeLevel });
-    // Optionally reset the form fields
     setStudentName("");
     setLRN("");
     setSection("");

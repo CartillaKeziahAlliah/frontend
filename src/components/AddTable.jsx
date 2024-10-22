@@ -18,7 +18,7 @@ export default function AddTable() {
     <Box
       sx={{
         width: "100%",
-        p: { xs: 1, sm: 2 }, // Responsive padding
+        p: { xs: 1, sm: 2 }, 
         display: "flex",
         flexDirection: "column",
       }}
@@ -31,7 +31,7 @@ export default function AddTable() {
         aria-label="add table tabs"
         sx={{
           flexGrow: 1,
-          justifyContent: "center", // Center tabs
+          justifyContent: "center", 
         }}
       >
         <Tab label="Add Grade" />
@@ -46,8 +46,8 @@ export default function AddTable() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          flexDirection: { xs: "column", sm: "row" }, // Stack vertically on small screens
-          gap: 2, // Space between components
+          flexDirection: { xs: "column", sm: "row" }, 
+          gap: 2, 
         }}
       >
         {activeTab === 0 && <AddGrade />}

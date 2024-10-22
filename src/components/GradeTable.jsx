@@ -14,7 +14,6 @@ const columns = [
     flex: 1,
     renderCell: (params) => (
       <Box display="flex" justifyContent="space-between">
-        {/* Edit Button */}
         <Button
           variant="contained"
           color="primary"
