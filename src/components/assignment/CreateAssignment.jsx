@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import {
   TextField,
@@ -19,7 +19,7 @@ import {
 
 const apiUrl = "http://localhost:5000"; // Your API URL
 
-const CreateExam = ({ selectedSubject, onclick }) => {
+const CreateAssignment = ({ selectedSubject, onclick }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState([
@@ -30,12 +30,19 @@ const CreateExam = ({ selectedSubject, onclick }) => {
     },
   ]);
   const [duration, setDuration] = useState("");
-  const [totalMarks, setTotalMarks] = useState("");
   const [passMarks, setPassMarks] = useState("");
+  const [deadline, setDeadline] = useState(""); // New state for deadline
+  const [totalMarks, setTotalMarks] = useState(0); // Initialize total marks to 0
   const [questionErrors, setQuestionErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
   const [previewVisible, setPreviewVisible] = useState(false);
   const errorRefs = useRef([]);
+
+  // Effect to calculate total marks whenever questions change
+  useEffect(() => {
+    const total = questions.reduce((sum, question) => sum + question.marks, 0);
+    setTotalMarks(total);
+  }, [questions]);
 
   const handleQuestionChange = (index, field, value) => {
     const updatedQuestions = [...questions];
@@ -128,19 +135,23 @@ const CreateExam = ({ selectedSubject, onclick }) => {
       return;
     }
 
-    // Prepare the exam data
-    const examData = {
+    // Prepare the assignment data
+    const assignmentData = {
       title,
       description,
       subject: selectedSubject._id,
       questions,
       duration: Number(duration), // Convert duration to number
-      totalMarks: Number(totalMarks), // Convert total marks to number
+      totalMarks, // Use the auto-calculated total marks
       passMarks: Number(passMarks), // Convert pass marks to number
+      deadline, // Include deadline
     };
 
     try {
-      const response = await axios.post(`${apiUrl}/api/exam`, examData);
+      const response = await axios.post(
+        `${apiUrl}/api/assignment`,
+        assignmentData
+      ); // Change endpoint to assignment
       setSuccessMessage(response.data.message);
       // Clear form fields after successful submission
       setTitle("");
@@ -153,11 +164,11 @@ const CreateExam = ({ selectedSubject, onclick }) => {
         },
       ]);
       setDuration("");
-      setTotalMarks("");
       setPassMarks("");
+      setDeadline(""); // Clear deadline after submission
     } catch (error) {
       setQuestionErrors({
-        general: error.response?.data?.message || "Failed to create exam",
+        general: error.response?.data?.message || "Failed to create assignment",
       });
     }
   };
@@ -192,7 +203,7 @@ const CreateExam = ({ selectedSubject, onclick }) => {
         ))}
         <Typography variant="body2">
           Duration: {duration} minutes | Total Marks: {totalMarks} | Pass Marks:{" "}
-          {passMarks}
+          {passMarks} | Deadline: {deadline}
         </Typography>
       </Box>
     );
@@ -202,7 +213,9 @@ const CreateExam = ({ selectedSubject, onclick }) => {
     <Box sx={{ padding: 3, backgroundColor: "#f9f9f9", borderRadius: 2 }}>
       <Button onClick={onclick}>Close</Button>
       <Card>
-        <CardHeader title={`Create Exam for ${selectedSubject.subject_name}`} />
+        <CardHeader
+          title={`Create Assignment for ${selectedSubject.subject_name}`}
+        />
         <Divider />
         <CardContent>
           <form onSubmit={handleSubmit}>
@@ -268,192 +281,144 @@ const CreateExam = ({ selectedSubject, onclick }) => {
                       Options
                     </Typography>
                     {question.options.map((option, optionIndex) => (
-                      <Grid
-                        container
-                        spacing={1}
-                        key={optionIndex}
-                        sx={{ mb: 1 }}
-                      >
-                        <Grid item xs={12}>
-                          <TextField
-                            label="Option"
-                            variant="outlined"
-                            fullWidth
-                            value={option.optionText}
-                            onChange={(e) =>
-                              handleOptionChange(
-                                questionIndex,
-                                optionIndex,
-                                "optionText",
-                                e.target.value
-                              )
-                            }
-                            required
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={option.isCorrect}
-                                onChange={(e) =>
-                                  handleOptionChange(
-                                    questionIndex,
-                                    optionIndex,
-                                    "isCorrect",
-                                    e.target.checked
-                                  )
-                                }
-                              />
-                            }
-                            label="Correct Answer"
-                          />
-                          <Button
-                            variant="outlined"
-                            color="secondary"
-                            onClick={() =>
-                              handleRemoveOption(questionIndex, optionIndex)
-                            }
-                          >
-                            Remove Option
-                          </Button>
-                        </Grid>
-                      </Grid>
+                      <Box key={optionIndex} mb={1}>
+                        <TextField
+                          label={`Option ${optionIndex + 1}`}
+                          variant="outlined"
+                          fullWidth
+                          value={option.optionText}
+                          onChange={(e) =>
+                            handleOptionChange(
+                              questionIndex,
+                              optionIndex,
+                              "optionText",
+                              e.target.value
+                            )
+                          }
+                          required
+                          sx={{ mb: 1 }}
+                        />
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={option.isCorrect}
+                              onChange={(e) =>
+                                handleOptionChange(
+                                  questionIndex,
+                                  optionIndex,
+                                  "isCorrect",
+                                  e.target.checked
+                                )
+                              }
+                            />
+                          }
+                          label="Correct Option"
+                        />
+                        <Button
+                          variant="outlined"
+                          onClick={() =>
+                            handleRemoveOption(questionIndex, optionIndex)
+                          }
+                        >
+                          Remove Option
+                        </Button>
+                      </Box>
                     ))}
                     <Button
                       variant="outlined"
-                      color="primary"
                       onClick={() => handleAddOption(questionIndex)}
                     >
                       Add Option
                     </Button>
                   </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      label="Marks"
+                      type="number"
+                      variant="outlined"
+                      value={question.marks}
+                      onChange={(e) =>
+                        handleQuestionChange(
+                          questionIndex,
+                          "marks",
+                          e.target.value
+                        )
+                      }
+                      required
+                      fullWidth
+                      sx={{ mb: 2 }}
+                    />
+                  </Grid>
                 </Grid>
-                <TextField
-                  label="Marks"
-                  variant="outlined"
-                  type="number"
-                  fullWidth
-                  value={question.marks}
-                  onChange={(e) =>
-                    handleQuestionChange(questionIndex, "marks", e.target.value)
-                  }
-                  required
-                  sx={{ mt: 2 }}
-                />
                 <Button
                   variant="outlined"
-                  color="error"
                   onClick={() => handleRemoveQuestion(questionIndex)}
-                  sx={{ mt: 2 }}
                 >
                   Remove Question
                 </Button>
               </Box>
             ))}
-
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleAddQuestion}
-              sx={{ mt: 2 }}
-            >
+            <Button variant="contained" onClick={handleAddQuestion}>
               Add Question
             </Button>
 
-            <Box sx={{ mt: 3 }}>
+            <Box mt={3}>
               <TextField
-                label="Duration (minutes)"
-                variant="outlined"
+                label="Duration (in minutes)"
                 type="number"
-                fullWidth
+                variant="outlined"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 required
+                sx={{ mb: 2 }}
               />
               <TextField
                 label="Total Marks"
-                variant="outlined"
                 type="number"
-                fullWidth
-                value={totalMarks}
-                onChange={(e) => setTotalMarks(e.target.value)}
-                required
-                sx={{ mt: 1 }}
+                variant="outlined"
+                value={totalMarks} // Display the calculated total marks
+                InputProps={{ readOnly: true }} // Make it read-only
+                sx={{ mb: 2 }}
               />
               <TextField
                 label="Pass Marks"
-                variant="outlined"
                 type="number"
-                fullWidth
+                variant="outlined"
                 value={passMarks}
                 onChange={(e) => setPassMarks(e.target.value)}
                 required
-                sx={{ mt: 1 }}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                label="Deadline"
+                type="date"
+                variant="outlined"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                required
+                sx={{ mb: 2 }}
               />
             </Box>
 
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              sx={{ mt: 2 }}
-            >
-              Create Exam
+            {successMessage && (
+              <Typography color="green">{successMessage}</Typography>
+            )}
+            {questionErrors.general && (
+              <Typography color="red">{questionErrors.general}</Typography>
+            )}
+
+            <Button type="submit" variant="contained" color="primary">
+              Create Assignment
             </Button>
-            <Button
-              variant="outlined"
-              onClick={handlePreviewToggle}
-              sx={{ mt: 2, ml: 2 }}
-            >
+            <Button variant="outlined" onClick={handlePreviewToggle}>
               {previewVisible ? "Hide Preview" : "Show Preview"}
             </Button>
           </form>
-
-          {previewVisible && (
-            <Modal
-              open={previewVisible}
-              onClose={handlePreviewToggle}
-              aria-labelledby="preview-modal-title"
-              aria-describedby="preview-modal-description"
-            >
-              <Box
-                sx={{
-                  backgroundColor: "white",
-                  padding: 4,
-                  outline: "none",
-                  margin: "auto",
-                  width: "90%",
-                  maxWidth: 600,
-                  borderRadius: 2,
-                  boxShadow: 24,
-                }}
-              >
-                {renderPreview()}
-                <Button
-                  variant="contained"
-                  onClick={handlePreviewToggle}
-                  sx={{ mt: 2 }}
-                >
-                  Close Preview
-                </Button>
-              </Box>
-            </Modal>
-          )}
-          {successMessage && (
-            <Typography variant="body2" color="success.main" sx={{ mt: 2 }}>
-              {successMessage}
-            </Typography>
-          )}
-          {questionErrors.general && (
-            <Typography variant="body2" color="error.main" sx={{ mt: 2 }}>
-              {questionErrors.general}
-            </Typography>
-          )}
+          {previewVisible && renderPreview()}
         </CardContent>
       </Card>
     </Box>
   );
 };
 
-export default CreateExam;
+export default CreateAssignment;
