@@ -17,7 +17,8 @@ import {
   Checkbox,
 } from "@mui/material";
 
-const apiUrl = "http://localhost:5000"; // Your API URL
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://backend-production-55e3.up.railway.app";
 
 const CreateQuiz = ({ selectedSubject, onclick }) => {
   const [title, setTitle] = useState("");

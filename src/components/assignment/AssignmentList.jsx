@@ -17,7 +17,8 @@ import { SearchOutlined } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import axios from "axios";
 
-const apiUrl = "http://localhost:5000";
+// const apiUrl = "http://localhost:5000";
+const apiUrl = "https://backend-production-55e3.up.railway.app";
 
 const AssignmentList = ({ selectedSubject }) => {
   const [assignments, setAssignments] = useState([]);

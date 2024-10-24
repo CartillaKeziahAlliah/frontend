@@ -11,7 +11,8 @@ import {
   Grid,
 } from "@mui/material";
 
-const apiUrl = "http://localhost:5000";
+// const apiUrl = "http://localhost:5000";
+const apiUrl = "https://backend-production-55e3.up.railway.app";
 
 const CreateDiscussion = ({ selectedSubject, onclick }) => {
   const [title, setTitle] = useState("");

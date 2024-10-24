@@ -26,7 +26,8 @@ import QuizList from "./quiz/quizList";
 import CreateDiscussion from "./discussion/CreateDiscussion";
 import DiscussionList from "./discussion/DiscussionList";
 
-const apiUrl = "http://localhost:5000";
+// const apiUrl = "http://localhost:5000";
+const apiUrl = "https://backend-production-55e3.up.railway.app";
 
 const SectionDetail = () => {
   const { sectionName } = useParams();
@@ -628,7 +629,19 @@ const SectionDetail = () => {
           <DiscussionList selectedSubject={selectedSubject} />
         </>
       )}
-      {selectedSubject && view === "" && <p>empty</p>}
+      {selectedSubject && view === "" && (
+        <div className="w-full p-6">
+          <div className="max-w-xl mx-auto overflow-hidden">
+            {" "}
+            {/* Container with max width and center alignment */}
+            <img
+              src="https://i.ytimg.com/vi/Kp2bYWRQylk/maxresdefault.jpg" // Replace with your image URL
+              alt="Description of the image"
+              className="w-full h-auto"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
