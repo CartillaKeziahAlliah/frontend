@@ -234,7 +234,7 @@ const SectionDetail = () => {
               id="subjects"
               onChange={handleSubjectChange}
               value={selectedSubject?._id || ""}
-              className="border rounded-3xl py-2 px-4 bg-white shadow-lg border-black"
+              className="border rounded-3xl mr-2 py-2 px-4 bg-white shadow-lg border-black"
             >
               <option value="">Select a Subject</option>
               {subjects.map((subject) => (
@@ -247,6 +247,7 @@ const SectionDetail = () => {
               id="view"
               onChange={handleViewChange}
               disabled={!selectedSubject}
+              className="border rounded-3xl py-2 px-4 bg-white shadow-lg border-black"
             >
               <option value="">Select View</option>
               <option value="exam">Exam</option>
@@ -417,6 +418,7 @@ const SectionDetail = () => {
                   variant="outlined"
                   onClick={() => setAction("exam")}
                   className="mr-2 m-2"
+                  sx={{ border: "1px solid black", color: "black" }}
                 >
                   Create Exam
                 </Button>
@@ -581,13 +583,16 @@ const SectionDetail = () => {
               }}
             />
           )}
-          <Button
-            variant="outlined"
-            onClick={() => setAction("assignment")}
-            className="mr-2 m-2"
-          >
-            Create Assignment
-          </Button>
+          <div className="flex justify-end">
+            <Button
+              variant="outlined"
+              onClick={() => setAction("assignment")}
+              className="mr-2 m-2"
+              sx={{ border: "1px solid black", color: "black" }}
+            >
+              Create Assignment
+            </Button>
+          </div>
           <AssignmentList selectedSubject={selectedSubject} />
         </>
       )}
@@ -599,13 +604,16 @@ const SectionDetail = () => {
               onclick={() => setAction("")}
             />
           )}
-          <Button
-            variant="outlined"
-            onClick={() => setAction("quiz")}
-            className="mr-2 m-2"
-          >
-            Create Quiz
-          </Button>
+          <div className="flex justify-end">
+            <Button
+              variant="outlined"
+              onClick={() => setAction("quiz")}
+              className="mr-2 m-2"
+              sx={{ border: "1px solid black", color: "black" }}
+            >
+              Create Quiz
+            </Button>
+          </div>
           <QuizList selectedSubject={selectedSubject} />
         </>
       )}
@@ -618,13 +626,16 @@ const SectionDetail = () => {
             />
           )}
           {action !== "discussion" && (
-            <Button
-              variant="outlined"
-              onClick={() => setAction("discussion")}
-              className="mr-2 m-2"
-            >
-              Create Discussion
-            </Button>
+            <div className="flex justify-end">
+              <Button
+                variant="outlined"
+                onClick={() => setAction("discussion")}
+                className="mr-2 m-2"
+                sx={{ border: "1px solid black", color: "black" }}
+              >
+                Create Discussion
+              </Button>
+            </div>
           )}
           <DiscussionList selectedSubject={selectedSubject} />
         </>

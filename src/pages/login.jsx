@@ -29,21 +29,34 @@ const LoginForm = () => {
       console.log("Response from login:", response.data);
       localStorage.setItem("token", response.data.token);
 
-      if (response.data.role === "student") {
-        window.location.href = "/Table";
-      } else {
-        window.location.href = "/Dashboard";
+      // Redirect based on role
+      switch (response.data.role) {
+        case "student":
+          window.location.href = "/Table";
+          break;
+        case "user":
+          window.location.href = "/UserDashboard"; // Assuming a separate dashboard for users
+          break;
+        default:
+          window.location.href = "/Dashboard";
       }
     } catch (err) {
       console.error("Login error:", err);
 
+      // Error handling based on the response status
       if (err.response) {
-        if (err.response.status === 400) {
-          setError("User doesn't exist");
-        } else if (err.response.status === 401) {
-          setError("Wrong password");
-        } else {
-          setError("Login failed");
+        switch (err.response.status) {
+          case 400:
+            setError("User doesn't exist");
+            break;
+          case 401:
+            setError("Wrong password");
+            break;
+          case 403:
+            setError("You have not been approved by the school");
+            break;
+          default:
+            setError("Login failed");
         }
       } else {
         setError("Login failed");
@@ -80,7 +93,7 @@ const LoginForm = () => {
           >
             {error}
           </Alert>
-        )}{" "}
+        )}
         <Box component="form" onSubmit={handleLogin} sx={{ mt: 1 }}>
           <TextField
             margin="normal"
@@ -133,7 +146,7 @@ const LoginForm = () => {
                   color: "#60a894",
                 },
                 "&.Mui-focused": {
-                  color: "#207e68",
+                  color: "#207E68",
                 },
               },
             }}
