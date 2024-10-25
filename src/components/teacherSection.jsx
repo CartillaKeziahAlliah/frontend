@@ -84,15 +84,13 @@ const SubjectsList = () => {
                       {subject.section ? subject.section.section_name : "N/A"}{" "}
                     </Typography>
                     <Typography variant="body2">
-                      Start:{" "}
-                      {subject.section ? subject.section.start_time : "N/A"}
+                      Start: {subject.start_time}
                     </Typography>
                     <Typography variant="body2">
-                      End: {subject.section ? subject.section.end_time : "N/A"}
+                      End: {subject.end_time}
                     </Typography>
                     <Typography variant="body2">
-                      Schedule:{" "}
-                      {subject.section ? subject.section.schedule : "N/A"}
+                      Schedule: {subject.schedule}
                     </Typography>
                   </CardContent>
                 </Card>
