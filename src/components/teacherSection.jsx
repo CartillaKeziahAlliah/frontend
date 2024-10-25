@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Box,
 } from "@mui/material";
+import { useAuth } from "../context/AuthContext";
 
 const getRandomPastelColor = () => {
   const colors = [
@@ -25,16 +26,18 @@ const getRandomPastelColor = () => {
 
 const apiUrl = "https://backend-production-55e3.up.railway.app";
 
-const SubjectsList = ({ teacherId }) => {
+const SubjectsList = () => {
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${apiUrl}/api/subject/${teacherId}`);
+        const response = await axios.get(`${apiUrl}/api/subject/${user._id}`);
+        console.log(response.data);
         setSubjects(response.data);
       } catch (err) {
         setError();
@@ -45,7 +48,7 @@ const SubjectsList = ({ teacherId }) => {
     };
 
     fetchSubjects();
-  }, [teacherId]);
+  }, [user._id]);
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;

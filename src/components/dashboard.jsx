@@ -48,7 +48,7 @@ const Dashboard = () => {
             <div className="h-full">
               <div className="flex flex-row h-full">
                 <EventCalendar />
-                <SectionsList teacherId={user._id} />
+                <SectionsList />
               </div>
             </div>
           )}

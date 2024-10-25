@@ -71,9 +71,7 @@ const SectionDetail = () => {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const response = await axios.get(
-          `${apiUrl}/api/subject/section/${sectionName}`
-        );
+        const response = await axios.get(`${apiUrl}/api/subject/${user._id}`);
         setSubjects(response.data);
       } catch (error) {
         console.error("Error fetching subjects:", error);
@@ -583,17 +581,21 @@ const SectionDetail = () => {
               }}
             />
           )}
-          <div className="flex justify-end">
-            <Button
-              variant="outlined"
-              onClick={() => setAction("assignment")}
-              className="mr-2 m-2"
-              sx={{ border: "1px solid black", color: "black" }}
-            >
-              Create Assignment
-            </Button>
-          </div>
-          <AssignmentList selectedSubject={selectedSubject} />
+          {action !== "assignment" && (
+            <>
+              <div className="flex justify-end">
+                <Button
+                  variant="outlined"
+                  onClick={() => setAction("assignment")}
+                  className="mr-2 m-2"
+                  sx={{ border: "1px solid black", color: "black" }}
+                >
+                  Create Assignment
+                </Button>
+              </div>
+              <AssignmentList selectedSubject={selectedSubject} />
+            </>
+          )}
         </>
       )}
       {selectedSubject && view === "quiz" && (
@@ -604,17 +606,21 @@ const SectionDetail = () => {
               onclick={() => setAction("")}
             />
           )}
-          <div className="flex justify-end">
-            <Button
-              variant="outlined"
-              onClick={() => setAction("quiz")}
-              className="mr-2 m-2"
-              sx={{ border: "1px solid black", color: "black" }}
-            >
-              Create Quiz
-            </Button>
-          </div>
-          <QuizList selectedSubject={selectedSubject} />
+          {action !== "quiz" && (
+            <>
+              <div className="flex justify-end">
+                <Button
+                  variant="outlined"
+                  onClick={() => setAction("quiz")}
+                  className="mr-2 m-2"
+                  sx={{ border: "1px solid black", color: "black" }}
+                >
+                  Create Quiz
+                </Button>
+              </div>
+              <QuizList selectedSubject={selectedSubject} />
+            </>
+          )}
         </>
       )}
       {selectedSubject && view === "discussion" && (
@@ -626,18 +632,21 @@ const SectionDetail = () => {
             />
           )}
           {action !== "discussion" && (
-            <div className="flex justify-end">
-              <Button
-                variant="outlined"
-                onClick={() => setAction("discussion")}
-                className="mr-2 m-2"
-                sx={{ border: "1px solid black", color: "black" }}
-              >
-                Create Discussion
-              </Button>
-            </div>
+            <>
+              {" "}
+              <div className="flex justify-end">
+                <Button
+                  variant="outlined"
+                  onClick={() => setAction("discussion")}
+                  className="mr-2 m-2"
+                  sx={{ border: "1px solid black", color: "black" }}
+                >
+                  Create Discussion
+                </Button>
+              </div>
+              <DiscussionList selectedSubject={selectedSubject} />
+            </>
           )}
-          <DiscussionList selectedSubject={selectedSubject} />
         </>
       )}
       {selectedSubject && view === "" && (

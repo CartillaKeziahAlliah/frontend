@@ -39,7 +39,7 @@ const DiscussionList = ({ selectedSubject }) => {
         setDiscussions(response.data);
       } catch (error) {
         console.error("Error fetching discussions:", error);
-        Swal.fire("Error", "Failed to load discussions", "error");
+        Swal.fire("Oopps", "You don't have any discussions", "error");
       } finally {
         setLoading(false);
       }
