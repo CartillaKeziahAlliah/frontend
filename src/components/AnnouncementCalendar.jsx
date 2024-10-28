@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-const apiUrl = "https://backend-production-55e3.up.railway.app";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const EventCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());

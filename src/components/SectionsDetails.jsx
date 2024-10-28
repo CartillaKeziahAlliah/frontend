@@ -27,7 +27,7 @@ import CreateDiscussion from "./discussion/CreateDiscussion";
 import DiscussionList from "./discussion/DiscussionList";
 
 // const apiUrl = "http://localhost:5000";
-const apiUrl = "https://backend-production-55e3.up.railway.app";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const SectionDetail = () => {
   const { sectionName } = useParams();

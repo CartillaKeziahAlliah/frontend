@@ -12,7 +12,7 @@ import {
   Typography,
   Alert,
 } from "@mui/material";
-const apiUrl = "https://backend-production-55e3.up.railway.app";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const UpdateProfile = () => {
   const [formData, setFormData] = useState({

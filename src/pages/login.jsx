@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 
-const apiUrl = "https://backend-production-55e3.up.railway.app";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-const apiUrl = "https://backend-production-55e3.up.railway.app";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const SectionsSidebar = ({
   teacherId,

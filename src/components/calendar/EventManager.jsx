@@ -5,8 +5,8 @@ import AddEvent from "./AddEvent";
 import EditEvent from "./EditEvent";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-const apiUrl = "https://backend-production-55e3.up.railway.app";
-
+const apiUrl = "https://server-production-dd7a.up.railway.app";
+import "../../App.css";
 const EventManager = () => {
   const [events, setEvents] = useState([]);
   const [currentEvent, setCurrentEvent] = useState(null);
@@ -80,7 +80,7 @@ const EventManager = () => {
         <Calendar
           onChange={setSelectedDate}
           value={selectedDate}
-          className="mx-auto"
+          className="custom-calendar"
         />
       </div>
       <div className="mb-5">

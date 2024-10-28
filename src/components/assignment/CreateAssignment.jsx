@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 
 // const apiUrl = "http://localhost:5000"; // Your API URL
-const apiUrl = "https://backend-production-55e3.up.railway.app";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const CreateAssignment = ({ selectedSubject, onclick }) => {
   const [title, setTitle] = useState("");
