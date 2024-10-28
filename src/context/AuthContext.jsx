@@ -2,8 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
 const AuthContext = createContext();
-// const apiUrl = "https://server-production-dd7a.up.railway.app";
-const apiUrl = "http://localhost:5000";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "http://localhost:5000";
 
 //please ayaw hilabti
 
