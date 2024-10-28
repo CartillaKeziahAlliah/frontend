@@ -663,9 +663,9 @@ const SectionDetail = () => {
             {" "}
             {/* Container with max width and center alignment */}
             <img
-              src="https://i.ytimg.com/vi/Kp2bYWRQylk/maxresdefault.jpg" // Replace with your image URL
+              src="https://scontent.fceb5-1.fna.fbcdn.net/v/t39.30808-6/275669416_104255052225224_6139433786003376488_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=qVe-kB3A6iYQ7kNvgGfNGZM&_nc_zt=23&_nc_ht=scontent.fceb5-1.fna&_nc_gid=AGNjjZb2S4JLA6UIt-mUjva&oh=00_AYAFSJROgNtdYb0grSav-Mfc5MvrkcRPft7mzkXh2ue1RA&oe=67252AB0" // Replace with your image URL
               alt="Description of the image"
-              className="w-full h-auto"
+              className="w-full h-auto border-[green] border-2"
             />
           </div>
         </div>
