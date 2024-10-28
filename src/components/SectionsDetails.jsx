@@ -25,6 +25,7 @@ import CreateQuiz from "./quiz/createQuiz";
 import QuizList from "./quiz/quizList";
 import CreateDiscussion from "./discussion/CreateDiscussion";
 import DiscussionList from "./discussion/DiscussionList";
+import StudentsComponent from "./studentList/studentlist";
 
 // const apiUrl = "http://localhost:5000";
 const apiUrl = "https://server-production-dd7a.up.railway.app";
@@ -42,6 +43,7 @@ const SectionDetail = () => {
   const [selectedExam, setSelectedExam] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [view, setView] = useState("");
+  const [students, setStudents] = useState([]);
   const [editData, setEditData] = useState({
     title: "",
     description: "",
@@ -252,6 +254,7 @@ const SectionDetail = () => {
               <option value="assignment">Assignment</option>
               <option value="quiz">Quiz</option>
               <option value="discussion">Discussion</option>
+              <option value="students">Students</option>
               {/* You can add more options here if needed */}
             </select>
           </div>
@@ -631,6 +634,7 @@ const SectionDetail = () => {
           )}
         </>
       )}
+      {view === "students" && <StudentsComponent sectionName={sectionName} />}
       {selectedSubject && view === "discussion" && (
         <>
           {action === "discussion" && (
