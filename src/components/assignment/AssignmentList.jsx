@@ -13,9 +13,10 @@ import {
   Typography,
   TablePagination,
 } from "@mui/material";
-import { SearchOutlined } from "@mui/icons-material";
+import { Delete, SearchOutlined } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 
 // const apiUrl = "http://localhost:5000";
 const apiUrl = "https://server-production-dd7a.up.railway.app";
@@ -27,7 +28,7 @@ const AssignmentList = ({ selectedSubject }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
-
+  const { user } = useAuth();
   useEffect(() => {
     const fetchAssignments = async () => {
       try {
@@ -232,19 +233,29 @@ const AssignmentList = ({ selectedSubject }) => {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      onClick={() => deleteAssignment(assignment._id)}
-                      variant="outlined"
-                    >
-                      Delete
-                    </Button>
-                    <Button
-                      onClick={() => handleAssignmentClick(assignment)}
-                      variant="outlined"
-                      color="secondary"
-                    >
-                      View
-                    </Button>
+                    {user.role !== "student" && (
+                      <Button
+                        onClick={() => deleteAssignment(assignment._id)}
+                        variant="text"
+                        sx={{ color: "red" }}
+                      >
+                        <Delete />
+                      </Button>
+                    )}
+                    {user.role !== "student" && (
+                      <Button
+                        onClick={() => handleAssignmentClick(assignment)}
+                        variant="outlined"
+                        sx={{
+                          bgcolor: "#207E68",
+                          borderRadius: "100px",
+                          color: "white",
+                        }}
+                      >
+                        View
+                      </Button>
+                    )}
+                    {user.role === "student" && <Button>Take Quiz</Button>}
                   </TableCell>
                 </TableRow>
               ))}

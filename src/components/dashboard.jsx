@@ -23,6 +23,7 @@ const Dashboard = () => {
             sx={{
               bgcolor: page === "Announcement" ? "green" : "transparent",
               borderColor: page === "Announcement" ? "none" : "green",
+              borderRadius: "100px",
             }}
           >
             Announcement
@@ -33,20 +34,17 @@ const Dashboard = () => {
             sx={{
               bgcolor: page === "calendar" ? "green" : "transparent",
               borderColor: page === "calendar" ? "none" : "green",
+              borderRadius: "100px",
             }}
           >
             Calendar
           </Button>
         </div>
-        <div className="h-auto">
-          {page === "Announcement" && (
-            <>
-              <AnnouncementApp />
-            </>
-          )}
+        <div className="h-auto w-full ">
+          {page === "Announcement" && <AnnouncementApp />}
           {page === "calendar" && (
             <div className="h-full">
-              <div className="flex flex-row h-full">
+              <div className="flex flex-row flex-wrap h-full">
                 <EventCalendar />
                 <SectionsList />
               </div>

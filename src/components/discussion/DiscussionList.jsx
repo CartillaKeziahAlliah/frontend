@@ -11,13 +11,22 @@ import {
   Button,
   Typography,
   TablePagination,
+  IconButton,
+  Menu,
+  MenuItem,
+  patch,
 } from "@mui/material";
-import { SearchOutlined, CheckCircle } from "@mui/icons-material";
+import {
+  SearchOutlined,
+  CheckCircle,
+  MoreVert,
+  CloseOutlined,
+} from "@mui/icons-material";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
+import { color } from "framer-motion";
 
-// const apiUrl = "http://localhost:5000";
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const DiscussionList = ({ selectedSubject }) => {
@@ -28,6 +37,16 @@ const DiscussionList = ({ selectedSubject }) => {
   const [loading, setLoading] = useState(true);
   const [selectedDiscussion, setSelectedDiscussion] = useState(null);
   const { user } = useAuth();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   useEffect(() => {
     const fetchDiscussions = async () => {
@@ -39,7 +58,7 @@ const DiscussionList = ({ selectedSubject }) => {
         setDiscussions(response.data);
       } catch (error) {
         console.error("Error fetching discussions:", error);
-        Swal.fire("Oopps", "You don't have any discussions", "error");
+        Swal.fire("Oops", "You don't have any discussions", "error");
       } finally {
         setLoading(false);
       }
@@ -104,20 +123,38 @@ const DiscussionList = ({ selectedSubject }) => {
       }
     }
   };
-
   const markDiscussionAsRead = async (discussionId) => {
     const studentId = user._id;
     try {
       await axios.patch(`${apiUrl}/api/discussion/${discussionId}/read`, {
         studentId,
       });
+      // Update the discussions state immediately
       setDiscussions((prev) =>
         prev.map((discussion) =>
           discussion._id === discussionId
-            ? { ...discussion, isRead: true }
+            ? {
+                ...discussion,
+                studentsRead: [
+                  ...discussion.studentsRead,
+                  { studentId, dateRead: new Date() },
+                ],
+              }
             : discussion
         )
       );
+
+      // If the selected discussion is the one marked as read, update it too
+      if (selectedDiscussion?._id === discussionId) {
+        setSelectedDiscussion((prev) => ({
+          ...prev,
+          studentsRead: [
+            ...prev.studentsRead,
+            { studentId, dateRead: new Date() },
+          ],
+        }));
+      }
+
       Swal.fire(
         "Marked as Read",
         "You have marked this discussion as read.",
@@ -127,6 +164,11 @@ const DiscussionList = ({ selectedSubject }) => {
       console.error("Failed to mark discussion as read:", error);
       Swal.fire("Error", "Failed to mark discussion as read", "error");
     }
+  };
+  const isDiscussionReadByUser = (discussion) => {
+    return discussion.studentsRead.some(
+      (student) => student.studentId.toString() === user._id
+    );
   };
 
   const handleDiscussionClick = (discussion) => {
@@ -173,7 +215,7 @@ const DiscussionList = ({ selectedSubject }) => {
                     Content
                   </Typography>
                 </TableCell>
-                <TableCell>
+                <TableCell align="right">
                   <Typography variant="subtitle1" fontWeight="bold">
                     Action
                   </Typography>
@@ -191,30 +233,40 @@ const DiscussionList = ({ selectedSubject }) => {
                       {discussion.content}
                     </Typography>
                   </TableCell>
-                  <TableCell>
-                    <Button
-                      onClick={() => deleteDiscussion(discussion._id)}
-                      variant="outlined"
-                    >
-                      Delete
-                    </Button>
-                    {discussion.isRead ? (
-                      <CheckCircle color="success" />
-                    ) : (
-                      <Button
-                        onClick={() => markDiscussionAsRead(discussion._id)}
-                        variant="outlined"
-                        color="secondary"
-                      >
-                        Mark as Read
-                      </Button>
-                    )}
-                    <Button
-                      onClick={() => handleDiscussionClick(discussion)}
-                      variant="outlined"
-                    >
-                      View Details
-                    </Button>
+                  <TableCell align="right">
+                    <IconButton onClick={handleClick}>
+                      <MoreVert />
+                    </IconButton>
+                    <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+                      {user.role !== "student" && (
+                        <MenuItem
+                          onClick={() => {
+                            deleteDiscussion(discussion._id);
+                            handleClose();
+                          }}
+                        >
+                          Delete
+                        </MenuItem>
+                      )}
+                      {isDiscussionReadByUser(discussion) ? (
+                        <MenuItem onClick={handleClose}>
+                          <CheckCircle
+                            color="success"
+                            sx={{ marginRight: 1 }}
+                          />
+                          Read
+                        </MenuItem>
+                      ) : (
+                        <MenuItem
+                          onClick={() => {
+                            handleDiscussionClick(discussion);
+                            handleClose();
+                          }}
+                        >
+                          Read Discussion
+                        </MenuItem>
+                      )}
+                    </Menu>
                   </TableCell>
                 </TableRow>
               ))}
@@ -245,23 +297,34 @@ const DiscussionList = ({ selectedSubject }) => {
             borderRadius: "8px",
           }}
         >
-          <Typography variant="h6">Discussion Details</Typography>
-          <Typography variant="body1" fontWeight="bold">
-            Title:
-          </Typography>
-          <Typography variant="body2">{selectedDiscussion.title}</Typography>
+          <div className="flex flex-row justify-between">
+            <Typography variant="h4">{selectedDiscussion.title}</Typography>
+
+            <div className="flex flex-row items-center">
+              {isDiscussionReadByUser(selectedDiscussion) ? (
+                <Typography color="success.main">
+                  You have read this discussion
+                </Typography>
+              ) : (
+                <MenuItem
+                  onClick={() => {
+                    markDiscussionAsRead(selectedDiscussion._id);
+                    handleClose();
+                  }}
+                >
+                  Mark as Read
+                </MenuItem>
+              )}
+              <Button onClick={clearSelectedDiscussion}>
+                <CloseOutlined sx={{ color: "#000" }} />
+              </Button>
+            </div>
+          </div>
+
           <Typography variant="body1" fontWeight="bold">
             Content:
           </Typography>
           <Typography variant="body2">{selectedDiscussion.content}</Typography>
-
-          <Button
-            onClick={clearSelectedDiscussion}
-            variant="outlined"
-            sx={{ marginTop: 2 }}
-          >
-            Close
-          </Button>
         </Box>
       )}
     </div>

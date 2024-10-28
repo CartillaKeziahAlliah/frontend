@@ -17,7 +17,7 @@ import {
   TablePagination,
   Grid, // Import TablePagination
 } from "@mui/material";
-import { SearchOutlined } from "@mui/icons-material";
+import { Delete, SearchOutlined } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import CreateAssignment from "./assignment/CreateAssignment";
 import AssignmentList from "./assignment/AssignmentList";
@@ -534,19 +534,27 @@ const SectionDetail = () => {
                               flexWrap: "wrap",
                             }}
                           >
-                            <Button
-                              onClick={() => deleteExam(exam._id)}
-                              variant="outlined"
-                            >
-                              Delete
-                            </Button>
-                            <Button
-                              onClick={() => handleExamClick(exam)}
-                              variant="outlined"
-                              color="secondary"
-                            >
-                              View
-                            </Button>
+                            {user.role !== "student" && (
+                              <Button
+                                onClick={() => deleteExam(exam._id)}
+                                variant="text"
+                                sx={{ color: "red" }}
+                              >
+                                <Delete />
+                              </Button>
+                            )}
+                            {user.role !== "student" && (
+                              <Button
+                                onClick={() => handleExamClick(exam)}
+                                variant="contained"
+                                sx={{
+                                  bgcolor: "#207E68",
+                                  borderRadius: "100px",
+                                }}
+                              >
+                                View
+                              </Button>
+                            )}
                           </TableCell>
                         </TableRow>
                       ))}

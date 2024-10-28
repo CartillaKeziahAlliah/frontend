@@ -22,16 +22,19 @@ import {
   Box,
   Avatar,
   Tooltip,
+  Pagination,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
-
 import DeleteIcon from "@mui/icons-material/Delete";
 import MarkAsReadIcon from "@mui/icons-material/CheckCircle";
 import AddIcon from "@mui/icons-material/Add";
 import axios from "axios";
-
 import Swal from "sweetalert2";
-const apiUrl = "https://backend-production-55e3.up.railway.app";
+import { data } from "autoprefixer";
+import { color } from "framer-motion";
+
+const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "http://localhost:5000";
 
 const AnnouncementApp = () => {
   const [title, setTitle] = useState("");
@@ -42,6 +45,12 @@ const AnnouncementApp = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuth();
+  const [filter, setFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("newest");
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5); // Default to 5 items per page
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,37 +62,32 @@ const AnnouncementApp = () => {
     };
 
     try {
-      const response = await fetch(`${apiUrl}/api/announcements/${user._id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(announcementData),
-      });
+      const response = await axios.post(
+        `${apiUrl}/api/announcements/${user._id}`,
+        announcementData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error("Failed to create announcement");
-      }
-
-      const result = await response.json();
-      console.log("Announcement created:", result);
       setSnackbarOpen(true);
-
       setTitle("");
       setContent("");
       setSection("");
       setIsModalOpen(false);
-
       fetchAnnouncements();
     } catch (error) {
-      console.error("Error:", error.message);
+      console.error(
+        "Error:",
+        error.response ? error.response.data : error.message
+      );
     }
   };
-
   const fetchSections = async () => {
     try {
       const response = await axios.get(`${apiUrl}/api/section/${user._id}`);
-      console.log("Sections", response.data);
       setSections(response.data);
     } catch (error) {
       console.error("Error fetching sections:", error.message);
@@ -93,11 +97,9 @@ const AnnouncementApp = () => {
   const fetchAnnouncements = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/announcements`);
-
       if (!response.ok) {
         throw new Error("Failed to fetch announcements");
       }
-
       const data = await response.json();
       setAnnouncements(data);
     } catch (error) {
@@ -130,7 +132,7 @@ const AnnouncementApp = () => {
             "Your announcement has been deleted.",
             "success"
           );
-          fetchAnnouncements(); // Refresh the list after deletion
+          fetchAnnouncements();
         } catch (error) {
           console.error("Error deleting announcement:", error.message);
           Swal.fire("Error", "Failed to delete the announcement.", "error");
@@ -149,8 +151,6 @@ const AnnouncementApp = () => {
         throw new Error("Failed to mark announcement as read");
       }
 
-      const updatedAnnouncement = await response.json();
-      console.log("Announcement marked as read:", updatedAnnouncement);
       fetchAnnouncements();
     } catch (error) {
       console.error("Error marking announcement as read:", error.message);
@@ -167,7 +167,6 @@ const AnnouncementApp = () => {
         throw new Error("Failed to mark all announcements as read");
       }
 
-      console.log("All announcements marked as read");
       fetchAnnouncements();
     } catch (error) {
       console.error("Error marking all announcements as read:", error.message);
@@ -179,28 +178,98 @@ const AnnouncementApp = () => {
     fetchSections();
   }, []);
 
+  const filteredAnnouncements = announcements.filter((announcement) => {
+    if (filter === "unread") return !announcement.read;
+    if (filter === "read") return announcement.read;
+    return true;
+  });
+
+  const sortedAnnouncements = filteredAnnouncements.sort((a, b) => {
+    const dateA = new Date(a.createdAt);
+    const dateB = new Date(b.createdAt);
+    return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+  });
+
+  // Get current announcements for pagination
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentAnnouncements = sortedAnnouncements.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const handleChangePage = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const handleItemsPerPageChange = (event) => {
+    setItemsPerPage(parseInt(event.target.value, 10));
+    setCurrentPage(1); // Reset to the first page
+  };
+  const truncateContent = (content, maxLength) => {
+    if (content.length > maxLength) {
+      return content.substring(0, maxLength) + "...";
+    }
+    return content;
+  };
   return (
-    <Container>
+    <div>
       <Box
         display="flex"
         flexDirection="row"
         justifyContent="end"
         alignItems="center"
+        mb={2}
       >
         {user.role !== "student" && (
-          <IconButton color="primary" onClick={() => setIsModalOpen(true)}>
-            <AddIcon fontSize="large" />
-          </IconButton>
+          <Tooltip title="Add Announcement" arrow>
+            <IconButton color="primary" onClick={() => setIsModalOpen(true)}>
+              <AddIcon fontSize="large" />
+            </IconButton>
+          </Tooltip>
         )}
         <Button
           variant="outlined"
-          sx={{ background: "gray", border: "gray", color: "white" }}
-          className="hover:bg-black"
+          sx={{ background: "#207E68", border: "gray", color: "white" }}
           onClick={handleMarkAllAsRead}
         >
           Mark All as Read
         </Button>
+        <Button
+          variant="outlined"
+          onClick={() => setFilter("all")}
+          sx={{ marginLeft: 1 }}
+        >
+          Show All
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={() => setFilter("unread")}
+          sx={{ marginLeft: 1 }}
+        >
+          Unread Only
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={() => setFilter("read")}
+          sx={{ marginLeft: 1 }}
+        >
+          Read Only
+        </Button>
+        <FormControl variant="standard" sx={{ marginLeft: 1, minWidth: 120 }}>
+          <InputLabel id="sort-order-label">Sort By</InputLabel>
+          <Select
+            labelId="sort-order-label"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            label="Sort By"
+          >
+            <MenuItem value="newest">Newest</MenuItem>
+            <MenuItem value="oldest">Oldest</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
+
       <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <DialogTitle>Make an Announcement</DialogTitle>
         <form onSubmit={handleSubmit}>
@@ -213,6 +282,22 @@ const AnnouncementApp = () => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
+              sx={{
+                "& .MuiInputLabel-root": {
+                  color: "black", // Label color
+                },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "black", // Default border color
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "black", // Border color on hover
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#207E68", // Border color on focus
+                  },
+                },
+              }}
             />
             <TextField
               label="Content"
@@ -224,120 +309,178 @@ const AnnouncementApp = () => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               required
+              sx={{
+                "& .MuiInputLabel-root": {
+                  color: "black", // Label color
+                },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: "black", // Default border color
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "black", // Border color on hover
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#207E68", // Border color on focus
+                  },
+                },
+              }}
             />
-
             <FormControl fullWidth margin="normal">
-              <InputLabel id="section-select-label">Section</InputLabel>
+              <InputLabel
+                id="section-select-label"
+                sx={{
+                  color: "#000", // Default label color
+                  "&.Mui-focused": {
+                    color: "#000", // Label color when focused
+                  },
+                }}
+              >
+                Section
+              </InputLabel>
               <Select
                 labelId="section-select-label"
                 value={section}
                 onChange={(e) => setSection(e.target.value)}
-                required
+                sx={{
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#000", // Default border color
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#000", // Border color on hover
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#207E68", // Border color on focus
+                  },
+                  "& .MuiSelect-select": {
+                    color: "#207E68", // Default text color for Select
+                  },
+                  "&.Mui-focused .MuiSelect-select": {
+                    color: "#207E68", // Text color when focused
+                  },
+                }}
               >
-                {sections.map((section) => (
-                  <MenuItem key={section._id} value={section._id}>
-                    {section.section_name}
+                {sections.map((sectionItem) => (
+                  <MenuItem key={sectionItem._id} value={sectionItem._id}>
+                    {sectionItem.section_name}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setIsModalOpen(false)} color="secondary">
+            <Button
+              variant="outlined"
+              onClick={() => setIsModalOpen(false)}
+              sx={{ border: "1px solid #207E68", color: "#207E68" }}
+            >
               Cancel
             </Button>
-            <Button type="submit" variant="contained" color="primary">
-              Create
+            <Button
+              type="submit"
+              color="primary"
+              variant="contained"
+              sx={{ background: "#207E68" }}
+            >
+              Submit
             </Button>
           </DialogActions>
         </form>
       </Dialog>
 
       <List>
-        {announcements.length === 0 ? (
-          <Typography>No announcements available</Typography>
+        {currentAnnouncements.length === 0 ? (
+          <Typography variant="h6" align="center">
+            No announcements available
+          </Typography>
         ) : (
-          announcements.map((announcement) => (
+          currentAnnouncements.map((announcement) => (
             <ListItem
               key={announcement._id}
-              style={{
-                backgroundColor: announcement.read ? "transparent" : "#e3f2fd",
-                borderRadius: "4px",
-                marginBottom: "8px",
-                borderBottom: "1px solid black",
-                boxShadow: "0 1px 1px gray",
+              divider
+              sx={{
+                bgcolor: announcement.read
+                  ? "transparent"
+                  : "rgba(32, 126, 104, 0.2)",
+                marginBottom: 1,
+                borderRadius: 2,
               }}
             >
-              <div>
-                {announcement.announcer?.avatar ? (
-                  <img
-                    src={announcement.announcer.avatar}
-                    alt={announcement.announcer.name}
-                    style={{ width: 40, height: 40, borderRadius: "50%" }}
-                    className="mx-4"
-                  />
-                ) : (
-                  <Avatar>
-                    <PersonIcon />
-                  </Avatar>
-                )}
-              </div>
-              <div className="flex flex-col w-full">
-                <div className="flex flex-row justify-between w-full">
-                  <Typography variant="h5" className="mx-4 capitalize">
-                    {announcement.announcer?.name || "Unknown"}
-                  </Typography>
-                </div>
-
+              <div style={{ display: "flex", alignItems: "start", gap: 2 }}>
+                <Avatar sx={{ marginRight: 1 }}>
+                  <PersonIcon />
+                </Avatar>
                 <div>
-                  <strong>Section:</strong>{" "}
-                  {announcement.section?.section_name || "Unknown"}
+                  <h2 className="capitalize text-xl font-bold">
+                    {announcement.announcer.name} -
+                    <span className="font-light text-md">
+                      {new Date(announcement.createdAt).toLocaleDateString()}
+                    </span>
+                  </h2>
+                  <b className="capitalize">{announcement.title}</b>
+                  <p>
+                    {" "}
+                    {truncateContent(announcement.content, 50)}{" "}
+                    {/* Truncate to 50 characters */}
+                  </p>
                 </div>
-                <div className="font-bold">{announcement.title}</div>
-                <div>{announcement.content}</div>
               </div>
-
-              <div className="flex flex-col justify-end">
-                <Typography variant="p" className="mx-4">
-                  {new Date(announcement.createdAt).toLocaleDateString()}{" "}
-                </Typography>
-                <div className="flex flex-row justify-end">
-                  <Tooltip title="Mark as Read">
-                    {!announcement.read && (
-                      <IconButton
-                        edge="end"
-                        color="primary"
-                        onClick={() => handleMarkAsRead(announcement._id)}
-                      >
-                        <MarkAsReadIcon />
-                      </IconButton>
-                    )}
+              <ListItemSecondaryAction>
+                {announcement.read !== true && (
+                  <Tooltip title="Mark as Read" arrow>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleMarkAsRead(announcement._id)}
+                    >
+                      <MarkAsReadIcon />
+                    </IconButton>
                   </Tooltip>
-                  {user.role !== "student" && (
-                    <Tooltip title="Delete Announcement">
-                      <IconButton
-                        edge="end"
-                        sx={{ color: "red" }}
-                        onClick={() => handleDelete(announcement._id)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </div>
-              </div>
+                )}
+                <Tooltip title="Delete" arrow>
+                  <IconButton
+                    color="error"
+                    onClick={() => handleDelete(announcement._id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
+              </ListItemSecondaryAction>
             </ListItem>
           ))
         )}
       </List>
+      <div className="flex flex-row justify-end">
+        <FormControl variant="standard" sx={{ marginLeft: 2, minWidth: 80 }}>
+          <InputLabel id="items-per-page-label"></InputLabel>
+          <Select
+            labelId="items-per-page-label"
+            value={itemsPerPage}
+            onChange={handleItemsPerPageChange}
+            label="Items per page"
+            className="text-center"
+          >
+            <MenuItem value={5}>5</MenuItem>
+            <MenuItem value={10}>10</MenuItem>
+            <MenuItem value={15}>15</MenuItem>
+            <MenuItem value={20}>20</MenuItem>
+          </Select>
+        </FormControl>
+        <Pagination
+          count={Math.ceil(sortedAnnouncements.length / itemsPerPage)}
+          page={currentPage}
+          onChange={handleChangePage}
+          color="primary"
+          sx={{ display: "flex", justifyContent: "center", marginTop: 2 }}
+        />
+      </div>
 
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={3000}
         onClose={() => setSnackbarOpen(false)}
-        message="Announcement created successfully"
+        autoHideDuration={3000}
+        message="Announcement created successfully!"
       />
-    </Container>
+    </div>
   );
 };
 

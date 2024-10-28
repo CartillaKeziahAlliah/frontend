@@ -1,6 +1,5 @@
+// EventCalendar.js
 import React, { useState, useEffect } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css"; // Calendar styles
 import {
   Dialog,
   DialogTitle,
@@ -10,9 +9,14 @@ import {
   TextField,
   Snackbar,
   Alert,
+  Tooltip,
 } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import Calendar from "./calendar/customCalendar"; // Import the new Calendar component
+import { FaPlus } from "react-icons/fa";
+import { ChevronLeft, ChevronRight, Delete, Edit } from "@mui/icons-material";
+
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const EventCalendar = () => {
@@ -45,8 +49,20 @@ const EventCalendar = () => {
     }
   };
 
-  const handleDateClick = (date) => {
-    setSelectedDate(date);
+  const handleDateClick = (day) => {
+    setSelectedDate(day);
+  };
+
+  const handleNextMonth = () => {
+    const nextMonth = new Date(selectedDate);
+    nextMonth.setMonth(selectedDate.getMonth() + 1);
+    setSelectedDate(nextMonth);
+  };
+
+  const handlePreviousMonth = () => {
+    const prevMonth = new Date(selectedDate);
+    prevMonth.setMonth(selectedDate.getMonth() - 1);
+    setSelectedDate(prevMonth);
   };
 
   const handleOpenDialog = () => {
@@ -122,40 +138,44 @@ const EventCalendar = () => {
     setSnackbarOpen(false);
   };
 
-  const getEventCountForDate = (date) => {
-    const formattedDate = date.toISOString().split("T")[0];
-    return events.filter((event) => event.event_date === formattedDate).length;
-  };
-
-  const tileContent = ({ date }) => {
-    const eventCount = getEventCountForDate(date);
-    if (eventCount === 0) return null;
-
-    const colors = ["#FF6347", "#FFD700", "#4CAF50"];
-    const dots = Array.from({ length: Math.min(eventCount, 3) }, (_, i) => (
-      <span
-        key={i}
-        style={{
-          display: "inline-block",
-          width: "8px",
-          height: "8px",
-          borderRadius: "50%",
-          backgroundColor: colors[i],
-          margin: "0 2px",
-        }}
-      ></span>
-    ));
-
-    return <div>{dots}</div>;
-  };
-
   return (
-    <div className="calendar-container h-full bg-[#207E68] flex justify-center flex-col items-center flex-1 max-w-lg p-6 shadow-lg rounded-lg">
+    <div className="calendar-container h-full bg-[#207E68] flex justify-center flex-col items-center flex-1 max-w-lg p-6 shadow-xl rounded-lg">
+      <div className="w-full">
+        {user.role !== "student" && (
+          <Tooltip title="Add Event" arrow>
+            <button
+              onClick={handleOpenDialog}
+              className="mt-2 bg-gray-100 rounded-md bg-opacity-55 p-2 hover:bg-teal-600 hover:bg-opacity-80"
+            >
+              <FaPlus color="#fff" />
+            </button>
+          </Tooltip>
+        )}
+      </div>
+      <div className="flex justify-between w-full mb-4">
+        <h1 className="text-3xl font-semibold text-black">
+          {selectedDate.toLocaleString("default", { month: "long" })}{" "}
+          {selectedDate.getFullYear()}
+        </h1>
+        <div>
+          <Tooltip title="Previous Month" arrow>
+            <button onClick={handlePreviousMonth} className="text-white">
+              <ChevronLeft />
+            </button>
+          </Tooltip>
+
+          <Tooltip title="Next Month" arrow>
+            <button onClick={handleNextMonth} className="text-white">
+              <ChevronRight />
+            </button>
+          </Tooltip>
+        </div>
+      </div>
+
       <Calendar
-        onClickDay={handleDateClick}
-        value={selectedDate}
-        tileContent={tileContent}
-        className="react-calendar"
+        selectedDate={selectedDate}
+        events={events}
+        onDateClick={handleDateClick}
       />
 
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
@@ -197,31 +217,27 @@ const EventCalendar = () => {
       </Dialog>
 
       <div className="mt-4 w-full">
-        <h3 className="text-lg font-bold text-white">
+        <h3 className="text-lg font-semibold text-white">
           {selectedDate.toDateString()}
         </h3>
-        {user.role !== "student" && (
-          <Button
-            onClick={handleOpenDialog}
-            color="primary"
-            variant="contained"
-            className="mt-2"
-          >
-            Add Event
-          </Button>
-        )}
+
         <ul className="mt-2 bg-white rounded-lg shadow-md p-4">
           {events.length === 0 ? (
-            <div className="text-center">No events for the selected date!</div>
+            <div className="text-center text-gray-400">
+              No events for the selected date!
+            </div>
           ) : (
             <>
               {events.map((event) => (
                 <li
                   key={event._id}
-                  className="flex justify-between items-center p-2 border-b"
+                  className="flex justify-between items-center p-2 border-b border-gray-700"
                 >
                   <div>
-                    <strong>{event.event_title}</strong> -{" "}
+                    <strong className="text-black capitalize">
+                      {event.event_title}
+                    </strong>{" "}
+                    -{" "}
                     {new Date(event.event_datetime).toLocaleDateString(
                       "en-US",
                       {
@@ -238,24 +254,22 @@ const EventCalendar = () => {
                         minute: "2-digit",
                       }
                     )}
-                    <br />
-                    <span className="text-gray-600">{event.note}</span>
                   </div>
                   {user.role !== "student" && (
-                    <div className="flex flex-row">
+                    <div className="flex ">
                       <Button
                         onClick={() => handleEditEvent(event)}
                         color="primary"
                         size="small"
                       >
-                        Edit
+                        <Edit />
                       </Button>
                       <Button
                         onClick={() => handleDeleteEvent(event._id)}
                         color="secondary"
                         size="small"
                       >
-                        Delete
+                        <Delete />
                       </Button>
                     </div>
                   )}

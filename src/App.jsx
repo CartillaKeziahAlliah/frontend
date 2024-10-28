@@ -10,6 +10,7 @@ import CourseDetail from "./components/CourseDetail";
 import Dashboard from "./components/dashboard";
 import UpdateProfile from "./components/UpdateProfile";
 import SectionDetail from "./components/SectionsDetails";
+import EventCalendar from "./components/AnnouncementCalendar";
 
 function App() {
   return (

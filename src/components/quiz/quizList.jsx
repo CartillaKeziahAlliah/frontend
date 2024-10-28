@@ -13,9 +13,10 @@ import {
   Typography,
   TablePagination,
 } from "@mui/material";
-import { SearchOutlined } from "@mui/icons-material";
+import { Delete, SearchOutlined } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 
 // const apiUrl = "http://localhost:5000";
 const apiUrl = "https://server-production-dd7a.up.railway.app";
@@ -28,7 +29,7 @@ const QuizList = ({ selectedSubject }) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [userAnswers, setUserAnswers] = useState({});
-
+  const { user } = useAuth();
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
@@ -245,19 +246,24 @@ const QuizList = ({ selectedSubject }) => {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      onClick={() => deleteQuiz(quiz._id)}
-                      variant="outlined"
-                    >
-                      Delete
-                    </Button>
-                    <Button
-                      onClick={() => handleQuizClick(quiz)}
-                      variant="outlined"
-                      color="secondary"
-                    >
-                      View Quiz
-                    </Button>
+                    {user.role !== "student" && (
+                      <Button
+                        onClick={() => deleteQuiz(quiz._id)}
+                        variant="text"
+                        sx={{ color: "red" }}
+                      >
+                        <Delete />
+                      </Button>
+                    )}
+                    {user.role !== "student" && (
+                      <Button
+                        onClick={() => handleQuizClick(quiz)}
+                        variant="contained"
+                        sx={{ bgcolor: "#207E68", borderRadius: "100px" }}
+                      >
+                        View Quiz
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
