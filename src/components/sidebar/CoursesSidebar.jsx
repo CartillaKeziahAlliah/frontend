@@ -11,14 +11,19 @@ const CoursesSidebar = ({
     <p className="text-2xl font-bold mb-4">COURSES:</p>
     {courses.map((course) => (
       <div
-        key={course}
-        onClick={() => handleCourseSelect(course)}
+        key={course.subjectId} // Use a unique identifier for the key
+        onClick={() => handleCourseSelect(course.subjectId)} // Pass the subjectId for selection
         className={`p-2 hover:bg-gray-300 rounded flex items-center gap-2 ${
-          active === course ? "bg-[#4a8e8b]" : ""
+          active === course.subjectId ? "bg-[#4a8e8b]" : ""
         }`}
       >
-        <p className={`${active === course ? "text-white" : "text-black"}`}>
-          {course}
+        <p
+          className={`${
+            active === course.subjectId ? "text-white" : "text-black"
+          }`}
+        >
+          {course.subjectName}{" "}
+          {/* Display the subjectName instead of the whole course object */}
         </p>
       </div>
     ))}

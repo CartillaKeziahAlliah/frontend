@@ -15,7 +15,7 @@ import {
   Button,
   Typography,
   TablePagination,
-  Grid, // Import TablePagination
+  Grid,
 } from "@mui/material";
 import { Delete, SearchOutlined } from "@mui/icons-material";
 import Swal from "sweetalert2";
@@ -619,17 +619,10 @@ const SectionDetail = () => {
           )}
           {action !== "quiz" && (
             <>
-              <div className="flex justify-end">
-                <Button
-                  variant="outlined"
-                  onClick={() => setAction("quiz")}
-                  className="mr-2 m-2"
-                  sx={{ border: "1px solid black", color: "black" }}
-                >
-                  Create Quiz
-                </Button>
-              </div>
-              <QuizList selectedSubject={selectedSubject} />
+              <QuizList
+                selectedSubject={selectedSubject}
+                setAction={() => setAction("quiz")}
+              />
             </>
           )}
         </>
@@ -647,14 +640,16 @@ const SectionDetail = () => {
             <>
               {" "}
               <div className="flex justify-end">
-                <Button
-                  variant="outlined"
-                  onClick={() => setAction("discussion")}
-                  className="mr-2 m-2"
-                  sx={{ border: "1px solid black", color: "black" }}
-                >
-                  Create Discussion
-                </Button>
+                {user.role !== "student" && (
+                  <Button
+                    variant="outlined"
+                    onClick={() => setAction("discussion")}
+                    className="mr-2 m-2"
+                    sx={{ border: "1px solid black", color: "black" }}
+                  >
+                    Create Discussion
+                  </Button>
+                )}
               </div>
               <DiscussionList selectedSubject={selectedSubject} />
             </>

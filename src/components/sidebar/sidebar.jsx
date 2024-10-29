@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Avatar, Tooltip } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { json, Link, useNavigate } from "react-router-dom";
 
 import Logout from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -14,7 +14,8 @@ import {
   MenuBookOutlined,
   Person2Outlined,
 } from "@mui/icons-material";
-
+const apiUrl = "http://localhost:5000"; // Your API URL
+// const apiUrl = "https://server-production-dd7a.up.railway.app";
 const Sidebar = ({ user, logout }) => {
   const navigate = useNavigate();
   const [active, setActive] = useState("Dashboard");
@@ -23,26 +24,32 @@ const Sidebar = ({ user, logout }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const [courses, setCourses] = useState([
-    "Mathematics",
-    "Science",
-    "Filipino",
-    "English",
-    "General Anatomy",
-    "HEKASI",
-    "Music",
-    "Arts",
-    "Physical Education",
-  ]);
+  const [courses, setCourses] = useState([]);
+
   const handleAccountClick = () => {
     setShowCourses(false);
     setShowSections(false);
     setActive("Account");
   };
-  const handleCoursesClick = () => {
+  const handleCoursesClick = async () => {
     setShowCourses((prev) => !prev);
     setShowSections(false);
     setActive("Courses");
+    if (!showCourses) {
+      try {
+        const response = await fetch(
+          `${apiUrl}/api/subject/${user._id}/subjects`
+        );
+        const data = await response.json();
+        if (response.ok) {
+          setCourses(data.subjects);
+        } else {
+          console.error(data.message);
+        }
+      } catch (error) {
+        console.error("Failed to fetch courses:", error);
+      }
+    }
   };
   const handleAdminClick = () => {
     setShowCourses(false);

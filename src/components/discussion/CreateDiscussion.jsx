@@ -73,19 +73,13 @@ const CreateDiscussion = ({ selectedSubject, onclick }) => {
       <Typography variant="h4" gutterBottom>
         Create Discussion
       </Typography>
-      <Button
-        variant="outlined"
-        onClick={onclick}
-        style={{ marginBottom: "20px" }}
-      >
-        Close
-      </Button>
+
       <form onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label="Title"
+              label="Topic Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -108,7 +102,20 @@ const CreateDiscussion = ({ selectedSubject, onclick }) => {
             />
           </Grid>
           <Grid item xs={12}>
-            <Button variant="contained" color="primary" type="submit">
+            <Button
+              variant="outlined"
+              onClick={onclick}
+              style={{ marginRight: "6px" }}
+              sx={{ borderColor: "#207E68", color: "#207E68" }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              sx={{ bgcolor: "#207E68" }}
+            >
               Create Discussion
             </Button>
           </Grid>

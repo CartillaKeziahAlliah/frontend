@@ -8,14 +8,14 @@ import Discussion from "./Discussion";
 import Assignment from "./Assignment";
 
 const CourseDetail = () => {
-  const { courseName } = useParams();
+  const { subjectId } = useParams();
   const [section, setSection] = useState("Exams");
   const { user } = useAuth();
 
   return (
     <div className="course-detail-container p-4">
       <h1 className="text-3xl font-bold mb-4">
-        {courseName} - {section}
+        {subjectId} - {section}
       </h1>
 
       {user && (
@@ -88,10 +88,16 @@ const CourseDetail = () => {
       </div>
 
       <div className="section-content">
-        {section === "Exams" && <Exam courseName={courseName} user={user} />}
-        {section === "Discussions" && <Discussion courseName={courseName} />}
-        {section === "Assignments" && <Assignment courseName={courseName} />}
-        {section === "Quizzes" && <Quiz courseName={courseName} />}
+        {section === "Exams" && <Exam subjectId={subjectId} user={user} />}
+        {section === "Discussions" && (
+          <Discussion subjectId={subjectId} userId={user._id} />
+        )}
+        {section === "Assignments" && (
+          <Assignment subjectId={subjectId} userId={user._id} />
+        )}
+        {section === "Quizzes" && (
+          <Quiz subjectId={subjectId} userId={user._id} />
+        )}
       </div>
     </div>
   );

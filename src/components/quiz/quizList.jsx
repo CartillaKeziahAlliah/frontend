@@ -1,52 +1,82 @@
-// QuizList.js
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Paper,
   Button,
   Typography,
   TablePagination,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
-import { Delete, SearchOutlined } from "@mui/icons-material";
+import AddIcon from "@mui/icons-material/Add";
+import {
+  AddCircleOutline,
+  CheckCircleOutline,
+  DescriptionOutlined,
+  DragIndicator,
+  MoreVert,
+  SearchOutlined,
+} from "@mui/icons-material";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
+import QuizView from "./QuizView";
+import QuizScoresView from "./QuizScoresView";
 
-// const apiUrl = "http://localhost:5000";
-const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "https://server-production-dd7a.up.railway.app";
+const apiUrl = "http://localhost:5000";
 
-const QuizList = ({ selectedSubject }) => {
+const QuizList = ({ selectedSubject, setAction }) => {
   const [quizzes, setQuizzes] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
-  const [userAnswers, setUserAnswers] = useState({});
   const { user } = useAuth();
-  useEffect(() => {
-    const fetchQuizzes = async () => {
-      try {
-        const response = await axios.get(
-          `${apiUrl}/api/quiz/bysubject/${selectedSubject._id}`
-        );
-        setQuizzes(response.data);
-      } catch (error) {
-        console.error("Error fetching quizzes:", error);
-      }
-    };
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [activeQuizId, setActiveQuizId] = useState(null);
+  const [showScores, setShowScores] = useState(false);
+  const [selectedQuizId, setSelectedQuizId] = useState(null);
+  const [viewlist, setViewlist] = useState(true);
 
-    if (selectedSubject) {
-      fetchQuizzes();
+  const checkQuizAttempt = async (userId, quizId) => {
+    try {
+      const response = await axios.get(
+        `${apiUrl}/api/quiz/check-quiz-attempt/${userId}/${quizId}`
+      );
+      return response.data.hasTakenQuiz;
+    } catch (error) {
+      console.error("Error checking quiz attempt:", error);
+      return false;
+    }
+  };
+
+  const fetchQuizzes = async () => {
+    try {
+      const response = await axios.get(
+        `${apiUrl}/api/quiz/bysubject/${selectedSubject._id}`
+      );
+      setQuizzes(response.data);
+    } catch (error) {
+      console.error("Error fetching quizzes:", error);
+    }
+  };
+  useEffect(() => {
+    fetchQuizzes();
+    if (user) {
+      fetchQuizAttempts();
     }
   }, [selectedSubject]);
 
+  const fetchQuizAttempts = async () => {
+    for (const quiz of quizzes) {
+      const hasTaken = await checkQuizAttempt(user.id, quiz._id);
+      quiz.hasTaken = hasTaken;
+    }
+    setQuizzes([...quizzes]);
+  };
   const handleSearchTermChange = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
     setPage(0);
@@ -75,7 +105,6 @@ const QuizList = ({ selectedSubject }) => {
       quiz.description.toLowerCase().includes(searchTerm)
   );
 
-  // Logic for pagination
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -119,41 +148,36 @@ const QuizList = ({ selectedSubject }) => {
 
   const handleQuizClick = (quiz) => {
     setSelectedQuiz(quiz);
-    setUserAnswers({}); // Reset user answers when a new quiz is opened
+    setShowScores(false);
+    setAnchorEl(null);
+    setViewlist(false);
+  };
+  const handleViewScores = (quizId) => {
+    console.log("Selected Quiz ID:", quizId);
+    setSelectedQuizId(quizId);
+    setShowScores(true);
+    setSelectedQuiz(null);
+    setViewlist(false);
+    setAnchorEl(null);
   };
 
-  const clearSelectedQuiz = () => {
+  const handleMenuOpen = (event, quizId) => {
+    setAnchorEl(event.currentTarget);
+    setActiveQuizId(quizId);
+  };
+  const handleShowScoreClose = () => {
+    setShowScores(false);
+    setSelectedQuizId(null);
+    setViewlist(true);
+  };
+  const handleCloseSelectedQuiz = () => {
+    setSelectedQuiz(null);
+    setViewlist(true);
     setSelectedQuiz(null);
   };
-
-  const handleAnswerChange = (questionIndex, optionIndex) => {
-    setUserAnswers((prev) => ({
-      ...prev,
-      [questionIndex]: optionIndex,
-    }));
-  };
-
-  const handleSubmitQuiz = () => {
-    const correctAnswers = selectedQuiz.questions.reduce(
-      (total, question, index) => {
-        const userAnswer = userAnswers[index];
-        if (
-          userAnswer !== undefined &&
-          question.options[userAnswer].isCorrect
-        ) {
-          return total + 1;
-        }
-        return total;
-      },
-      0
-    );
-
-    Swal.fire(
-      "Quiz Submitted!",
-      `You scored ${correctAnswers} out of ${selectedQuiz.questions.length}`,
-      "success"
-    );
-    clearSelectedQuiz(); // Clear quiz after submission
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setActiveQuizId(null);
   };
 
   return (
@@ -169,7 +193,12 @@ const QuizList = ({ selectedSubject }) => {
             className="w-full p-2 outline-none rounded-3xl"
           />
         </div>
-
+        <button
+          onClick={setAction}
+          className="flex justify-center items-center mb-4 rounded-full hover:bg-gray-300 px-2"
+        >
+          <AddIcon />
+        </button>
         <select
           value={sortOption}
           onChange={handleSortChange}
@@ -181,198 +210,83 @@ const QuizList = ({ selectedSubject }) => {
         </select>
       </Box>
 
-      {paginatedQuizzes.length > 0 ? (
-        <TableContainer
-          component={Paper}
-          elevation={3}
-          sx={{
-            borderRadius: "10px",
-            overflow: "hidden",
-          }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Title
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Description
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Duration (min)
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Total Marks
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Deadline
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Action
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedQuizzes.map((quiz) => (
-                <TableRow key={quiz._id} hover>
-                  <TableCell>
-                    <Typography variant="body1">{quiz.title}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body1">{quiz.description}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body1">{quiz.duration}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body1">{quiz.totalMarks}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body1">
-                      {new Date(quiz.deadline).toLocaleDateString()}{" "}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    {user.role !== "student" && (
-                      <Button
-                        onClick={() => deleteQuiz(quiz._id)}
-                        variant="text"
-                        sx={{ color: "red" }}
-                      >
-                        <Delete />
-                      </Button>
+      {viewlist && (
+        <>
+          {paginatedQuizzes.length > 0 ? (
+            paginatedQuizzes.map((quiz) => (
+              <Paper
+                key={quiz._id}
+                elevation={3}
+                sx={{
+                  marginBottom: 2,
+                  padding: 2,
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box
+                  display="flex"
+                  flexDirection="row"
+                  alignItems="center"
+                  className="capitalize"
+                  gap={1}
+                >
+                  <DragIndicator />
+                  <DescriptionOutlined
+                    sx={{ color: "rgba(67, 141, 97, 0.8)" }}
+                  />
+                  <div className="flex justify-center">
+                    <Typography variant="h6">{quiz.title}</Typography>
+                  </div>
+                </Box>
+                <Box>
+                  <IconButton onClick={(e) => handleMenuOpen(e, quiz._id)}>
+                    <MoreVert />
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl) && activeQuizId === quiz._id}
+                    onClose={handleMenuClose}
+                  >
+                    {user.role === "teacher" && (
+                      <MenuItem onClick={() => deleteQuiz(quiz._id)}>
+                        Delete
+                      </MenuItem>
                     )}
-                    {user.role !== "student" && (
-                      <Button
-                        onClick={() => handleQuizClick(quiz)}
-                        variant="contained"
-                        sx={{ bgcolor: "#207E68", borderRadius: "100px" }}
-                      >
-                        View Quiz
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      ) : (
-        <p>No quizzes found.</p>
+                    <MenuItem onClick={() => handleQuizClick(quiz)}>
+                      {user.role === "student" ? "Take Quiz" : "View Quiz"}
+                    </MenuItem>
+                    <MenuItem onClick={() => handleViewScores(quiz)}>
+                      View Scores
+                    </MenuItem>
+                  </Menu>
+                </Box>
+              </Paper>
+            ))
+          ) : (
+            <Typography variant="body2" color="textSecondary">
+              No quizzes found.
+            </Typography>
+          )}
+        </>
       )}
-
-      {/* Pagination Component */}
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
         component="div"
         count={filteredQuizzes.length}
-        rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
+        rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
 
-      {/* Selected Quiz Details */}
       {selectedQuiz && (
-        <Box
-          sx={{
-            marginTop: 3,
-            padding: 2,
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-          }}
-        >
-          <Typography variant="h6">Quiz Details</Typography>
-          <Typography variant="body1" fontWeight="bold">
-            Title:
-          </Typography>
-          <Typography variant="body2">{selectedQuiz.title}</Typography>
-          <Typography variant="body1" fontWeight="bold">
-            Description:
-          </Typography>
-          <Typography variant="body2">{selectedQuiz.description}</Typography>
-          <Typography variant="body1" fontWeight="bold">
-            Duration:
-          </Typography>
-          <Typography variant="body2">
-            {selectedQuiz.duration} minutes
-          </Typography>
-          <Typography variant="body1" fontWeight="bold">
-            Total Marks:
-          </Typography>
-          <Typography variant="body2">{selectedQuiz.totalMarks}</Typography>
-          <Typography variant="body1" fontWeight="bold">
-            Deadline:
-          </Typography>
-          <Typography variant="body2">
-            {new Date(selectedQuiz.deadline).toLocaleDateString()}
-          </Typography>
-
-          <Typography variant="body1" fontWeight="bold">
-            Questions:
-          </Typography>
-          {selectedQuiz.questions.length > 0 ? (
-            <ul>
-              {selectedQuiz.questions.map((question, index) => (
-                <li key={index}>
-                  <Typography variant="body2">
-                    {index + 1}. {question.questionText}
-                    <br />
-                    Options:
-                    <ul>
-                      {question.options.map((option, optIndex) => (
-                        <li key={optIndex}>
-                          <label>
-                            <input
-                              type="radio"
-                              name={`question-${index}`}
-                              checked={userAnswers[index] === optIndex}
-                              onChange={() =>
-                                handleAnswerChange(index, optIndex)
-                              }
-                            />
-                            {option.optionText}{" "}
-                            {option.isCorrect ? "(Correct)" : ""}
-                          </label>
-                        </li>
-                      ))}
-                    </ul>
-                  </Typography>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <Typography variant="body2">No questions available.</Typography>
-          )}
-          <Button
-            onClick={handleSubmitQuiz}
-            variant="contained"
-            color="primary"
-            sx={{ marginTop: 2 }}
-          >
-            Submit Quiz
-          </Button>
-          <Button
-            onClick={clearSelectedQuiz}
-            variant="outlined"
-            sx={{ marginTop: 2, marginLeft: 1 }}
-          >
-            Close
-          </Button>
-        </Box>
+        <QuizView quiz={selectedQuiz} onClose={handleCloseSelectedQuiz} />
+      )}
+      {showScores && (
+        <QuizScoresView quiz={selectedQuizId} onClose={handleShowScoreClose} />
       )}
     </div>
   );

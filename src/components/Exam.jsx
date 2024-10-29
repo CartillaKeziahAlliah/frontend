@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios"; // Import Axios
 import {
   Button,
   TextField,
@@ -10,44 +11,37 @@ import {
   CardContent,
   Typography,
   Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  duration,
 } from "@mui/material";
 
-const Exam = ({ courseName, user }) => {
-  const [exams, setExams] = useState([
-    {
-      id: 1,
-      title: "Midterm Exam",
-      questions: [
-        {
-          type: "text",
-          question: "What is the capital of France?",
-          answer: "",
-        },
-        {
-          type: "multiple",
-          question: "Select the correct colors:",
-          choices: ["Red", "Blue", "Green"],
-          answer: "",
-        },
-      ],
-      score: null,
-    },
-    {
-      id: 2,
-      title: "Final Exam",
-      questions: [
-        { type: "text", question: "Explain Newton's first law.", answer: "" },
-        {
-          type: "multiple",
-          question: "Choose the programming languages:",
-          choices: ["JavaScript", "HTML", "CSS", "Python"],
-          answer: "",
-        },
-      ],
-      score: null,
-    },
-  ]);
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://server-production-dd7a.up.railway.app";
+
+const Exam = ({ subjectId, user }) => {
+  const [exams, setExams] = useState([]);
   const [currentExam, setCurrentExam] = useState(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
+  // Fetch exams when the component mounts
+  useEffect(() => {
+    const fetchExams = async () => {
+      try {
+        const response = await axios.get(
+          `${apiUrl}/api/exam/bysubject/${subjectId}`
+        );
+        setExams(response.data);
+        console.log("Exams fetched:", response.data); // Log the fetched exams
+      } catch (error) {
+        console.error("Failed to fetch exams:", error);
+      }
+    };
+
+    fetchExams();
+  }, [subjectId]);
 
   const handleTakeExam = (exam) => {
     setCurrentExam(exam);
@@ -55,7 +49,7 @@ const Exam = ({ courseName, user }) => {
 
   const handleAnswerChange = (index, value) => {
     const updatedExams = exams.map((exam) => {
-      if (exam.id === currentExam.id) {
+      if (exam._id === currentExam._id) {
         const updatedQuestions = [...exam.questions];
         updatedQuestions[index].answer = value;
         return { ...exam, questions: updatedQuestions };
@@ -66,20 +60,26 @@ const Exam = ({ courseName, user }) => {
   };
 
   const handleSubmit = () => {
+    // Simulate score calculation; here you could implement your own logic
     const updatedExams = exams.map((exam) =>
-      exam.id === currentExam.id ? { ...exam, score: 90 } : exam
+      exam._id === currentExam._id ? { ...exam, score: 90 } : exam
     );
     setExams(updatedExams);
     setCurrentExam(null);
   };
 
-  const handleViewScore = (exam) => {
-    alert(exam.score !== null ? `Your score: ${exam.score}` : "Not scored yet");
+  const handleViewDetails = (exam) => {
+    setCurrentExam(exam);
+    setDetailsOpen(true);
+  };
+
+  const handleCloseDetails = () => {
+    setDetailsOpen(false);
   };
 
   return (
     <div>
-      <h2>Exams for {courseName}</h2>
+      <h2>Exams for {subjectId}</h2>
       {user && <p>Student: {user.name}</p>}
 
       {currentExam ? (
@@ -87,7 +87,7 @@ const Exam = ({ courseName, user }) => {
           <h4>{currentExam.title} Questions</h4>
           {currentExam.questions.map((question, index) => (
             <div key={index} className="mb-4">
-              <p>{question.question}</p>
+              <p>{question.questionText}</p>
               {question.type === "text" && (
                 <TextField
                   label="Your Answer"
@@ -101,12 +101,12 @@ const Exam = ({ courseName, user }) => {
                   <RadioGroup
                     onChange={(e) => handleAnswerChange(index, e.target.value)}
                   >
-                    {question.choices.map((choice, choiceIndex) => (
+                    {question.options.map((option, choiceIndex) => (
                       <FormControlLabel
                         key={choiceIndex}
-                        value={choice}
+                        value={option.optionText}
                         control={<Radio />}
-                        label={choice}
+                        label={option.optionText}
                       />
                     ))}
                   </RadioGroup>
@@ -130,7 +130,7 @@ const Exam = ({ courseName, user }) => {
       ) : (
         <Grid container spacing={2}>
           {exams.map((exam) => (
-            <Grid item xs={12} sm={6} md={4} key={exam.id}>
+            <Grid item xs={12} sm={6} md={4} key={exam._id}>
               <Card
                 variant="outlined"
                 className="hover:shadow-lg transition-shadow duration-300"
@@ -138,7 +138,7 @@ const Exam = ({ courseName, user }) => {
                 <CardContent>
                   <Typography variant="h6">{exam.title}</Typography>
                   <div className="flex gap-2 mt-2">
-                    {exam.score === null ? (
+                    {exam.scores.length === 0 ? (
                       <Button
                         variant="contained"
                         onClick={() => handleTakeExam(exam)}
@@ -154,7 +154,7 @@ const Exam = ({ courseName, user }) => {
                     ) : (
                       <Button
                         variant="outlined"
-                        onClick={() => handleViewScore(exam)}
+                        onClick={() => handleViewDetails(exam)}
                         sx={{
                           mt: 2,
                           color: "#207E68",
@@ -165,7 +165,7 @@ const Exam = ({ courseName, user }) => {
                           },
                         }}
                       >
-                        View Score
+                        View Details
                       </Button>
                     )}
                   </div>
@@ -175,6 +175,46 @@ const Exam = ({ courseName, user }) => {
           ))}
         </Grid>
       )}
+
+      <Dialog open={detailsOpen} onClose={handleCloseDetails}>
+        <DialogTitle>Exam Details</DialogTitle>
+        <DialogContent>
+          {currentExam && (
+            <div>
+              <Typography variant="h6">{currentExam.title}</Typography>
+              <Typography variant="body1">{currentExam.description}</Typography>
+              <Typography variant="body2">
+                Duration: {currentExam.duration} minutes
+              </Typography>
+              <Typography variant="body2">
+                Total Marks: {currentExam.totalMarks}
+              </Typography>
+              <Typography variant="body2">
+                Pass Marks: {currentExam.passMarks}
+              </Typography>
+              <Typography variant="h6">Questions:</Typography>
+              {currentExam.questions.map((question, index) => (
+                <div key={index}>
+                  <Typography variant="body2">
+                    {index + 1}. {question.questionText}
+                  </Typography>
+                  {question.options.map((option, optionIndex) => (
+                    <Typography variant="body2" key={optionIndex}>
+                      - {option.optionText}{" "}
+                      {option.isCorrect ? "(Correct)" : ""}
+                    </Typography>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDetails} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

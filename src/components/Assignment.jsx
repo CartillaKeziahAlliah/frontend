@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -6,24 +6,45 @@ import {
   CardContent,
   Typography,
   Grid,
+  Snackbar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
+import axios from "axios"; // Import axios for HTTP requests
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
-const Assignment = ({ courseName, user }) => {
-  const [assignments, setAssignments] = useState([
-    {
-      id: 1,
-      title: "First Assignment",
-      score: null,
-      answer: "",
-    },
-    {
-      id: 2,
-      title: "Second Assignment",
-      score: null,
-      answer: "",
-    },
-  ]);
+const Alert = React.forwardRef((props, ref) => (
+  <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+));
+
+const Assignment = ({ subjectId, user }) => {
+  const [assignments, setAssignments] = useState([]);
   const [currentAssignment, setCurrentAssignment] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
+
+  // Fetch assignments from the backend when the component mounts
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      try {
+        const response = await axios.get(
+          `${apiUrl}/api/assignment/bysubject/${subjectId}`
+        );
+        setAssignments(response.data);
+      } catch (error) {
+        console.error("Error fetching assignments:", error);
+        setSnackbarMessage("Failed to fetch assignments.");
+        setSnackbarOpen(true);
+      }
+    };
+
+    fetchAssignments();
+  }, [subjectId]);
 
   const handleTakeAssignment = (assignment) => {
     setCurrentAssignment(assignment);
@@ -40,13 +61,22 @@ const Assignment = ({ courseName, user }) => {
   };
 
   const handleSubmit = () => {
+    if (currentAssignment.answer.trim() === "") {
+      setSnackbarMessage("Please enter an answer before submitting.");
+      setSnackbarOpen(true);
+      return;
+    }
+
+    // Here, you would typically send the answer to the server
     const updatedAssignments = assignments.map((assignment) =>
       assignment.id === currentAssignment.id
-        ? { ...assignment, score: 75 }
+        ? { ...assignment, score: 75 } // Replace with dynamic scoring as needed
         : assignment
     );
     setAssignments(updatedAssignments);
     setCurrentAssignment(null);
+    setSnackbarMessage("Assignment submitted successfully!");
+    setSnackbarOpen(true);
   };
 
   const handleViewScore = (assignment) => {
@@ -57,9 +87,23 @@ const Assignment = ({ courseName, user }) => {
     );
   };
 
+  const handleViewDetails = (assignment) => {
+    setSelectedAssignment(assignment);
+    setDetailsOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  const handleCloseDetails = () => {
+    setDetailsOpen(false);
+    setSelectedAssignment(null);
+  };
+
   return (
     <div>
-      <h2>Assignments for {courseName}</h2>
+      <h2>Assignments for {subjectId}</h2>
       {user && <p>Student: {user.name}</p>}
 
       {!currentAssignment ? (
@@ -92,6 +136,12 @@ const Assignment = ({ courseName, user }) => {
                         View Score
                       </Button>
                     )}
+                    <Button
+                      variant="outlined"
+                      onClick={() => handleViewDetails(assignment)}
+                    >
+                      View Details
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -124,6 +174,62 @@ const Assignment = ({ courseName, user }) => {
           </Button>
         </div>
       )}
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity="info">
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+
+      {/* Details Dialog */}
+      <Dialog open={detailsOpen} onClose={handleCloseDetails}>
+        <DialogTitle>Assignment Details</DialogTitle>
+        <DialogContent>
+          {selectedAssignment && (
+            <>
+              <Typography variant="h6">{selectedAssignment.title}</Typography>
+              <Typography variant="body1">
+                {selectedAssignment.description}
+              </Typography>
+              <Typography variant="body2">
+                Duration: {selectedAssignment.duration} mins
+              </Typography>
+              <Typography variant="body2">
+                Total Marks: {selectedAssignment.totalMarks}
+              </Typography>
+              <Typography variant="body2">
+                Pass Marks: {selectedAssignment.passMarks}
+              </Typography>
+              <Typography variant="body2">
+                Deadline:{" "}
+                {new Date(selectedAssignment.deadline).toLocaleString()}
+              </Typography>
+              <Typography variant="h6">Questions:</Typography>
+              {selectedAssignment.questions.map((question, index) => (
+                <div key={index}>
+                  <Typography variant="body2">
+                    {index + 1}. {question.questionText}
+                  </Typography>
+                  <ul>
+                    {question.options.map((option, optIndex) => (
+                      <li key={optIndex}>{option.optionText}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDetails} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

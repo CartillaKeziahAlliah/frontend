@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   TextField,
@@ -7,44 +7,76 @@ import {
   Typography,
   Grid,
 } from "@mui/material";
+import axios from "axios";
 
-const Quiz = ({ courseName, user }) => {
-  const [quizzes, setQuizzes] = useState([
-    {
-      id: 1,
-      title: "Midterm Quiz",
-      score: null,
-      answer: "",
-    },
-    {
-      id: 2,
-      title: "Final Quiz",
-      score: null,
-      answer: "",
-    },
-  ]);
+// const apiUrl = "http://localhost:5000";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
+const Quiz = ({ subjectId, user }) => {
+  const [quizzes, setQuizzes] = useState([]);
   const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [userAnswers, setUserAnswers] = useState({});
 
-  const handleTakeQuiz = (quiz) => {
-    setCurrentQuiz(quiz);
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const response = await axios.get(
+          `${apiUrl}/api/quiz/bysubject/${subjectId}`
+        );
+        setQuizzes(response.data);
+      } catch (error) {
+        console.error("Error fetching quizzes:", error);
+      }
+    };
+
+    fetchQuizzes();
+  }, [subjectId]);
+
+  const handleTakeQuiz = async (quiz) => {
+    try {
+      const response = await axios.get(
+        `${apiUrl}/api/quiz/check-quiz-attempt/${user.id}/${quiz.id}`
+      );
+
+      if (response.data.hasTakenQuiz) {
+        alert("You have already taken this quiz.");
+      } else {
+        setCurrentQuiz(quiz);
+      }
+    } catch (error) {
+      console.error("Error checking quiz attempt:", error);
+    }
   };
 
   const handleAnswerChange = (value) => {
-    const updatedQuizzes = quizzes.map((quiz) => {
-      if (quiz.id === currentQuiz.id) {
-        return { ...quiz, answer: value };
-      }
-      return quiz;
-    });
-    setQuizzes(updatedQuizzes);
+    setUserAnswers({ ...userAnswers, [currentQuiz.id]: value });
   };
 
-  const handleSubmit = () => {
-    const updatedQuizzes = quizzes.map((quiz) =>
-      quiz.id === currentQuiz.id ? { ...quiz, score: 85 } : quiz
-    );
-    setQuizzes(updatedQuizzes);
-    setCurrentQuiz(null);
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        `${apiUrl}/api/quiz/submit/${currentQuiz.id}/${user.id}`,
+        {
+          userAnswers: userAnswers[currentQuiz.id],
+        }
+      );
+
+      const updatedQuiz = {
+        ...currentQuiz,
+        score: response.data.obtainedMarks,
+      };
+      setQuizzes((prevQuizzes) =>
+        prevQuizzes.map((quiz) =>
+          quiz.id === updatedQuiz.id ? updatedQuiz : quiz
+        )
+      );
+      setCurrentQuiz(null);
+      setUserAnswers((prevAnswers) => ({
+        ...prevAnswers,
+        [currentQuiz.id]: "",
+      })); // Clear answer
+    } catch (error) {
+      console.error("Error submitting quiz:", error);
+    }
   };
 
   const handleViewScore = (quiz) => {
@@ -53,13 +85,13 @@ const Quiz = ({ courseName, user }) => {
 
   return (
     <div>
-      <h2>Quizzes for {courseName}</h2>
+      <h2>Quizzes for Subject {subjectId}</h2>
       {user && <p>Student: {user.name}</p>}
 
       {!currentQuiz ? (
         <Grid container spacing={2}>
-          {quizzes.map((quiz) => (
-            <Grid item xs={12} sm={6} md={4} key={quiz.id}>
+          {quizzes.map((quiz, index) => (
+            <Grid item xs={12} sm={6} md={4} key={quiz.id || index}>
               <Card
                 variant="outlined"
                 className="hover:shadow-lg transition-shadow duration-300"
@@ -111,7 +143,7 @@ const Quiz = ({ courseName, user }) => {
             variant="outlined"
             fullWidth
             multiline
-            value={currentQuiz.answer}
+            value={userAnswers[currentQuiz.id] || ""}
             onChange={(e) => handleAnswerChange(e.target.value)}
           />
           <Button

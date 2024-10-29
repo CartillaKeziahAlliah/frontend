@@ -25,7 +25,7 @@ function App() {
             <Route path="/table" element={<TablePages />} />
             <Route path="/Dashboard" element={<Dashboard />} />
             <Route path="/updateprofile" element={<UpdateProfile />} />
-            <Route path="/course/:courseName" element={<CourseDetail />} />
+            <Route path="/course/:subjectId" element={<CourseDetail />} />
             <Route path="/section/:sectionName" element={<SectionDetail />} />
           </Route>
           <Route path="*" element={<div>Not found</div>} />

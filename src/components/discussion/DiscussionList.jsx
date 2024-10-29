@@ -167,7 +167,7 @@ const DiscussionList = ({ selectedSubject }) => {
   };
   const isDiscussionReadByUser = (discussion) => {
     return discussion.studentsRead.some(
-      (student) => student.studentId.toString() === user._id
+      (student) => student.studentId === user._id
     );
   };
 
@@ -194,98 +194,103 @@ const DiscussionList = ({ selectedSubject }) => {
         </div>
       </Box>
 
-      {loading ? (
-        <Typography>Loading discussions...</Typography>
-      ) : paginatedDiscussions.length > 0 ? (
-        <TableContainer
-          component={Paper}
-          elevation={3}
-          sx={{ borderRadius: "10px", overflow: "hidden" }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Title
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Content
-                  </Typography>
-                </TableCell>
-                <TableCell align="right">
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Action
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedDiscussions.map((discussion) => (
-                <TableRow key={discussion._id} hover>
-                  <TableCell>
-                    <Typography variant="body1">{discussion.title}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body1">
-                      {discussion.content}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton onClick={handleClick}>
-                      <MoreVert />
-                    </IconButton>
-                    <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-                      {user.role !== "student" && (
-                        <MenuItem
-                          onClick={() => {
-                            deleteDiscussion(discussion._id);
-                            handleClose();
-                          }}
-                        >
-                          Delete
-                        </MenuItem>
-                      )}
-                      {isDiscussionReadByUser(discussion) ? (
-                        <MenuItem onClick={handleClose}>
-                          <CheckCircle
-                            color="success"
-                            sx={{ marginRight: 1 }}
-                          />
-                          Read
-                        </MenuItem>
-                      ) : (
-                        <MenuItem
-                          onClick={() => {
-                            handleDiscussionClick(discussion);
-                            handleClose();
-                          }}
-                        >
-                          Read Discussion
-                        </MenuItem>
-                      )}
-                    </Menu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      ) : (
-        <Typography>No discussions found.</Typography>
+      {!selectedDiscussion && (
+        <>
+          {loading ? (
+            <Typography>Loading discussions...</Typography>
+          ) : paginatedDiscussions.length > 0 ? (
+            <TableContainer
+              component={Paper}
+              elevation={3}
+              sx={{ borderRadius: "10px", overflow: "hidden" }}
+            >
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Title
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Content
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Action
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedDiscussions.map((discussion) => (
+                    <TableRow key={discussion._id} hover>
+                      <TableCell>
+                        <Typography variant="body1">
+                          {discussion.title}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body1">
+                          {discussion.content}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        {isDiscussionReadByUser(discussion) ? (
+                          <Button
+                            sx={{
+                              color: "black",
+                              cursor: "default",
+                            }}
+                          >
+                            <CheckCircle
+                              color="success"
+                              sx={{ marginRight: 1 }}
+                            />
+                            Read
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={() => {
+                              handleDiscussionClick(discussion);
+                              handleClose();
+                            }}
+                          >
+                            Read Discussion
+                          </Button>
+                        )}
+                        {user.role !== "student" && (
+                          <Button
+                            onClick={() => {
+                              deleteDiscussion(discussion._id);
+                              handleClose();
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={filteredDiscussions.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </TableContainer>
+          ) : (
+            <Typography>No discussions found.</Typography>
+          )}
+        </>
       )}
-
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={filteredDiscussions.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
 
       {/* Selected Discussion Details */}
       {selectedDiscussion && (
@@ -297,23 +302,29 @@ const DiscussionList = ({ selectedSubject }) => {
             borderRadius: "8px",
           }}
         >
+          <h1></h1>
+          <Typography variant="h2">Discussion</Typography>
           <div className="flex flex-row justify-between">
             <Typography variant="h4">{selectedDiscussion.title}</Typography>
 
             <div className="flex flex-row items-center">
-              {isDiscussionReadByUser(selectedDiscussion) ? (
-                <Typography color="success.main">
-                  You have read this discussion
-                </Typography>
-              ) : (
-                <MenuItem
-                  onClick={() => {
-                    markDiscussionAsRead(selectedDiscussion._id);
-                    handleClose();
-                  }}
-                >
-                  Mark as Read
-                </MenuItem>
+              {user.role === "student" && (
+                <>
+                  {isDiscussionReadByUser(selectedDiscussion) ? (
+                    <Typography color="success.main">
+                      You have read this discussion
+                    </Typography>
+                  ) : (
+                    <MenuItem
+                      onClick={() => {
+                        markDiscussionAsRead(selectedDiscussion._id);
+                        handleClose();
+                      }}
+                    >
+                      Mark as Read
+                    </MenuItem>
+                  )}
+                </>
               )}
               <Button onClick={clearSelectedDiscussion}>
                 <CloseOutlined sx={{ color: "#000" }} />
