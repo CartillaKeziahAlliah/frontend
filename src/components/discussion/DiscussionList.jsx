@@ -11,21 +11,16 @@ import {
   Button,
   Typography,
   TablePagination,
-  IconButton,
-  Menu,
-  MenuItem,
-  patch,
-  Modal,
 } from "@mui/material";
 import {
   SearchOutlined,
   CheckCircle,
-  MoreVert,
   CloseOutlined,
 } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
+import StudentsReadList from "./StudentsReadModal"; // Import the new students read list component
 
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 
@@ -37,18 +32,9 @@ const DiscussionList = ({ selectedSubject }) => {
   const [loading, setLoading] = useState(true);
   const [selectedDiscussion, setSelectedDiscussion] = useState(null);
   const { user } = useAuth();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
   const [studentsReadList, setStudentsReadList] = useState([]);
-  const [openStudentsReadModal, setOpenStudentsReadModal] = useState(false);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
+  const [showStudentsReadList, setShowStudentsReadList] = useState(false); // State to toggle student read list visibility
+  const [viewRead, setViewRead] = useState(false);
   useEffect(() => {
     const fetchDiscussions = async () => {
       setLoading(true);
@@ -124,6 +110,7 @@ const DiscussionList = ({ selectedSubject }) => {
       }
     }
   };
+
   const markDiscussionAsRead = async (discussionId) => {
     const studentId = user._id;
     try {
@@ -166,6 +153,7 @@ const DiscussionList = ({ selectedSubject }) => {
       Swal.fire("Error", "Failed to mark discussion as read", "error");
     }
   };
+
   const isDiscussionReadByUser = (discussion) => {
     return discussion.studentsRead.some(
       (student) => student.studentId === user._id
@@ -179,18 +167,20 @@ const DiscussionList = ({ selectedSubject }) => {
   const clearSelectedDiscussion = () => {
     setSelectedDiscussion(null); // Clear selected discussion
   };
+
   const fetchStudentsReadList = async (discussionId) => {
     try {
       const response = await axios.get(
         `${apiUrl}/api/discussion/${discussionId}/students-read`
       );
       setStudentsReadList(response.data);
-      setOpenStudentsReadModal(true); // Open the modal after fetching data
+      setShowStudentsReadList(true); // Show the students read list after fetching data
     } catch (error) {
       console.error("Error fetching students read list:", error);
       Swal.fire("Error", "Failed to fetch students read list", "error");
     }
   };
+
   return (
     <div className="discussion-list">
       <Box display="flex" flexDirection="row" gap={1} sx={{ marginTop: 2 }}>
@@ -206,7 +196,7 @@ const DiscussionList = ({ selectedSubject }) => {
         </div>
       </Box>
 
-      {!selectedDiscussion && (
+      {!selectedDiscussion && !showStudentsReadList && (
         <>
           {loading ? (
             <Typography>Loading discussions...</Typography>
@@ -267,7 +257,6 @@ const DiscussionList = ({ selectedSubject }) => {
                           <Button
                             onClick={() => {
                               handleDiscussionClick(discussion);
-                              handleClose();
                             }}
                           >
                             Read Discussion
@@ -282,7 +271,6 @@ const DiscussionList = ({ selectedSubject }) => {
                           <Button
                             onClick={() => {
                               deleteDiscussion(discussion._id);
-                              handleClose();
                             }}
                           >
                             Delete
@@ -319,7 +307,6 @@ const DiscussionList = ({ selectedSubject }) => {
             borderRadius: "8px",
           }}
         >
-          <h1></h1>
           <Typography variant="h2">Discussion</Typography>
           <div className="flex flex-row justify-between">
             <Typography variant="h4">{selectedDiscussion.title}</Typography>
@@ -332,14 +319,13 @@ const DiscussionList = ({ selectedSubject }) => {
                       You have read this discussion
                     </Typography>
                   ) : (
-                    <MenuItem
+                    <Button
                       onClick={() => {
                         markDiscussionAsRead(selectedDiscussion._id);
-                        handleClose();
                       }}
                     >
                       Mark as Read
-                    </MenuItem>
+                    </Button>
                   )}
                 </>
               )}
@@ -355,52 +341,14 @@ const DiscussionList = ({ selectedSubject }) => {
           <Typography variant="body2">{selectedDiscussion.content}</Typography>
         </Box>
       )}
-      <Modal
-        open={openStudentsReadModal}
-        onClose={() => setOpenStudentsReadModal(false)}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Box
-          sx={{
-            width: 400,
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
-            maxHeight: "80vh",
-            overflowY: "auto",
-          }}
-        >
-          <Typography variant="h6" component="h2" gutterBottom>
-            Students Who Read the Discussion
-          </Typography>
-          {studentsReadList.length > 0 ? (
-            studentsReadList.map((entry, index) => (
-              <Box
-                key={index}
-                sx={{ display: "flex", justifyContent: "space-between" }}
-              >
-                <Typography>
-                  {entry.student.name} (Read on{" "}
-                  {new Date(entry.dateRead).toLocaleDateString()})
-                </Typography>
-              </Box>
-            ))
-          ) : (
-            <Typography>No students have read this discussion yet.</Typography>
-          )}
-          <IconButton
-            sx={{ position: "absolute", top: 10, right: 10 }}
-            onClick={() => setOpenStudentsReadModal(false)}
-          >
-            <CloseOutlined />
-          </IconButton>
-        </Box>
-      </Modal>
+
+      {/* Display the Students Read List */}
+      {showStudentsReadList && (
+        <StudentsReadList
+          studentsReadList={studentsReadList}
+          onClose={() => setShowStudentsReadList(false)} // Close the student list
+        />
+      )}
     </div>
   );
 };
