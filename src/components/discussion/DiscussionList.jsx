@@ -15,6 +15,7 @@ import {
   Menu,
   MenuItem,
   patch,
+  Modal,
 } from "@mui/material";
 import {
   SearchOutlined,
@@ -25,7 +26,6 @@ import {
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
-import { color } from "framer-motion";
 
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 
@@ -39,7 +39,8 @@ const DiscussionList = ({ selectedSubject }) => {
   const { user } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-
+  const [studentsReadList, setStudentsReadList] = useState([]);
+  const [openStudentsReadModal, setOpenStudentsReadModal] = useState(false);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -178,7 +179,18 @@ const DiscussionList = ({ selectedSubject }) => {
   const clearSelectedDiscussion = () => {
     setSelectedDiscussion(null); // Clear selected discussion
   };
-
+  const fetchStudentsReadList = async (discussionId) => {
+    try {
+      const response = await axios.get(
+        `${apiUrl}/api/discussion/${discussionId}/students-read`
+      );
+      setStudentsReadList(response.data);
+      setOpenStudentsReadModal(true); // Open the modal after fetching data
+    } catch (error) {
+      console.error("Error fetching students read list:", error);
+      Swal.fire("Error", "Failed to fetch students read list", "error");
+    }
+  };
   return (
     <div className="discussion-list">
       <Box display="flex" flexDirection="row" gap={1} sx={{ marginTop: 2 }}>
@@ -261,6 +273,11 @@ const DiscussionList = ({ selectedSubject }) => {
                             Read Discussion
                           </Button>
                         )}
+                        <Button
+                          onClick={() => fetchStudentsReadList(discussion._id)}
+                        >
+                          View Students
+                        </Button>
                         {user.role !== "student" && (
                           <Button
                             onClick={() => {
@@ -338,6 +355,52 @@ const DiscussionList = ({ selectedSubject }) => {
           <Typography variant="body2">{selectedDiscussion.content}</Typography>
         </Box>
       )}
+      <Modal
+        open={openStudentsReadModal}
+        onClose={() => setOpenStudentsReadModal(false)}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box
+          sx={{
+            width: 400,
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+            maxHeight: "80vh",
+            overflowY: "auto",
+          }}
+        >
+          <Typography variant="h6" component="h2" gutterBottom>
+            Students Who Read the Discussion
+          </Typography>
+          {studentsReadList.length > 0 ? (
+            studentsReadList.map((entry, index) => (
+              <Box
+                key={index}
+                sx={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <Typography>
+                  {entry.student.name} (Read on{" "}
+                  {new Date(entry.dateRead).toLocaleDateString()})
+                </Typography>
+              </Box>
+            ))
+          ) : (
+            <Typography>No students have read this discussion yet.</Typography>
+          )}
+          <IconButton
+            sx={{ position: "absolute", top: 10, right: 10 }}
+            onClick={() => setOpenStudentsReadModal(false)}
+          >
+            <CloseOutlined />
+          </IconButton>
+        </Box>
+      </Modal>
     </div>
   );
 };
