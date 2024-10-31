@@ -17,6 +17,7 @@ import { Delete, SearchOutlined } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
+import AssScoresView from "./AssScoresView";
 
 // const apiUrl = "http://localhost:5000";
 const apiUrl = "https://server-production-dd7a.up.railway.app";
@@ -28,6 +29,17 @@ const AssignmentList = ({ selectedSubject }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
+  const [viewlist, setViewlist] = useState(true);
+  const [showScores, setShowScores] = useState(false);
+
+  const handleViewScores = (assignmentId) => {
+    console.log("Selected Quiz ID:", assignmentId);
+    setSelectedAssignmentId(assignmentId);
+    setShowScores(true);
+    setSelectedAssignment(null);
+    setViewlist(false);
+  };
   const { user } = useAuth();
   useEffect(() => {
     const fetchAssignments = async () => {
@@ -45,6 +57,11 @@ const AssignmentList = ({ selectedSubject }) => {
       fetchAssignments();
     }
   }, [selectedSubject]);
+  const handleShowScoreClose = () => {
+    setShowScores(false);
+    setSelectedAssignmentId(null); // Set assignment ID to null
+    setViewlist(true); // Toggle view list back to true
+  };
 
   const handleSearchTermChange = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
@@ -152,118 +169,129 @@ const AssignmentList = ({ selectedSubject }) => {
         </select>
       </Box>
 
-      {paginatedAssignments.length > 0 ? (
-        <TableContainer
-          component={Paper}
-          elevation={3}
-          sx={{
-            borderRadius: "10px",
-            overflow: "hidden",
-          }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Title
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Description
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Duration (min)
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Total Marks
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Pass Marks
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Deadline
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    Action
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedAssignments.map((assignment) => (
-                <TableRow key={assignment._id} hover>
-                  <TableCell>
-                    <Typography variant="body1">{assignment.title}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body1">
-                      {assignment.description}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body1">
-                      {assignment.duration}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body1">
-                      {assignment.totalMarks}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body1">
-                      {assignment.passMarks}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body1">
-                      {new Date(assignment.deadline).toLocaleDateString()}{" "}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    {user.role !== "student" && (
-                      <Button
-                        onClick={() => deleteAssignment(assignment._id)}
-                        variant="text"
-                        sx={{ color: "red" }}
-                      >
-                        <Delete />
-                      </Button>
-                    )}
-                    {user.role !== "student" && (
-                      <Button
-                        onClick={() => handleAssignmentClick(assignment)}
-                        variant="outlined"
-                        sx={{
-                          bgcolor: "#207E68",
-                          borderRadius: "100px",
-                          color: "white",
-                        }}
-                      >
-                        View
-                      </Button>
-                    )}
-                    {user.role === "student" && <Button>Take Quiz</Button>}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      ) : (
-        <p>No assignments found.</p>
+      {viewlist === true && (
+        <>
+          {paginatedAssignments.length > 0 ? (
+            <TableContainer
+              component={Paper}
+              elevation={3}
+              sx={{
+                borderRadius: "10px",
+                overflow: "hidden",
+              }}
+            >
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Title
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Description
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Duration (min)
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Total Marks
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Pass Marks
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Deadline
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Action
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedAssignments.map((assignment) => (
+                    <TableRow key={assignment._id} hover>
+                      <TableCell>
+                        <Typography variant="body1">
+                          {assignment.title}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body1">
+                          {assignment.description}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body1">
+                          {assignment.duration}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body1">
+                          {assignment.totalMarks}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body1">
+                          {assignment.passMarks}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body1">
+                          {new Date(assignment.deadline).toLocaleDateString()}{" "}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        {user.role !== "student" && (
+                          <Button
+                            onClick={() => deleteAssignment(assignment._id)}
+                            variant="text"
+                            sx={{ color: "red" }}
+                          >
+                            <Delete />
+                          </Button>
+                        )}
+                        {user.role !== "student" && (
+                          <Button
+                            onClick={() => handleAssignmentClick(assignment)}
+                            variant="outlined"
+                            sx={{
+                              bgcolor: "#207E68",
+                              borderRadius: "100px",
+                              color: "white",
+                            }}
+                          >
+                            View
+                          </Button>
+                        )}
+                        {user.role !== "student" && (
+                          <Button onClick={() => handleViewScores(assignment)}>
+                            View Scores
+                          </Button>
+                        )}
+                        {user.role === "student" && <Button>Take Quiz</Button>}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <p>No assignments found.</p>
+          )}
+        </>
       )}
 
       {/* Pagination Component */}
@@ -356,6 +384,12 @@ const AssignmentList = ({ selectedSubject }) => {
             Close
           </Button>
         </Box>
+      )}
+      {showScores && (
+        <AssScoresView
+          assignments={selectedAssignmentId}
+          onClose={handleShowScoreClose}
+        />
       )}
     </div>
   );

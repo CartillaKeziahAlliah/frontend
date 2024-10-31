@@ -26,6 +26,7 @@ import QuizList from "./quiz/quizList";
 import CreateDiscussion from "./discussion/CreateDiscussion";
 import DiscussionList from "./discussion/DiscussionList";
 import StudentsComponent from "./studentList/studentlist";
+import ExamScoresView from "./exam/ExamScoresView";
 
 // const apiUrl = "http://localhost:5000";
 const apiUrl = "https://server-production-dd7a.up.railway.app";
@@ -44,6 +45,9 @@ const SectionDetail = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [view, setView] = useState("");
   const [students, setStudents] = useState([]);
+  const [selectedExamId, setSelectedExamId] = useState(null);
+  const [viewlist, setViewlist] = useState(true);
+  const [showScores, setShowScores] = useState(false);
   const [editData, setEditData] = useState({
     title: "",
     description: "",
@@ -59,6 +63,19 @@ const SectionDetail = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5); // Default number of rows per page
 
+  const handleViewScores = (examId) => {
+    console.log("Selected Quiz ID:", examId);
+    setSelectedExamId(examId);
+    setShowScores(true);
+    setSelectedExam(null);
+    setViewlist(false);
+  };
+
+  const handleShowScoreClose = () => {
+    setShowScores(false);
+    setSelectedExamId(null); // Set assignment ID to null
+    setViewlist(true); // Toggle view list back to true
+  };
   const handleExamClick = (exam) => {
     setSelectedExam(exam);
     setEditData({
@@ -424,160 +441,171 @@ const SectionDetail = () => {
                   Create Exam
                 </Button>
               </div>
-              <Box
-                display="flex"
-                flexDirection="row"
-                gap={1}
-                sx={{ justifyContent: "flex-between", marginTop: 2 }}
-              >
-                <div className="border border-gray-500 px-2 rounded-3xl mb-4 w-full flex flex-row items-center">
-                  <SearchOutlined />
-                  <input
-                    type="text"
-                    placeholder="Search exams..."
-                    value={searchTerm}
-                    onChange={handleSearchTermChange}
-                    className="w-full p-2 outline-none rounded-3xl"
-                  />
-                </div>
+              {viewlist && (
+                <>
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                    gap={1}
+                    sx={{ justifyContent: "flex-between", marginTop: 2 }}
+                  >
+                    <div className="border border-gray-500 px-2 rounded-3xl mb-4 w-full flex flex-row items-center">
+                      <SearchOutlined />
+                      <input
+                        type="text"
+                        placeholder="Search exams..."
+                        value={searchTerm}
+                        onChange={handleSearchTermChange}
+                        className="w-full p-2 outline-none rounded-3xl"
+                      />
+                    </div>
 
-                <select
-                  value={sortOption}
-                  onChange={handleSortChange}
-                  className="border border-gray-500 p-2 rounded-3xl mb-4"
-                >
-                  <option value="">Sort by</option>
-                  <option value="alphabetical">Alphabetical</option>
-                  <option value="date">Date</option>
-                </select>
-              </Box>
+                    <select
+                      value={sortOption}
+                      onChange={handleSortChange}
+                      className="border border-gray-500 p-2 rounded-3xl mb-4"
+                    >
+                      <option value="">Sort by</option>
+                      <option value="alphabetical">Alphabetical</option>
+                      <option value="date">Date</option>
+                    </select>
+                  </Box>
 
-              {paginatedExams.length > 0 ? (
-                <TableContainer
-                  component={Paper}
-                  elevation={3}
-                  sx={{
-                    borderRadius: "10px",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Table>
-                    <TableHead>
-                      <TableRow
-                        sx={{
-                          backgroundColor: "#f5f5f5", // Light gray header
-                        }}
-                      >
-                        <TableCell>
-                          <Typography variant="subtitle1" fontWeight="bold">
-                            Title
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="subtitle1" fontWeight="bold">
-                            Total Marks
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="subtitle1" fontWeight="bold">
-                            Passing Marks
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="subtitle1" fontWeight="bold">
-                            Duration
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="subtitle1" fontWeight="bold">
-                            Action
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {paginatedExams.map((exam) => (
-                        <TableRow
-                          key={exam._id}
-                          hover
-                          sx={{
-                            cursor: "pointer",
-                            "&:nth-of-type(odd)": {
-                              backgroundColor: "#f9f9f9", // Light background for odd rows
-                            },
-                            "&:hover": {
-                              backgroundColor: "#e0f7fa", // Subtle hover color
-                            },
-                          }}
-                        >
-                          <TableCell>
-                            <Typography variant="body1">
-                              {exam.title}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="body1">
-                              {exam.totalMarks}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="body1">
-                              {exam.passMarks}
-                            </Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="body1">
-                              {exam.duration}
-                            </Typography>
-                          </TableCell>
-                          <TableCell
+                  {paginatedExams.length > 0 ? (
+                    <TableContainer
+                      component={Paper}
+                      elevation={3}
+                      sx={{
+                        borderRadius: "10px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <Table>
+                        <TableHead>
+                          <TableRow
                             sx={{
-                              display: "flex",
-                              gap: 1,
-                              flexWrap: "wrap",
+                              backgroundColor: "#f5f5f5", // Light gray header
                             }}
                           >
-                            {user.role !== "student" && (
-                              <Button
-                                onClick={() => deleteExam(exam._id)}
-                                variant="text"
-                                sx={{ color: "red" }}
-                              >
-                                <Delete />
-                              </Button>
-                            )}
-                            {user.role !== "student" && (
-                              <Button
-                                onClick={() => handleExamClick(exam)}
-                                variant="contained"
+                            <TableCell>
+                              <Typography variant="subtitle1" fontWeight="bold">
+                                Title
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="subtitle1" fontWeight="bold">
+                                Total Marks
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="subtitle1" fontWeight="bold">
+                                Passing Marks
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="subtitle1" fontWeight="bold">
+                                Duration
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="subtitle1" fontWeight="bold">
+                                Action
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {paginatedExams.map((exam) => (
+                            <TableRow
+                              key={exam._id}
+                              hover
+                              sx={{
+                                cursor: "pointer",
+                                "&:nth-of-type(odd)": {
+                                  backgroundColor: "#f9f9f9", // Light background for odd rows
+                                },
+                                "&:hover": {
+                                  backgroundColor: "#e0f7fa", // Subtle hover color
+                                },
+                              }}
+                            >
+                              <TableCell>
+                                <Typography variant="body1">
+                                  {exam.title}
+                                </Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant="body1">
+                                  {exam.totalMarks}
+                                </Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant="body1">
+                                  {exam.passMarks}
+                                </Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant="body1">
+                                  {exam.duration}
+                                </Typography>
+                              </TableCell>
+                              <TableCell
                                 sx={{
-                                  bgcolor: "#207E68",
-                                  borderRadius: "100px",
+                                  display: "flex",
+                                  gap: 1,
+                                  flexWrap: "wrap",
                                 }}
                               >
-                                View
-                              </Button>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              ) : (
-                <p>No exams found.</p>
-              )}
+                                {user.role !== "student" && (
+                                  <Button
+                                    onClick={() => deleteExam(exam._id)}
+                                    variant="text"
+                                    sx={{ color: "red" }}
+                                  >
+                                    <Delete />
+                                  </Button>
+                                )}
+                                {user.role !== "student" && (
+                                  <Button
+                                    onClick={() => handleExamClick(exam)}
+                                    variant="contained"
+                                    sx={{
+                                      bgcolor: "#207E68",
+                                      borderRadius: "100px",
+                                    }}
+                                  >
+                                    View
+                                  </Button>
+                                )}
+                                {user.role !== "student" && (
+                                  <Button
+                                    onClick={() => handleViewScores(exam)}
+                                  >
+                                    View Scores
+                                  </Button>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  ) : (
+                    <p>No exams found.</p>
+                  )}
 
-              {/* Pagination Component */}
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={filteredExams.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
+                  {/* Pagination Component */}
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    component="div"
+                    count={filteredExams.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </>
+              )}
             </>
           )}
         </div>
@@ -668,6 +696,9 @@ const SectionDetail = () => {
             />
           </div>
         </div>
+      )}
+      {showScores && (
+        <ExamScoresView exam={selectedExamId} onClose={handleShowScoreClose} />
       )}
     </div>
   );
