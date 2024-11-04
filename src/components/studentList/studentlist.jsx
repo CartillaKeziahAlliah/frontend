@@ -86,8 +86,12 @@ const StudentsComponent = ({ sectionName }) => {
             students.map((student) => (
               <TableRow key={student._id}>
                 <TableCell>{student.name}</TableCell>
-                <TableCell>{student.status || "N/A"}</TableCell>
-                <TableCell>{student.finalGrade || "N/A"}</TableCell>
+                <TableCell>
+                  {student.status ? student.status : <>N/A</>}
+                </TableCell>
+                <TableCell>
+                  <>N/A</>
+                </TableCell>
               </TableRow>
             ))
           )}

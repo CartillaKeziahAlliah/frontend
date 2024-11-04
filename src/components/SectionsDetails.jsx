@@ -5,19 +5,25 @@ import axios from "axios";
 import CreateExam from "./exam/createExam";
 import {
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Paper,
   Button,
   Typography,
   TablePagination,
   Grid,
+  Menu,
+  IconButton,
+  MenuItem,
+  Tooltip,
 } from "@mui/material";
-import { Delete, SearchOutlined } from "@mui/icons-material";
+import {
+  ChevronLeft,
+  Delete,
+  DescriptionOutlined,
+  DragIndicator,
+  Edit,
+  MoreVert,
+  SearchOutlined,
+} from "@mui/icons-material";
 import Swal from "sweetalert2";
 import CreateAssignment from "./assignment/CreateAssignment";
 import AssignmentList from "./assignment/AssignmentList";
@@ -48,6 +54,8 @@ const SectionDetail = () => {
   const [selectedExamId, setSelectedExamId] = useState(null);
   const [viewlist, setViewlist] = useState(true);
   const [showScores, setShowScores] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [activeExamId, setActiveExamId] = useState(null);
   const [editData, setEditData] = useState({
     title: "",
     description: "",
@@ -62,7 +70,14 @@ const SectionDetail = () => {
   // Pagination state
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5); // Default number of rows per page
-
+  const handleMenuOpen = (event, examId) => {
+    setAnchorEl(event.currentTarget);
+    setActiveExamId(examId);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setActiveExamId(null);
+  };
   const handleViewScores = (examId) => {
     console.log("Selected Quiz ID:", examId);
     setSelectedExamId(examId);
@@ -75,6 +90,7 @@ const SectionDetail = () => {
     setShowScores(false);
     setSelectedExamId(null); // Set assignment ID to null
     setViewlist(true); // Toggle view list back to true
+    setAnchorEl(null);
   };
   const handleExamClick = (exam) => {
     setSelectedExam(exam);
@@ -241,7 +257,10 @@ const SectionDetail = () => {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
-
+  const closeExam = () => {
+    setSelectedExam(null);
+    setAnchorEl(null);
+  };
   return (
     <div className="course-Sectiondetail-container h-full p-4">
       <Box display="flex">
@@ -333,33 +352,34 @@ const SectionDetail = () => {
           )}
           {selectedExam ? (
             <div className="exam-details p-4 border">
-              <button
-                onClick={() => setSelectedExam(null)}
-                className="text-sm mb-2 text-blue-500 underline"
-              >
-                Back to Exam List
-              </button>
-
+              <div className="flex justify-between">
+                <button
+                  onClick={closeExam}
+                  className="text-sm mb-2 text-blue-500 underline"
+                >
+                  <Tooltip title="Back to Exam List" arrow>
+                    <ChevronLeft sx={{ color: "black" }} />
+                  </Tooltip>
+                </button>
+                {!isEditing && (
+                  <Tooltip title="Edit Exam" sx={{ cursor: "pointer" }}>
+                    <Edit
+                      sx={{ color: "#207E68" }}
+                      onClick={() => setIsEditing(true)}
+                    />
+                  </Tooltip>
+                )}
+              </div>
               {!isEditing ? (
                 <>
-                  <h2 className="text-3xl font-bold mb-4">
+                  <h2 className="text-3xl font-bold mb-4 bg-[#cdcdcd] capitalize p-2">
                     {selectedExam.title}
                   </h2>
-                  <p className="mb-4">{selectedExam.description}</p>
-
-                  {selectedExam.subject && (
-                    <h3 className="text-2xl font-semibold">
-                      Subject: {selectedExam.subject.subject_name}
-                    </h3>
-                  )}
+                  <p className="mb-4 capitalize">{selectedExam.description}</p>
 
                   <p>Duration: {selectedExam.duration} minutes</p>
                   <p>Total Marks: {selectedExam.totalMarks}</p>
                   <p>Passing Marks: {selectedExam.passMarks}</p>
-
-                  <button onClick={() => setIsEditing(true)} className="mr-2">
-                    Edit Exam
-                  </button>
                 </>
               ) : (
                 <div className="edit-exam-form">
@@ -414,18 +434,20 @@ const SectionDetail = () => {
                       className="border p-2 w-full"
                     />
                   </label>
-                  <button
-                    onClick={handleSaveChanges}
-                    className="mt-4 bg-blue-500 text-white px-4 py-2"
-                  >
-                    Save Changes
-                  </button>
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="mt-4 bg-gray-500 text-white px-4 py-2"
-                  >
-                    Cancel
-                  </button>
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={handleSaveChanges}
+                      className="mt-4 bg-[#207E68] rounded-md text-white px-4 py-2"
+                    >
+                      Save Changes
+                    </button>
+                    <button
+                      onClick={() => setIsEditing(false)}
+                      className="mt-4 bg-gray-500 rounded-md text-white px-4 py-2"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -472,124 +494,70 @@ const SectionDetail = () => {
                   </Box>
 
                   {paginatedExams.length > 0 ? (
-                    <TableContainer
-                      component={Paper}
-                      elevation={3}
-                      sx={{
-                        borderRadius: "10px",
-                        overflow: "hidden",
-                      }}
-                    >
-                      <Table>
-                        <TableHead>
-                          <TableRow
-                            sx={{
-                              backgroundColor: "#f5f5f5", // Light gray header
-                            }}
+                    paginatedExams.map((exam) => (
+                      <Paper
+                        key={exam._id}
+                        elevation={3}
+                        sx={{
+                          marginBottom: 2,
+                          padding: 2,
+                          border: "1px solid #ccc",
+                          borderRadius: "18px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Box
+                          display="flex"
+                          flexDirection="row"
+                          alignItems="center"
+                          className="capitalize"
+                          gap={1}
+                        >
+                          <DragIndicator />
+                          <DescriptionOutlined
+                            sx={{ color: "rgba(67, 141, 97, 0.8)" }}
+                          />
+                          <div className="flex justify-center">
+                            <Typography variant="h6">{exam.title}</Typography>
+                          </div>
+                        </Box>
+                        <Box>
+                          <IconButton
+                            onClick={(e) => handleMenuOpen(e, exam._id)}
                           >
-                            <TableCell>
-                              <Typography variant="subtitle1" fontWeight="bold">
-                                Title
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="subtitle1" fontWeight="bold">
-                                Total Marks
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="subtitle1" fontWeight="bold">
-                                Passing Marks
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="subtitle1" fontWeight="bold">
-                                Duration
-                              </Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography variant="subtitle1" fontWeight="bold">
-                                Action
-                              </Typography>
-                            </TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {paginatedExams.map((exam) => (
-                            <TableRow
-                              key={exam._id}
-                              hover
-                              sx={{
-                                cursor: "pointer",
-                                "&:nth-of-type(odd)": {
-                                  backgroundColor: "#f9f9f9", // Light background for odd rows
-                                },
-                                "&:hover": {
-                                  backgroundColor: "#e0f7fa", // Subtle hover color
-                                },
-                              }}
-                            >
-                              <TableCell>
-                                <Typography variant="body1">
-                                  {exam.title}
-                                </Typography>
-                              </TableCell>
-                              <TableCell>
-                                <Typography variant="body1">
-                                  {exam.totalMarks}
-                                </Typography>
-                              </TableCell>
-                              <TableCell>
-                                <Typography variant="body1">
-                                  {exam.passMarks}
-                                </Typography>
-                              </TableCell>
-                              <TableCell>
-                                <Typography variant="body1">
-                                  {exam.duration}
-                                </Typography>
-                              </TableCell>
-                              <TableCell
-                                sx={{
-                                  display: "flex",
-                                  gap: 1,
-                                  flexWrap: "wrap",
-                                }}
+                            <MoreVert />
+                          </IconButton>
+                          <Menu
+                            anchorEl={anchorEl}
+                            open={
+                              Boolean(anchorEl) && activeExamId === exam._id
+                            }
+                            onClose={handleMenuClose}
+                          >
+                            {user.role !== "student" && (
+                              <MenuItem
+                                onClick={() => deleteExam(exam._id)}
+                                sx={{ color: "red" }}
                               >
-                                {user.role !== "student" && (
-                                  <Button
-                                    onClick={() => deleteExam(exam._id)}
-                                    variant="text"
-                                    sx={{ color: "red" }}
-                                  >
-                                    <Delete />
-                                  </Button>
-                                )}
-                                {user.role !== "student" && (
-                                  <Button
-                                    onClick={() => handleExamClick(exam)}
-                                    variant="contained"
-                                    sx={{
-                                      bgcolor: "#207E68",
-                                      borderRadius: "100px",
-                                    }}
-                                  >
-                                    View
-                                  </Button>
-                                )}
-                                {user.role !== "student" && (
-                                  <Button
-                                    onClick={() => handleViewScores(exam)}
-                                  >
-                                    View Scores
-                                  </Button>
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
+                                <Delete />
+                              </MenuItem>
+                            )}
+                            {user.role !== "student" && (
+                              <MenuItem onClick={() => handleExamClick(exam)}>
+                                View Exam
+                              </MenuItem>
+                            )}
+                            {user.role !== "student" && (
+                              <MenuItem onClick={() => handleViewScores(exam)}>
+                                View Scores
+                              </MenuItem>
+                            )}
+                          </Menu>
+                        </Box>
+                      </Paper>
+                    ))
                   ) : (
                     <p>No exams found.</p>
                   )}

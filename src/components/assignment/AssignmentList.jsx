@@ -2,18 +2,22 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Paper,
   Button,
   Typography,
   TablePagination,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
-import { Delete, SearchOutlined } from "@mui/icons-material";
+import {
+  Close,
+  Delete,
+  DescriptionOutlined,
+  DragIndicator,
+  MoreVert,
+  SearchOutlined,
+} from "@mui/icons-material";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
@@ -32,7 +36,8 @@ const AssignmentList = ({ selectedSubject }) => {
   const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
   const [viewlist, setViewlist] = useState(true);
   const [showScores, setShowScores] = useState(false);
-
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [activeAssignmentId, setActiveAssignmentId] = useState(null);
   const handleViewScores = (assignmentId) => {
     console.log("Selected Quiz ID:", assignmentId);
     setSelectedAssignmentId(assignmentId);
@@ -40,7 +45,18 @@ const AssignmentList = ({ selectedSubject }) => {
     setSelectedAssignment(null);
     setViewlist(false);
   };
+
   const { user } = useAuth();
+
+  const handleMenuOpen = (event, assignmentId) => {
+    setAnchorEl(event.currentTarget);
+    setActiveAssignmentId(assignmentId);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setActiveAssignmentId(null);
+  };
   useEffect(() => {
     const fetchAssignments = async () => {
       try {
@@ -61,6 +77,7 @@ const AssignmentList = ({ selectedSubject }) => {
     setShowScores(false);
     setSelectedAssignmentId(null); // Set assignment ID to null
     setViewlist(true); // Toggle view list back to true
+    setAnchorEl(null);
   };
 
   const handleSearchTermChange = (e) => {
@@ -137,11 +154,14 @@ const AssignmentList = ({ selectedSubject }) => {
   };
 
   const handleAssignmentClick = (assignment) => {
-    setSelectedAssignment(assignment); // Set the selected assignment for viewing
+    setSelectedAssignment(assignment);
+    setViewlist(false);
   };
 
   const clearSelectedAssignment = () => {
     setSelectedAssignment(null); // Clear selected assignment
+    setAnchorEl(null);
+    setViewlist(true);
   };
 
   return (
@@ -172,138 +192,89 @@ const AssignmentList = ({ selectedSubject }) => {
       {viewlist === true && (
         <>
           {paginatedAssignments.length > 0 ? (
-            <TableContainer
-              component={Paper}
-              elevation={3}
-              sx={{
-                borderRadius: "10px",
-                overflow: "hidden",
-              }}
-            >
-              <Table>
-                <TableHead>
-                  <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                    <TableCell>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Title
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Description
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Duration (min)
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Total Marks
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Pass Marks
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Deadline
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Action
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedAssignments.map((assignment) => (
-                    <TableRow key={assignment._id} hover>
-                      <TableCell>
-                        <Typography variant="body1">
-                          {assignment.title}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body1">
-                          {assignment.description}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body1">
-                          {assignment.duration}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body1">
-                          {assignment.totalMarks}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body1">
-                          {assignment.passMarks}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body1">
-                          {new Date(assignment.deadline).toLocaleDateString()}{" "}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        {user.role !== "student" && (
-                          <Button
-                            onClick={() => deleteAssignment(assignment._id)}
-                            variant="text"
-                            sx={{ color: "red" }}
-                          >
-                            <Delete />
-                          </Button>
-                        )}
-                        {user.role !== "student" && (
-                          <Button
-                            onClick={() => handleAssignmentClick(assignment)}
-                            variant="outlined"
-                            sx={{
-                              bgcolor: "#207E68",
-                              borderRadius: "100px",
-                              color: "white",
-                            }}
-                          >
-                            View
-                          </Button>
-                        )}
-                        {user.role !== "student" && (
-                          <Button onClick={() => handleViewScores(assignment)}>
-                            View Scores
-                          </Button>
-                        )}
-                        {user.role === "student" && <Button>Take Quiz</Button>}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            paginatedAssignments.map((assignment) => (
+              <Paper
+                key={assignment._id}
+                elevation={3}
+                sx={{
+                  marginBottom: 2,
+                  padding: 2,
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box
+                  display="flex"
+                  flexDirection="row"
+                  alignItems="center"
+                  className="capitalize"
+                  gap={1}
+                >
+                  <DragIndicator />
+                  <DescriptionOutlined
+                    sx={{ color: "rgba(67, 141, 97, 0.8)" }}
+                  />
+                  <div className="flex justify-center">
+                    <Typography variant="h6">{assignment.title}</Typography>
+                  </div>
+                </Box>
+
+                <Box>
+                  <IconButton
+                    onClick={(e) => handleMenuOpen(e, assignment._id)}
+                  >
+                    <MoreVert />
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={
+                      Boolean(anchorEl) && activeAssignmentId === assignment._id
+                    }
+                    onClose={handleMenuClose}
+                  >
+                    {user.role !== "student" && (
+                      <MenuItem
+                        onClick={() => deleteAssignment(assignment._id)}
+                        sx={{ color: "red" }}
+                      >
+                        <Delete />
+                      </MenuItem>
+                    )}
+                    {user.role !== "student" && (
+                      <MenuItem
+                        onClick={() => handleAssignmentClick(assignment)}
+                      >
+                        View Assignment
+                      </MenuItem>
+                    )}
+                    {user.role !== "student" && (
+                      <MenuItem onClick={() => handleViewScores(assignment)}>
+                        View Scores
+                      </MenuItem>
+                    )}
+                    {user.role === "student" && <MenuItem>Take Quiz</MenuItem>}
+                  </Menu>
+                </Box>
+              </Paper>
+            ))
           ) : (
             <p>No assignments found.</p>
           )}
+          {/* Pagination Component */}
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={filteredAssignments.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </>
       )}
-
-      {/* Pagination Component */}
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={filteredAssignments.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
 
       {/* Selected Assignment Details */}
       {selectedAssignment && (
@@ -313,57 +284,85 @@ const AssignmentList = ({ selectedSubject }) => {
             padding: 2,
             border: "1px solid #ccc",
             borderRadius: "8px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
           }}
         >
-          <Typography variant="h6">Assignment Details</Typography>
-          <Typography variant="body1" fontWeight="bold">
-            Title:
-          </Typography>
-          <Typography variant="body2">{selectedAssignment.title}</Typography>
-          <Typography variant="body1" fontWeight="bold">
-            Description:
-          </Typography>
-          <Typography variant="body2">
-            {selectedAssignment.description}
-          </Typography>
-          <Typography variant="body1" fontWeight="bold">
-            Duration:
-          </Typography>
-          <Typography variant="body2">
-            {selectedAssignment.duration} minutes
-          </Typography>
-          <Typography variant="body1" fontWeight="bold">
-            Total Marks:
-          </Typography>
-          <Typography variant="body2">
-            {selectedAssignment.totalMarks}
-          </Typography>
-          <Typography variant="body1" fontWeight="bold">
-            Pass Marks:
-          </Typography>
-          <Typography variant="body2">
-            {selectedAssignment.passMarks}
-          </Typography>
-          <Typography variant="body1" fontWeight="bold">
-            Deadline:
-          </Typography>
-          <Typography variant="body2">
-            {new Date(selectedAssignment.deadline).toLocaleDateString()}
-          </Typography>
-          <Typography variant="body1" fontWeight="bold">
+          <div className="flex flex-row justify-between">
+            <Typography variant="h6">Assignment Details</Typography>
+
+            <Button onClick={clearSelectedAssignment}>
+              <Close className="text-black" />
+            </Button>
+          </div>
+          <div className="flex flex-row flex-wrap justify-between">
+            <div className="flex flex-row items-center gap-1">
+              <Typography variant="body1" fontWeight="bold">
+                Title:
+              </Typography>
+              <Typography variant="body2" className="capitalize">
+                {selectedAssignment.title}
+              </Typography>
+            </div>
+            <div className="flex flex-row items-center gap-1">
+              <Typography variant="body1" fontWeight="bold">
+                Description:
+              </Typography>
+              <Typography variant="body2" className="capitalize">
+                {selectedAssignment.description}
+              </Typography>
+            </div>
+            <div className="flex flex-row items-center gap-1">
+              <Typography variant="body1" fontWeight="bold">
+                Duration:
+              </Typography>
+              <Typography variant="body2" className="capitalize">
+                {selectedAssignment.duration} minutes
+              </Typography>
+            </div>
+            <div className="flex flex-row items-center gap-1">
+              {" "}
+              <Typography variant="body1" fontWeight="bold">
+                Total Marks:
+              </Typography>
+              <Typography variant="body2" className="capitalize">
+                {selectedAssignment.totalMarks}
+              </Typography>
+            </div>
+            <div className="flex flex-row items-center gap-1">
+              {" "}
+              <Typography variant="body1" fontWeight="bold">
+                Pass Marks:
+              </Typography>
+              <Typography variant="body2" className="capitalize">
+                {selectedAssignment.passMarks}
+              </Typography>
+            </div>
+            <div className="flex flex-row items-center gap-1">
+              {" "}
+              <Typography variant="body1" fontWeight="bold">
+                Deadline:
+              </Typography>
+              <Typography variant="body2" className="capitalize">
+                {new Date(selectedAssignment.deadline).toLocaleDateString()}
+              </Typography>
+            </div>
+          </div>
+          <Typography variant="body1" fontWeight="bold" className="capitalize">
             Questions:
           </Typography>
           {selectedAssignment.questions.length > 0 ? (
             <ul>
               {selectedAssignment.questions.map((question, index) => (
                 <li key={index}>
-                  <Typography variant="body2">
+                  <Typography variant="body2" className="capitalize">
                     {index + 1}. {question.questionText}
                     <br />
                     Options:
                     <ul>
                       {question.options.map((option, optIndex) => (
-                        <li key={optIndex}>
+                        <li key={optIndex} className="capitalize">
                           {option.optionText}{" "}
                           {option.isCorrect ? "(Correct)" : ""}
                         </li>
@@ -376,13 +375,6 @@ const AssignmentList = ({ selectedSubject }) => {
           ) : (
             <Typography variant="body2">No questions available.</Typography>
           )}
-          <Button
-            onClick={clearSelectedAssignment}
-            variant="outlined"
-            sx={{ marginTop: 2 }}
-          >
-            Close
-          </Button>
         </Box>
       )}
       {showScores && (

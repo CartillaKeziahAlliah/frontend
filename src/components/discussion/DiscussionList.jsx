@@ -1,21 +1,22 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Paper,
   Button,
   Typography,
   TablePagination,
+  Skeleton,
+  MenuItem,
+  IconButton,
+  Menu,
 } from "@mui/material";
 import {
   SearchOutlined,
   CheckCircle,
   CloseOutlined,
+  DragIndicator,
+  DescriptionOutlined,
+  MoreVert,
 } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -35,6 +36,8 @@ const DiscussionList = ({ selectedSubject }) => {
   const [studentsReadList, setStudentsReadList] = useState([]);
   const [showStudentsReadList, setShowStudentsReadList] = useState(false); // State to toggle student read list visibility
   const [viewRead, setViewRead] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [activeDiscussionId, setActiveDiscussionId] = useState(null);
   useEffect(() => {
     const fetchDiscussions = async () => {
       setLoading(true);
@@ -55,12 +58,18 @@ const DiscussionList = ({ selectedSubject }) => {
       fetchDiscussions();
     }
   }, [selectedSubject]);
-
+  const handleMenuOpen = (event, discussionId) => {
+    setAnchorEl(event.currentTarget);
+    setActiveDiscussionId(discussionId);
+  };
   const handleSearchTermChange = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
     setPage(0);
   };
-
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setActiveDiscussionId(null);
+  };
   const filteredDiscussions = useMemo(() => {
     return discussions.filter(
       (discussion) =>
@@ -166,6 +175,7 @@ const DiscussionList = ({ selectedSubject }) => {
 
   const clearSelectedDiscussion = () => {
     setSelectedDiscussion(null); // Clear selected discussion
+    setAnchorEl(null);
   };
 
   const fetchStudentsReadList = async (discussionId) => {
@@ -180,7 +190,10 @@ const DiscussionList = ({ selectedSubject }) => {
       Swal.fire("Error", "Failed to fetch students read list", "error");
     }
   };
-
+  const CloseReadList = () => {
+    setShowStudentsReadList(false);
+    setAnchorEl(null);
+  };
   return (
     <div className="discussion-list">
       <Box display="flex" flexDirection="row" gap={1} sx={{ marginTop: 2 }}>
@@ -199,104 +212,102 @@ const DiscussionList = ({ selectedSubject }) => {
       {!selectedDiscussion && !showStudentsReadList && (
         <>
           {loading ? (
-            <Typography>Loading discussions...</Typography>
+            <Typography>
+              <Skeleton />
+            </Typography>
           ) : paginatedDiscussions.length > 0 ? (
-            <TableContainer
-              component={Paper}
-              elevation={3}
-              sx={{ borderRadius: "10px", overflow: "hidden" }}
-            >
-              <Table>
-                <TableHead>
-                  <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                    <TableCell>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Title
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Content
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Typography variant="subtitle1" fontWeight="bold">
-                        Action
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedDiscussions.map((discussion) => (
-                    <TableRow key={discussion._id} hover>
-                      <TableCell>
-                        <Typography variant="body1">
-                          {discussion.title}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body1">
-                          {discussion.content}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        {isDiscussionReadByUser(discussion) ? (
-                          <Button
-                            sx={{
-                              color: "black",
-                              cursor: "default",
-                            }}
-                          >
-                            <CheckCircle
-                              color="success"
-                              sx={{ marginRight: 1 }}
-                            />
-                            Read
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={() => {
-                              handleDiscussionClick(discussion);
-                            }}
-                          >
-                            Read Discussion
-                          </Button>
-                        )}
-                        <Button
-                          onClick={() => fetchStudentsReadList(discussion._id)}
-                        >
-                          View Students
-                        </Button>
-                        {user.role !== "student" && (
-                          <Button
-                            onClick={() => {
-                              deleteDiscussion(discussion._id);
-                            }}
-                          >
-                            Delete
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={filteredDiscussions.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-            </TableContainer>
+            paginatedDiscussions.map((discussion) => (
+              <Paper
+                key={discussion._id}
+                elevation={3}
+                sx={{
+                  marginBottom: 2,
+                  padding: 2,
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box
+                  display="flex"
+                  flexDirection="row"
+                  alignItems="center"
+                  className="capitalize"
+                  gap={1}
+                >
+                  <DragIndicator />
+                  <DescriptionOutlined
+                    sx={{ color: "rgba(67, 141, 97, 0.8)" }}
+                  />
+                  <Typography variant="body1">{discussion.title}</Typography>
+                </Box>
+
+                <Box align="right">
+                  <IconButton
+                    onClick={(e) => handleMenuOpen(e, discussion._id)}
+                  >
+                    <MoreVert />
+                  </IconButton>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={
+                      Boolean(anchorEl) && activeDiscussionId === discussion._id
+                    }
+                    onClose={handleMenuClose}
+                  >
+                    {isDiscussionReadByUser(discussion) ? (
+                      <MenuItem
+                        sx={{
+                          color: "black",
+                          cursor: "default",
+                        }}
+                      >
+                        <CheckCircle color="success" sx={{ marginRight: 1 }} />
+                        Read
+                      </MenuItem>
+                    ) : (
+                      <MenuItem
+                        onClick={() => {
+                          handleDiscussionClick(discussion);
+                        }}
+                      >
+                        Read Discussion
+                      </MenuItem>
+                    )}
+                    <MenuItem
+                      onClick={() => fetchStudentsReadList(discussion._id)}
+                    >
+                      View Students
+                    </MenuItem>
+                    {user.role !== "student" && (
+                      <MenuItem
+                        onClick={() => {
+                          deleteDiscussion(discussion._id);
+                        }}
+                      >
+                        Delete
+                      </MenuItem>
+                    )}
+                  </Menu>
+                </Box>
+              </Paper>
+            ))
           ) : (
             <Typography>No discussions found.</Typography>
           )}
         </>
       )}
-
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={filteredDiscussions.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
       {/* Selected Discussion Details */}
       {selectedDiscussion && (
         <Box
@@ -307,34 +318,37 @@ const DiscussionList = ({ selectedSubject }) => {
             borderRadius: "8px",
           }}
         >
-          <Typography variant="h2">Discussion</Typography>
-          <div className="flex flex-row justify-between">
-            <Typography variant="h4">{selectedDiscussion.title}</Typography>
+          <div className="flex flex-col">
+            <div className="flex flex-row justify-between">
+              <Typography variant="h4">Discussion</Typography>
 
-            <div className="flex flex-row items-center">
-              {user.role === "student" && (
-                <>
-                  {isDiscussionReadByUser(selectedDiscussion) ? (
-                    <Typography color="success.main">
-                      You have read this discussion
-                    </Typography>
-                  ) : (
-                    <Button
-                      onClick={() => {
-                        markDiscussionAsRead(selectedDiscussion._id);
-                      }}
-                    >
-                      Mark as Read
-                    </Button>
-                  )}
-                </>
-              )}
-              <Button onClick={clearSelectedDiscussion}>
-                <CloseOutlined sx={{ color: "#000" }} />
-              </Button>
+              <div className="flex flex-row items-center">
+                {user.role === "student" && (
+                  <>
+                    {isDiscussionReadByUser(selectedDiscussion) ? (
+                      <Typography color="success.main">
+                        You have read this discussion
+                      </Typography>
+                    ) : (
+                      <Button
+                        onClick={() => {
+                          markDiscussionAsRead(selectedDiscussion._id);
+                        }}
+                      >
+                        Mark as Read
+                      </Button>
+                    )}
+                  </>
+                )}
+                <Button onClick={clearSelectedDiscussion}>
+                  <CloseOutlined sx={{ color: "#000" }} />
+                </Button>
+              </div>
             </div>
+            <Typography variant="h5" className="capitalize">
+              {selectedDiscussion.title}
+            </Typography>
           </div>
-
           <Typography variant="body1" fontWeight="bold">
             Content:
           </Typography>
@@ -346,7 +360,7 @@ const DiscussionList = ({ selectedSubject }) => {
       {showStudentsReadList && (
         <StudentsReadList
           studentsReadList={studentsReadList}
-          onClose={() => setShowStudentsReadList(false)} // Close the student list
+          onClose={CloseReadList} // Close the student list
         />
       )}
     </div>

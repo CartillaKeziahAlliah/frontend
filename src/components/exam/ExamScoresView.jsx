@@ -57,7 +57,7 @@ const ExamScoresView = ({ exam, onClose }) => {
         </Button>
       </div>
 
-      {loading ? ( // Show loading spinner when loading
+      {loading ? (
         <CircularProgress />
       ) : (
         <TableContainer component={Paper}>

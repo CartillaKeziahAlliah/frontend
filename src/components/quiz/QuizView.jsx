@@ -3,7 +3,7 @@ import { Box, Typography, Button } from "@mui/material";
 import Swal from "sweetalert2";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
-import { CheckOutlined } from "@mui/icons-material";
+import { CheckOutlined, Close } from "@mui/icons-material";
 
 const apiUrl = "http://localhost:5000";
 
@@ -152,9 +152,12 @@ const QuizView = ({ quiz, onClose }) => {
         borderRadius: "8px",
       }}
     >
-      <Typography variant="h6">
-        {user.role === "student" ? "Quiz" : "Quiz Details"}
-      </Typography>
+      <div className="flex flex-row justify-between">
+        <Typography variant="h6">
+          {user.role === "student" ? "Quiz" : "Quiz Details"}
+        </Typography>
+        <Close className="cursor-pointer" onClick={onClose} />
+      </div>
       <div className="py-2 flex flex-row flex-wrap w-full justify-between">
         <div className="flex flex-row items-center gap-1 capitalize">
           <Typography variant="body1" fontWeight="bold">
@@ -271,10 +274,9 @@ const QuizView = ({ quiz, onClose }) => {
             <ul>
               {quiz.questions.map((question, index) => (
                 <li key={index}>
-                  <Typography variant="body2">
+                  <Typography variant="body2" className="capitalize">
                     {index + 1}. {question.questionText}
                     <br />
-                    Options:
                     <ul>
                       {question.options.map((option, optIndex) => (
                         <li key={optIndex}>
@@ -299,27 +301,6 @@ const QuizView = ({ quiz, onClose }) => {
           ) : (
             <Typography variant="body2">No questions found.</Typography>
           )}
-
-          <Box display="flex" justifyContent="space-between" mt={2}>
-            {!isLocked && (
-              <Button
-                onClick={handleStartQuiz}
-                variant="contained"
-                sx={{ bgcolor: "#4CAF50", color: "#fff" }}
-              >
-                Take Exam
-              </Button>
-            )}
-            {isLocked && (
-              <Button
-                onClick={handleSubmitQuiz}
-                variant="contained"
-                sx={{ bgcolor: "#4CAF50", color: "#fff" }}
-              >
-                Submit Quiz
-              </Button>
-            )}
-          </Box>
         </>
       )}
     </Box>
