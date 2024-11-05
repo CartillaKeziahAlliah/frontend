@@ -16,6 +16,7 @@ import {
   Modal,
   Checkbox,
 } from "@mui/material";
+import { Close, Delete } from "@mui/icons-material";
 
 // const apiUrl = "http://localhost:5000"; // Your API URL
 const apiUrl = "https://server-production-dd7a.up.railway.app";
@@ -200,10 +201,24 @@ const CreateExam = ({ selectedSubject, onclick }) => {
   };
 
   return (
-    <Box sx={{ padding: 3, backgroundColor: "#f9f9f9", borderRadius: 2 }}>
-      <Button onClick={onclick}>Close</Button>
+    <Box
+      sx={{
+        padding: 3,
+        backgroundColor: "#f9f9f9",
+        borderRadius: 2,
+        height: "100vh",
+        overflowY: "scroll",
+      }}
+    >
       <Card>
-        <CardHeader title={`Create Exam for ${selectedSubject.subject_name}`} />
+        <div className="flex justify-between">
+          <CardHeader
+            title={`Create Exam for ${selectedSubject.subject_name}`}
+          />{" "}
+          <Button onClick={onclick}>
+            <Close className="text-black" />
+          </Button>
+        </div>
         <Divider />
         <CardContent>
           <form onSubmit={handleSubmit}>
@@ -228,141 +243,7 @@ const CreateExam = ({ selectedSubject, onclick }) => {
                 required
               />
             </Box>
-
-            <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
-              Questions
-            </Typography>
-            {questions.map((question, questionIndex) => (
-              <Box
-                key={questionIndex}
-                mb={3}
-                sx={{
-                  border: "1px solid #ddd",
-                  borderRadius: 1,
-                  padding: 2,
-                  backgroundColor: questionErrors[questionIndex]
-                    ? "#f8d7da"
-                    : "inherit",
-                }}
-                ref={(el) => (errorRefs.current[questionIndex] = el)}
-              >
-                <TextField
-                  label="Question"
-                  variant="outlined"
-                  fullWidth
-                  value={question.questionText}
-                  onChange={(e) =>
-                    handleQuestionChange(
-                      questionIndex,
-                      "questionText",
-                      e.target.value
-                    )
-                  }
-                  required
-                  sx={{ mb: 2 }}
-                  error={Boolean(questionErrors[questionIndex])}
-                  helperText={questionErrors[questionIndex]}
-                />
-                <Grid container spacing={2}>
-                  <Grid item xs={8}>
-                    <Typography variant="subtitle1" gutterBottom>
-                      Options
-                    </Typography>
-                    {question.options.map((option, optionIndex) => (
-                      <Grid
-                        container
-                        spacing={1}
-                        key={optionIndex}
-                        sx={{ mb: 1 }}
-                      >
-                        <Grid item xs={12}>
-                          <TextField
-                            label="Option"
-                            variant="outlined"
-                            fullWidth
-                            value={option.optionText}
-                            onChange={(e) =>
-                              handleOptionChange(
-                                questionIndex,
-                                optionIndex,
-                                "optionText",
-                                e.target.value
-                              )
-                            }
-                            required
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={option.isCorrect}
-                                onChange={(e) =>
-                                  handleOptionChange(
-                                    questionIndex,
-                                    optionIndex,
-                                    "isCorrect",
-                                    e.target.checked
-                                  )
-                                }
-                              />
-                            }
-                            label="Correct Answer"
-                          />
-                          <Button
-                            variant="outlined"
-                            color="secondary"
-                            onClick={() =>
-                              handleRemoveOption(questionIndex, optionIndex)
-                            }
-                          >
-                            Remove Option
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    ))}
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={() => handleAddOption(questionIndex)}
-                    >
-                      Add Option
-                    </Button>
-                  </Grid>
-                </Grid>
-                <TextField
-                  label="Marks"
-                  variant="outlined"
-                  type="number"
-                  fullWidth
-                  value={question.marks}
-                  onChange={(e) =>
-                    handleQuestionChange(questionIndex, "marks", e.target.value)
-                  }
-                  required
-                  sx={{ mt: 2 }}
-                />
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={() => handleRemoveQuestion(questionIndex)}
-                  sx={{ mt: 2 }}
-                >
-                  Remove Question
-                </Button>
-              </Box>
-            ))}
-
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleAddQuestion}
-              sx={{ mt: 2 }}
-            >
-              Add Question
-            </Button>
-
-            <Box sx={{ mt: 3 }}>
+            <Box sx={{ mt: 3 }} display="flex" gap={1}>
               <TextField
                 label="Duration (minutes)"
                 variant="outlined"
@@ -371,6 +252,7 @@ const CreateExam = ({ selectedSubject, onclick }) => {
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 required
+                sx={{ mt: 1 }}
               />
               <TextField
                 label="Total Marks"
@@ -393,22 +275,158 @@ const CreateExam = ({ selectedSubject, onclick }) => {
                 sx={{ mt: 1 }}
               />
             </Box>
+            <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
+              Questions
+            </Typography>
+            {questions.map((question, questionIndex) => (
+              <Box
+                key={questionIndex}
+                mb={3}
+                sx={{
+                  border: "1px solid #ddd",
+                  borderRadius: 1,
+                  padding: 2,
+                  backgroundColor: questionErrors[questionIndex]
+                    ? "#f8d7da"
+                    : "inherit",
+                }}
+                ref={(el) => (errorRefs.current[questionIndex] = el)}
+              >
+                <div className="flex flex-row justify-between">
+                  <TextField
+                    label="Question"
+                    variant="outlined"
+                    value={question.questionText}
+                    onChange={(e) =>
+                      handleQuestionChange(
+                        questionIndex,
+                        "questionText",
+                        e.target.value
+                      )
+                    }
+                    required
+                    sx={{ mb: 2, width: "89%" }}
+                    error={Boolean(questionErrors[questionIndex])}
+                    helperText={questionErrors[questionIndex]}
+                  />
+                  <TextField
+                    label="Marks"
+                    variant="outlined"
+                    type="number"
+                    sx={{ mb: 2, width: "10%" }}
+                    value={question.marks}
+                    onChange={(e) =>
+                      handleQuestionChange(
+                        questionIndex,
+                        "marks",
+                        e.target.value
+                      )
+                    }
+                    required
+                  />
+                </div>
+                <div>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Options
+                  </Typography>
+                  {question.options.map((option, optionIndex) => (
+                    <Box display="flex" flexDirection="row" gap={2} fullWidth>
+                      <TextField
+                        label="Option"
+                        variant="outlined"
+                        fullWidth
+                        value={option.optionText}
+                        sx={{ mb: 1 }}
+                        onChange={(e) =>
+                          handleOptionChange(
+                            questionIndex,
+                            optionIndex,
+                            "optionText",
+                            e.target.value
+                          )
+                        }
+                        required
+                      />
+
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={option.isCorrect}
+                            onChange={(e) =>
+                              handleOptionChange(
+                                questionIndex,
+                                optionIndex,
+                                "isCorrect",
+                                e.target.checked
+                              )
+                            }
+                          />
+                        }
+                        label="Correct"
+                      />
+                      <Button
+                        variant="text"
+                        color="secondary"
+                        sx={{ color: "red" }}
+                        onClick={() =>
+                          handleRemoveOption(questionIndex, optionIndex)
+                        }
+                      >
+                        <Delete />
+                      </Button>
+                    </Box>
+                  ))}
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleAddOption(questionIndex)}
+                    sx={{ mt: 1 }}
+                  >
+                    Add Option
+                  </Button>
+                </div>
+
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={() => handleRemoveQuestion(questionIndex)}
+                  sx={{ mt: 2 }}
+                >
+                  Remove Question
+                </Button>
+              </Box>
+            ))}
 
             <Button
               variant="contained"
               color="primary"
-              type="submit"
-              sx={{ mt: 2 }}
+              onClick={handleAddQuestion}
+              sx={{ mt: 2, background: "#207E68" }}
             >
-              Create Exam
+              Add Question
             </Button>
-            <Button
-              variant="outlined"
-              onClick={handlePreviewToggle}
-              sx={{ mt: 2, ml: 2 }}
-            >
-              {previewVisible ? "Hide Preview" : "Show Preview"}
-            </Button>
+            <br />
+            <div className="flex flex-row justify-end">
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                sx={{ mt: 2, background: "#207E68" }}
+              >
+                Create Exam
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={handlePreviewToggle}
+                sx={{
+                  mt: 2,
+                  ml: 2,
+                  border: "1px solid #207E68",
+                  color: "#207E68",
+                }}
+              >
+                {previewVisible ? "Hide Preview" : "Show Preview"}
+              </Button>
+            </div>
           </form>
 
           {previewVisible && (

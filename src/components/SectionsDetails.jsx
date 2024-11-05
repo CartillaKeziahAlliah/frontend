@@ -453,17 +453,19 @@ const SectionDetail = () => {
             </div>
           ) : (
             <>
-              <div className="flex justify-end">
-                <Button
-                  variant="outlined"
-                  onClick={() => setAction("exam")}
-                  className="mr-2 m-2"
-                  sx={{ border: "1px solid black", color: "black" }}
-                >
-                  Create Exam
-                </Button>
-              </div>
-              {viewlist && (
+              {action !== "exam" && (
+                <div className="flex justify-end">
+                  <Button
+                    variant="outlined"
+                    onClick={() => setAction("exam")}
+                    className="mr-2 m-2"
+                    sx={{ border: "1px solid black", color: "black" }}
+                  >
+                    Create Exam
+                  </Button>
+                </div>
+              )}
+              {viewlist && action !== "exam" && (
                 <>
                   <Box
                     display="flex"
