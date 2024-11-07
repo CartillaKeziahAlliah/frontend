@@ -22,10 +22,11 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 import StudentsReadList from "./StudentsReadModal"; // Import the new students read list component
+import AddIcon from "@mui/icons-material/Add";
 
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 
-const DiscussionList = ({ selectedSubject }) => {
+const DiscussionList = ({ selectedSubject, setAction }) => {
   const [discussions, setDiscussions] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
@@ -207,6 +208,12 @@ const DiscussionList = ({ selectedSubject }) => {
             className="w-full p-2 outline-none rounded-3xl"
           />
         </div>
+        <button
+          onClick={setAction}
+          className="flex justify-center items-center mb-4 rounded-full hover:bg-gray-300 px-2"
+        >
+          <AddIcon />
+        </button>
       </Box>
 
       {!selectedDiscussion && !showStudentsReadList && (

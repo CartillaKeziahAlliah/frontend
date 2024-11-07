@@ -16,6 +16,7 @@ import {
   Modal,
   Checkbox,
 } from "@mui/material";
+import { Delete } from "@mui/icons-material";
 
 // const apiUrl = "http://localhost:5000"; // Your API URL
 const apiUrl = "https://server-production-dd7a.up.railway.app";
@@ -257,30 +258,51 @@ const CreateQuiz = ({ selectedSubject, onclick }) => {
                 }}
                 ref={(el) => (errorRefs.current[questionIndex] = el)}
               >
-                <TextField
-                  label="Question"
-                  variant="outlined"
-                  fullWidth
-                  value={question.questionText}
-                  onChange={(e) =>
-                    handleQuestionChange(
-                      questionIndex,
-                      "questionText",
-                      e.target.value
-                    )
-                  }
-                  required
-                  sx={{ mb: 2 }}
-                  error={Boolean(questionErrors[questionIndex])}
-                  helperText={questionErrors[questionIndex]}
-                />
-                <Grid container spacing={2}>
-                  <Grid item xs={8}>
-                    <Typography variant="subtitle1" gutterBottom>
-                      Options
-                    </Typography>
+                <div className="flex justify-between gap-2 flex-col md:flex-row">
+                  <TextField
+                    label="Question"
+                    variant="outlined"
+                    fullWidth
+                    value={question.questionText}
+                    onChange={(e) =>
+                      handleQuestionChange(
+                        questionIndex,
+                        "questionText",
+                        e.target.value
+                      )
+                    }
+                    required
+                    sx={{ mb: 2 }}
+                    error={Boolean(questionErrors[questionIndex])}
+                    helperText={questionErrors[questionIndex]}
+                  />
+                  <TextField
+                    label="Marks"
+                    type="number"
+                    variant="outlined"
+                    value={question.marks}
+                    onChange={(e) =>
+                      handleQuestionChange(
+                        questionIndex,
+                        "marks",
+                        e.target.value
+                      )
+                    }
+                    required
+                    sx={{ mb: 2 }}
+                  />
+                </div>
+                <div className="w-full">
+                  <Typography variant="subtitle1" gutterBottom>
+                    Options
+                  </Typography>
+
+                  <div className=" w-full mb-2 ">
                     {question.options.map((option, optionIndex) => (
-                      <Box key={optionIndex} mb={1}>
+                      <div
+                        className="flex flex-col md:flex-row items-center gap-2"
+                        key={optionIndex}
+                      >
                         <TextField
                           label={`Option ${optionIndex + 1}`}
                           variant="outlined"
@@ -311,17 +333,15 @@ const CreateQuiz = ({ selectedSubject, onclick }) => {
                               }
                             />
                           }
-                          label="Correct Option"
+                          label="Correct"
                         />
-                        <Button
-                          variant="outlined"
+                        <Delete
+                        sx={{color:"red"}}
                           onClick={() =>
                             handleRemoveOption(questionIndex, optionIndex)
                           }
-                        >
-                          Remove Option
-                        </Button>
-                      </Box>
+                        />
+                      </div>
                     ))}
                     <Button
                       variant="outlined"
@@ -329,32 +349,14 @@ const CreateQuiz = ({ selectedSubject, onclick }) => {
                     >
                       Add Option
                     </Button>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      label="Marks"
-                      type="number"
-                      variant="outlined"
-                      value={question.marks}
-                      onChange={(e) =>
-                        handleQuestionChange(
-                          questionIndex,
-                          "marks",
-                          e.target.value
-                        )
-                      }
-                      required
-                      fullWidth
-                      sx={{ mb: 2 }}
-                    />
-                  </Grid>
-                </Grid>
-                <Button
-                  variant="outlined"
-                  onClick={() => handleRemoveQuestion(questionIndex)}
-                >
-                  Remove Question
-                </Button>
+                  </div>
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleRemoveQuestion(questionIndex)}
+                  >
+                    Remove Question
+                  </Button>
+                </div>
               </Box>
             ))}
             <Button variant="contained" onClick={handleAddQuestion}>

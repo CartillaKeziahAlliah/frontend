@@ -436,14 +436,16 @@ const AnnouncementApp = () => {
                     </IconButton>
                   </Tooltip>
                 )}
-                <Tooltip title="Delete" arrow>
-                  <IconButton
-                    color="error"
-                    onClick={() => handleDelete(announcement._id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
+                {user.role !== "student" && (
+                  <Tooltip title="Delete" arrow>
+                    <IconButton
+                      color="error"
+                      onClick={() => handleDelete(announcement._id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </ListItemSecondaryAction>
             </ListItem>
           ))

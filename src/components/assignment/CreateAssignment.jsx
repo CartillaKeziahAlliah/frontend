@@ -16,6 +16,7 @@ import {
   Modal,
   Checkbox,
 } from "@mui/material";
+import { Close, Delete } from "@mui/icons-material";
 
 // const apiUrl = "http://localhost:5000"; // Your API URL
 const apiUrl = "https://server-production-dd7a.up.railway.app";
@@ -183,6 +184,7 @@ const CreateAssignment = ({ selectedSubject, onclick }) => {
       <Box sx={{ p: 2, backgroundColor: "#f0f0f0", borderRadius: 2 }}>
         <Typography variant="h5">{title}</Typography>
         <Typography variant="body1">{description}</Typography>
+
         <Typography variant="h6" sx={{ mt: 2 }}>
           Questions
         </Typography>
@@ -212,7 +214,11 @@ const CreateAssignment = ({ selectedSubject, onclick }) => {
 
   return (
     <Box sx={{ padding: 3, backgroundColor: "#f9f9f9", borderRadius: 2 }}>
-      <Button onClick={onclick}>Close</Button>
+      <div className="flex justify-end">
+        <Button onClick={onclick}>
+          <Close sx={{ color: "#000" }} />
+        </Button>
+      </div>
       <Card>
         <CardHeader
           title={`Create Assignment for ${selectedSubject.subject_name}`}
@@ -241,7 +247,43 @@ const CreateAssignment = ({ selectedSubject, onclick }) => {
                 required
               />
             </Box>
-
+            <Box display="flex" justifyContent="space-between" gap={2}>
+              <TextField
+                label="Duration (in minutes)"
+                type="number"
+                variant="outlined"
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                required
+                sx={{ mb: 2,flex:1 }}
+              />
+              <TextField
+                label="Total Marks"
+                type="number"
+                variant="outlined"
+                value={totalMarks} // Display the calculated total marks
+                InputProps={{ readOnly: true }} // Make it read-only
+                sx={{ mb: 2,flex:1 }}
+              />
+              <TextField
+                label="Pass Marks"
+                type="number"
+                variant="outlined"
+                value={passMarks}
+                onChange={(e) => setPassMarks(e.target.value)}
+                required
+                sx={{ mb: 2,flex:1}}
+              />
+              <TextField
+                label="Deadline"
+                type="date"
+                variant="outlined"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                required
+                sx={{ mb: 2,flex:1 }}
+              />
+            </Box>
             <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
               Questions
             </Typography>
@@ -259,98 +301,95 @@ const CreateAssignment = ({ selectedSubject, onclick }) => {
                 }}
                 ref={(el) => (errorRefs.current[questionIndex] = el)}
               >
-                <TextField
-                  label="Question"
-                  variant="outlined"
-                  fullWidth
-                  value={question.questionText}
-                  onChange={(e) =>
-                    handleQuestionChange(
-                      questionIndex,
-                      "questionText",
-                      e.target.value
-                    )
-                  }
-                  required
-                  sx={{ mb: 2 }}
-                  error={Boolean(questionErrors[questionIndex])}
-                  helperText={questionErrors[questionIndex]}
-                />
-                <Grid container spacing={2}>
-                  <Grid item xs={8}>
-                    <Typography variant="subtitle1" gutterBottom>
-                      Options
-                    </Typography>
-                    {question.options.map((option, optionIndex) => (
-                      <Box key={optionIndex} mb={1}>
-                        <TextField
-                          label={`Option ${optionIndex + 1}`}
-                          variant="outlined"
-                          fullWidth
-                          value={option.optionText}
-                          onChange={(e) =>
-                            handleOptionChange(
-                              questionIndex,
-                              optionIndex,
-                              "optionText",
-                              e.target.value
-                            )
-                          }
-                          required
-                          sx={{ mb: 1 }}
-                        />
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={option.isCorrect}
-                              onChange={(e) =>
-                                handleOptionChange(
-                                  questionIndex,
-                                  optionIndex,
-                                  "isCorrect",
-                                  e.target.checked
-                                )
-                              }
-                            />
-                          }
-                          label="Correct Option"
-                        />
-                        <Button
-                          variant="outlined"
-                          onClick={() =>
-                            handleRemoveOption(questionIndex, optionIndex)
-                          }
-                        >
-                          Remove Option
-                        </Button>
-                      </Box>
-                    ))}
-                    <Button
-                      variant="outlined"
-                      onClick={() => handleAddOption(questionIndex)}
+                <div className="flex flex-col justify-between md:flex-row">
+                  <TextField
+                    label="Question"
+                    variant="outlined"
+                    value={question.questionText}
+                    onChange={(e) =>
+                      handleQuestionChange(
+                        questionIndex,
+                        "questionText",
+                        e.target.value
+                      )
+                    }
+                    required
+                    sx={{ mb: 2, width: "79%" }}
+                    error={Boolean(questionErrors[questionIndex])}
+                    helperText={questionErrors[questionIndex]}
+                  />
+                  <TextField
+                    label="Marks"
+                    type="number"
+                    variant="outlined"
+                    value={question.marks}
+                    onChange={(e) =>
+                      handleQuestionChange(
+                        questionIndex,
+                        "marks",
+                        e.target.value
+                      )
+                    }
+                    required
+                    sx={{ mb: 2, width: "20%" }}
+                  />
+                </div>
+                <div className="w-full">
+                  <Typography variant="subtitle1" gutterBottom>
+                    Options
+                  </Typography>
+                  {question.options.map((option, optionIndex) => (
+                    <div
+                      className="flex w-full justify-between gap-2 items-center"
+                      key={optionIndex}
                     >
-                      Add Option
-                    </Button>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      label="Marks"
-                      type="number"
-                      variant="outlined"
-                      value={question.marks}
-                      onChange={(e) =>
-                        handleQuestionChange(
-                          questionIndex,
-                          "marks",
-                          e.target.value
-                        )
-                      }
-                      required
-                      fullWidth
-                      sx={{ mb: 2 }}
-                    />
-                  </Grid>
-                </Grid>
+                      <TextField
+                        label={`Option ${optionIndex + 1}`}
+                        variant="outlined"
+                        fullWidth
+                        value={option.optionText}
+                        onChange={(e) =>
+                          handleOptionChange(
+                            questionIndex,
+                            optionIndex,
+                            "optionText",
+                            e.target.value
+                          )
+                        }
+                        required
+                      />
+                      <FormControlLabel
+                        fullWidth
+                        control={
+                          <Checkbox
+                            checked={option.isCorrect}
+                            onChange={(e) =>
+                              handleOptionChange(
+                                questionIndex,
+                                optionIndex,
+                                "isCorrect",
+                                e.target.checked
+                              )
+                            }
+                          />
+                        }
+                        label="Correct"
+                      />
+                      <Delete
+                        sx={{ color: "red" }}
+                        onClick={() =>
+                          handleRemoveOption(questionIndex, optionIndex)
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleAddOption(questionIndex)}
+                >
+                  Add Option
+                </Button>
                 <Button
                   variant="outlined"
                   onClick={() => handleRemoveQuestion(questionIndex)}
@@ -362,44 +401,6 @@ const CreateAssignment = ({ selectedSubject, onclick }) => {
             <Button variant="contained" onClick={handleAddQuestion}>
               Add Question
             </Button>
-
-            <Box mt={3}>
-              <TextField
-                label="Duration (in minutes)"
-                type="number"
-                variant="outlined"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                required
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                label="Total Marks"
-                type="number"
-                variant="outlined"
-                value={totalMarks} // Display the calculated total marks
-                InputProps={{ readOnly: true }} // Make it read-only
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                label="Pass Marks"
-                type="number"
-                variant="outlined"
-                value={passMarks}
-                onChange={(e) => setPassMarks(e.target.value)}
-                required
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                label="Deadline"
-                type="date"
-                variant="outlined"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-                required
-                sx={{ mb: 2 }}
-              />
-            </Box>
 
             {successMessage && (
               <Typography color="green">{successMessage}</Typography>

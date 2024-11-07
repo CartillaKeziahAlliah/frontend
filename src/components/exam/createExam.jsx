@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import {
   TextField,
@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { Close, Delete } from "@mui/icons-material";
 
+
 // const apiUrl = "http://localhost:5000"; // Your API URL
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 
@@ -32,13 +33,16 @@ const CreateExam = ({ selectedSubject, onclick }) => {
     },
   ]);
   const [duration, setDuration] = useState("");
-  const [totalMarks, setTotalMarks] = useState("");
+  const [totalMarks, setTotalMarks] = useState(0); // Initialize total marks to 0
   const [passMarks, setPassMarks] = useState("");
   const [questionErrors, setQuestionErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
   const [previewVisible, setPreviewVisible] = useState(false);
   const errorRefs = useRef([]);
-
+  useEffect(() => {
+    const total = questions.reduce((sum, question) => sum + question.marks, 0);
+    setTotalMarks(total);
+  }, [questions]);
   const handleQuestionChange = (index, field, value) => {
     const updatedQuestions = [...questions];
     if (field === "questionText") {
@@ -137,7 +141,7 @@ const CreateExam = ({ selectedSubject, onclick }) => {
       subject: selectedSubject._id,
       questions,
       duration: Number(duration), // Convert duration to number
-      totalMarks: Number(totalMarks), // Convert total marks to number
+      totalMarks, // Convert total marks to number
       passMarks: Number(passMarks), // Convert pass marks to number
     };
 
@@ -155,7 +159,6 @@ const CreateExam = ({ selectedSubject, onclick }) => {
         },
       ]);
       setDuration("");
-      setTotalMarks("");
       setPassMarks("");
     } catch (error) {
       setQuestionErrors({
@@ -210,7 +213,7 @@ const CreateExam = ({ selectedSubject, onclick }) => {
         overflowY: "scroll",
       }}
     >
-      <Card>
+      <Card className="border border-[#207E68]">
         <div className="flex justify-between">
           <CardHeader
             title={`Create Exam for ${selectedSubject.subject_name}`}
@@ -260,7 +263,7 @@ const CreateExam = ({ selectedSubject, onclick }) => {
                 type="number"
                 fullWidth
                 value={totalMarks}
-                onChange={(e) => setTotalMarks(e.target.value)}
+                InputProps={{ readOnly: true }} // Make it read-only
                 required
                 sx={{ mt: 1 }}
               />

@@ -21,7 +21,7 @@ import {
 // const apiUrl = "http://localhost:5000"; // Your API URL
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 
-const Exam = ({ subjectId, user }) => {
+const Exam = ({ subjectId, user, subject }) => {
   const [exams, setExams] = useState([]);
   const [currentExam, setCurrentExam] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -79,7 +79,7 @@ const Exam = ({ subjectId, user }) => {
 
   return (
     <div>
-      <h2>Exams for {subjectId}</h2>
+      <h2>Exams for {subject.subject_name}</h2>
       {user && <p>Student: {user.name}</p>}
 
       {currentExam ? (

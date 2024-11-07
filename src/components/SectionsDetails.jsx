@@ -33,6 +33,7 @@ import CreateDiscussion from "./discussion/CreateDiscussion";
 import DiscussionList from "./discussion/DiscussionList";
 import StudentsComponent from "./studentList/studentlist";
 import ExamScoresView from "./exam/ExamScoresView";
+import AddIcon from "@mui/icons-material/Add";
 
 // const apiUrl = "http://localhost:5000";
 const apiUrl = "https://server-production-dd7a.up.railway.app";
@@ -453,18 +454,6 @@ const SectionDetail = () => {
             </div>
           ) : (
             <>
-              {action !== "exam" && (
-                <div className="flex justify-end">
-                  <Button
-                    variant="outlined"
-                    onClick={() => setAction("exam")}
-                    className="mr-2 m-2"
-                    sx={{ border: "1px solid black", color: "black" }}
-                  >
-                    Create Exam
-                  </Button>
-                </div>
-              )}
               {viewlist && action !== "exam" && (
                 <>
                   <Box
@@ -483,7 +472,12 @@ const SectionDetail = () => {
                         className="w-full p-2 outline-none rounded-3xl"
                       />
                     </div>
-
+                    <button
+                      onClick={() => setAction("exam")}
+                      className="flex justify-center items-center mb-4 rounded-full hover:bg-gray-300 px-2"
+                    >
+                      <AddIcon />
+                    </button>
                     <select
                       value={sortOption}
                       onChange={handleSortChange}
@@ -592,17 +586,10 @@ const SectionDetail = () => {
           )}
           {action !== "assignment" && (
             <>
-              <div className="flex justify-end">
-                <Button
-                  variant="outlined"
-                  onClick={() => setAction("assignment")}
-                  className="mr-2 m-2"
-                  sx={{ border: "1px solid black", color: "black" }}
-                >
-                  Create Assignment
-                </Button>
-              </div>
-              <AssignmentList selectedSubject={selectedSubject} />
+              <AssignmentList
+                selectedSubject={selectedSubject}
+                setAction={() => setAction("assignment")}
+              />
             </>
           )}
         </>
@@ -636,20 +623,10 @@ const SectionDetail = () => {
           )}
           {action !== "discussion" && (
             <>
-              {" "}
-              <div className="flex justify-end">
-                {user.role !== "student" && (
-                  <Button
-                    variant="outlined"
-                    onClick={() => setAction("discussion")}
-                    className="mr-2 m-2"
-                    sx={{ border: "1px solid black", color: "black" }}
-                  >
-                    Create Discussion
-                  </Button>
-                )}
-              </div>
-              <DiscussionList selectedSubject={selectedSubject} />
+              <DiscussionList
+                selectedSubject={selectedSubject}
+                setAction={() => setAction("discussion")}
+              />
             </>
           )}
         </>
