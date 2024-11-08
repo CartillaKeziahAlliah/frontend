@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios"; // Import Axios
+import axios from "axios";
 import {
   Button,
   TextField,
@@ -15,16 +15,19 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  duration,
 } from "@mui/material";
 
-// const apiUrl = "http://localhost:5000"; // Your API URL
-const apiUrl = "https://server-production-dd7a.up.railway.app";
+// Define your API URL
+const apiUrl = "http://localhost:5000";
 
+// Component for the Exam
 const Exam = ({ subjectId, user, subject }) => {
   const [exams, setExams] = useState([]);
   const [currentExam, setCurrentExam] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [answers, setAnswers] = useState({});
+  const [takeExam, setTakeExam] = useState(false);
+  const [viewScore, setViewScore] = useState(null); // New state for viewing score
 
   // Fetch exams when the component mounts
   useEffect(() => {
@@ -34,7 +37,7 @@ const Exam = ({ subjectId, user, subject }) => {
           `${apiUrl}/api/exam/bysubject/${subjectId}`
         );
         setExams(response.data);
-        console.log("Exams fetched:", response.data); // Log the fetched exams
+        console.log("Exams fetched:", response.data);
       } catch (error) {
         console.error("Failed to fetch exams:", error);
       }
@@ -43,75 +46,90 @@ const Exam = ({ subjectId, user, subject }) => {
     fetchExams();
   }, [subjectId]);
 
+  // Handle when a user starts taking an exam
   const handleTakeExam = (exam) => {
     setCurrentExam(exam);
+    setTakeExam(true);
+    setAnswers({}); // Reset answers
   };
 
-  const handleAnswerChange = (index, value) => {
-    const updatedExams = exams.map((exam) => {
-      if (exam._id === currentExam._id) {
-        const updatedQuestions = [...exam.questions];
-        updatedQuestions[index].answer = value;
-        return { ...exam, questions: updatedQuestions };
-      }
-      return exam;
-    });
-    setExams(updatedExams);
+  // Handle answer selection for each question
+  const handleAnswerChange = (questionIndex, value) => {
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [questionIndex]: value, // Store answer as the index of the selected option
+    }));
   };
 
-  const handleSubmit = () => {
-    // Simulate score calculation; here you could implement your own logic
-    const updatedExams = exams.map((exam) =>
-      exam._id === currentExam._id ? { ...exam, score: 90 } : exam
+  // Submit answers for grading
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        `${apiUrl}/api/exam/${currentExam._id}/take`,
+        {
+          studentId: user._id,
+          answers: Object.values(answers), // Convert answers object to array for backend
+        }
+      );
+
+      // Update the exam score in local state
+      const updatedExams = exams.map((exam) =>
+        exam._id === currentExam._id
+          ? { ...exam, score: response.data.obtainedMarks }
+          : exam
+      );
+      setExams(updatedExams);
+      setCurrentExam(null);
+
+      // Show result to the student
+      alert(
+        `Exam submitted! Your score: ${response.data.obtainedMarks}/${
+          response.data.totalMarks
+        }. Passed: ${response.data.passed ? "Yes" : "No"}`
+      );
+    } catch (error) {
+      console.error("Failed to submit exam:", error);
+    }
+  };
+
+  // View detailed exam information
+  const handleViewScore = (exam) => {
+    const studentScore = exam.scores.find(
+      (score) => score.studentId.toString() === user._id.toString()
     );
-    setExams(updatedExams);
-    setCurrentExam(null);
+    setViewScore(studentScore);
   };
-
-  const handleViewDetails = (exam) => {
-    setCurrentExam(exam);
-    setDetailsOpen(true);
+  const handleCloseScore = () => {
+    setViewScore(null);
   };
-
-  const handleCloseDetails = () => {
-    setDetailsOpen(false);
-  };
-
   return (
     <div>
       <h2>Exams for {subject.subject_name}</h2>
       {user && <p>Student: {user.name}</p>}
 
-      {currentExam ? (
+      {currentExam && takeExam ? (
         <div>
+          <button onClick={() => setTakeExam(false)}>Back</button>
           <h4>{currentExam.title} Questions</h4>
           {currentExam.questions.map((question, index) => (
             <div key={index} className="mb-4">
               <p>{question.questionText}</p>
-              {question.type === "text" && (
-                <TextField
-                  label="Your Answer"
-                  variant="outlined"
-                  fullWidth
-                  onChange={(e) => handleAnswerChange(index, e.target.value)}
-                />
-              )}
-              {question.type === "multiple" && (
-                <FormControl component="fieldset">
-                  <RadioGroup
-                    onChange={(e) => handleAnswerChange(index, e.target.value)}
-                  >
-                    {question.options.map((option, choiceIndex) => (
-                      <FormControlLabel
-                        key={choiceIndex}
-                        value={option.optionText}
-                        control={<Radio />}
-                        label={option.optionText}
-                      />
-                    ))}
-                  </RadioGroup>
-                </FormControl>
-              )}
+              <FormControl component="fieldset">
+                <RadioGroup
+                  onChange={(e) =>
+                    handleAnswerChange(index, Number(e.target.value))
+                  }
+                >
+                  {question.options.map((option, choiceIndex) => (
+                    <FormControlLabel
+                      key={choiceIndex}
+                      value={choiceIndex} // Value is choiceIndex (index of the option)
+                      control={<Radio />}
+                      label={option.optionText}
+                    />
+                  ))}
+                </RadioGroup>
+              </FormControl>
             </div>
           ))}
           <Button
@@ -137,8 +155,20 @@ const Exam = ({ subjectId, user, subject }) => {
               >
                 <CardContent>
                   <Typography variant="h6">{exam.title}</Typography>
+
                   <div className="flex gap-2 mt-2">
-                    {exam.scores.length === 0 ? (
+                    {exam.scores.some(
+                      (score) =>
+                        score.studentId.toString() === user._id.toString()
+                    ) ? (
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={() => handleViewScore(exam)}
+                      >
+                        View Score
+                      </Button>
+                    ) : (
                       <Button
                         variant="contained"
                         onClick={() => handleTakeExam(exam)}
@@ -151,22 +181,6 @@ const Exam = ({ subjectId, user, subject }) => {
                       >
                         Take Exam
                       </Button>
-                    ) : (
-                      <Button
-                        variant="outlined"
-                        onClick={() => handleViewDetails(exam)}
-                        sx={{
-                          mt: 2,
-                          color: "#207E68",
-                          borderColor: "#207E68",
-                          "&:hover": {
-                            backgroundColor: "#f0f0f0",
-                            borderColor: "#1a5b4f",
-                          },
-                        }}
-                      >
-                        View Details
-                      </Button>
                     )}
                   </div>
                 </CardContent>
@@ -175,46 +189,29 @@ const Exam = ({ subjectId, user, subject }) => {
           ))}
         </Grid>
       )}
-
-      <Dialog open={detailsOpen} onClose={handleCloseDetails}>
-        <DialogTitle>Exam Details</DialogTitle>
-        <DialogContent>
-          {currentExam && (
-            <div>
-              <Typography variant="h6">{currentExam.title}</Typography>
-              <Typography variant="body1">{currentExam.description}</Typography>
-              <Typography variant="body2">
-                Duration: {currentExam.duration} minutes
-              </Typography>
-              <Typography variant="body2">
-                Total Marks: {currentExam.totalMarks}
-              </Typography>
-              <Typography variant="body2">
-                Pass Marks: {currentExam.passMarks}
-              </Typography>
-              <Typography variant="h6">Questions:</Typography>
-              {currentExam.questions.map((question, index) => (
-                <div key={index}>
-                  <Typography variant="body2">
-                    {index + 1}. {question.questionText}
-                  </Typography>
-                  {question.options.map((option, optionIndex) => (
-                    <Typography variant="body2" key={optionIndex}>
-                      - {option.optionText}{" "}
-                      {option.isCorrect ? "(Correct)" : ""}
-                    </Typography>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDetails} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {viewScore && (
+        <Dialog open={Boolean(viewScore)} onClose={handleCloseScore}>
+          <DialogTitle>Exam Score</DialogTitle>
+          <DialogContent>
+            <Typography>Score: {viewScore.obtainedMarks}</Typography>
+            <Typography>Passed: {viewScore.passed ? "Yes" : "No"} </Typography>
+            <Typography>
+              Exam Date:{" "}
+              {new Date(viewScore.examDate).toLocaleString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseScore} color="primary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </div>
   );
 };
