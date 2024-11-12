@@ -5,6 +5,7 @@ import EventCalendar from "./AnnouncementCalendar";
 import SectionsList from "./teacherSection";
 import { useAuth } from "../context/AuthContext";
 import AnnouncementApp from "./Announcement";
+import SubjectsList from "./student.subjects";
 
 const Dashboard = () => {
   const [page, setPage] = useState("calendar");
@@ -46,7 +47,7 @@ const Dashboard = () => {
             <div className="h-full">
               <div className="flex flex-row flex-wrap h-full">
                 <EventCalendar />
-                <SectionsList />
+                {user.role === "student" ? <SubjectsList /> : <SectionsList />}
               </div>
             </div>
           )}

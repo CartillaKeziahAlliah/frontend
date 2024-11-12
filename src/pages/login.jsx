@@ -33,11 +33,9 @@ const LoginForm = () => {
       // Redirect based on role
       switch (response.data.role) {
         case "student":
-          window.location.href = "/Table";
+          window.location.href = "/Dashboard";
           break;
-        case "user":
-          window.location.href = "/UserDashboard"; // Assuming a separate dashboard for users
-          break;
+
         default:
           window.location.href = "/Dashboard";
       }

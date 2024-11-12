@@ -7,10 +7,19 @@ import {
   Grid,
   CircularProgress,
   Snackbar,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  IconButton,
+  MenuItem,
+  Menu,
 } from "@mui/material";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { CheckCircle } from "@mui/icons-material";
+import { CheckCircle, MoreHoriz } from "@mui/icons-material";
 
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 
@@ -20,6 +29,7 @@ const Discussion = ({ subjectId, userId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [anchorEl, setAnchorEl] = useState(null);
 
   // Fetch discussions when the component mounts
   useEffect(() => {
@@ -64,52 +74,69 @@ const Discussion = ({ subjectId, userId }) => {
 
   const handleBack = () => {
     setCurrentDiscussionIndex(null);
+    setAnchorEl(false);
   };
 
   const handleCloseSnackbar = () => {
     setSuccessMessage("");
     setError(null);
   };
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
   return (
     <div>
-      <h2>Discussions for {subjectId}</h2>
       {loading ? (
         <CircularProgress />
       ) : (
         <>
           {currentDiscussionIndex === null ? (
-            <Grid container spacing={2}>
-              {discussions.map((discussion, index) => (
-                <Grid item xs={12} sm={6} md={4} key={discussion._id}>
-                  <Card
-                    variant="outlined"
-                    className="hover:shadow-lg transition-shadow duration-300"
-                  >
-                    <CardContent>
-                      <Typography variant="h6">{discussion.title}</Typography>
-                      <Button
-                        variant="contained"
-                        onClick={() => {
-                          handleViewDiscussion(index);
-                        }}
-                        aria-label={`View discussion titled ${discussion.title}`}
-                        sx={{
-                          backgroundColor: "#207E68",
-                          "&:hover": {
-                            backgroundColor: "#1a5b4f",
-                          },
-                          color: "#fff",
-                          mt: 2,
-                        }}
-                      >
-                        View Discussion
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
+            <TableContainer component={Card}>
+              <Table>
+                <TableHead bgColor="#cdcdcd">
+                  <TableRow>
+                    <TableCell>Title</TableCell>
+                    <TableCell>Number of Read</TableCell>
+
+                    <TableCell align="right">Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {discussions.map((discussion, index) => (
+                    <TableRow key={discussion._id}>
+                      <TableCell>
+                        <Typography className="capitalize">
+                          {discussion.title}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography>
+                          {discussion.studentsRead.length}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <IconButton onClick={handleMenuOpen}>
+                          <MoreHoriz />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={Boolean(anchorEl)}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem onClick={() => handleViewDiscussion(index)}>
+                            View Discussion
+                          </MenuItem>
+                        </Menu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           ) : (
             <div>
               <div className="flex flex-row">

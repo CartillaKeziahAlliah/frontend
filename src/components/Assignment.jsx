@@ -11,10 +11,28 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  TableContainer,
+  Paper,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  IconButton,
+  Menu,
+  MenuItem,
+  TableHead,
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import axios from "axios"; // Import axios for HTTP requests
-const apiUrl = "https://server-production-dd7a.up.railway.app";
+import { useAuth } from "../context/AuthContext";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+const apiUrl = "http://localhost:5000";
+
+// const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -23,11 +41,15 @@ const Alert = React.forwardRef((props, ref) => (
 const Assignment = ({ subjectId, user }) => {
   const [assignments, setAssignments] = useState([]);
   const [currentAssignment, setCurrentAssignment] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [takeAssignment, setTakeAssignment] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null); // Anchor for the menu
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
-
+  const [timeLeft, setTimeLeft] = useState(0); // Track remaining time
+  const [timerActive, setTimerActive] = useState(false); // To control the timer state
   // Fetch assignments from the backend when the component mounts
   useEffect(() => {
     const fetchAssignments = async () => {
@@ -46,50 +68,50 @@ const Assignment = ({ subjectId, user }) => {
     fetchAssignments();
   }, [subjectId]);
 
-  const handleTakeAssignment = (assignment) => {
+  const handleTakeAssignment = async (assignment) => {
+    console.log(assignment._id);
     setCurrentAssignment(assignment);
+    setTakeAssignment(true);
+    setAnswers({});
+    handleCloseMenu();
+    setTimeLeft(assignment.duration * 60);
+    setTimerActive(true);
   };
 
-  const handleAnswerChange = (value) => {
-    const updatedAssignments = assignments.map((assignment) => {
-      if (assignment.id === currentAssignment.id) {
-        return { ...assignment, answer: value };
-      }
-      return assignment;
-    });
-    setAssignments(updatedAssignments);
+  const handleAnswerChange = (questionIndex, value) => {
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [questionIndex]: value,
+    }));
   };
 
-  const handleSubmit = () => {
-    if (currentAssignment.answer.trim() === "") {
-      setSnackbarMessage("Please enter an answer before submitting.");
+  const handleSubmit = async () => {
+    console.log("user id", user); // Now this is safe because we already checked if currentAssignment exists
+
+    try {
+      const response = await axios.post(
+        `${apiUrl}/api/assignment/${currentAssignment._id}/take`,
+        {
+          studentId: user,
+          answers: Object.values(answers),
+        }
+      );
+
+      const updatedAssignments = assignments.map((assignment) =>
+        assignment._id === currentAssignment._id
+          ? { ...assignment, score: response.data.obtainedMarks } // Replace with dynamic scoring as needed
+          : assignment
+      );
+
+      setAssignments(updatedAssignments);
+      setCurrentAssignment(null);
+      setSnackbarMessage("Assignment submitted successfully!");
       setSnackbarOpen(true);
-      return;
+      window.location.reload(); // You may want to optimize this to avoid full page reload
+    } catch (error) {
+      console.error("Error submitting assignment:", error);
+      setSnackbarOpen(true);
     }
-
-    // Here, you would typically send the answer to the server
-    const updatedAssignments = assignments.map((assignment) =>
-      assignment.id === currentAssignment.id
-        ? { ...assignment, score: 75 } // Replace with dynamic scoring as needed
-        : assignment
-    );
-    setAssignments(updatedAssignments);
-    setCurrentAssignment(null);
-    setSnackbarMessage("Assignment submitted successfully!");
-    setSnackbarOpen(true);
-  };
-
-  const handleViewScore = (assignment) => {
-    alert(
-      assignment.score !== null
-        ? `Your score: ${assignment.score}`
-        : "Not scored yet"
-    );
-  };
-
-  const handleViewDetails = (assignment) => {
-    setSelectedAssignment(assignment);
-    setDetailsOpen(true);
   };
 
   const handleSnackbarClose = () => {
@@ -100,136 +122,137 @@ const Assignment = ({ subjectId, user }) => {
     setDetailsOpen(false);
     setSelectedAssignment(null);
   };
+  const handleOpenMenu = (event, assignment) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedAssignment(assignment);
+  };
 
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+    setSelectedAssignment(null);
+  };
+  useEffect(() => {
+    let timer;
+
+    if (timerActive && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000); // Decrease time every second
+    }
+
+    if (timeLeft === 0) {
+      // Time's up, auto-submit the exam
+      handleSubmit();
+    }
+
+    return () => {
+      clearInterval(timer); // Clean up the interval on unmount or when timer is inactive
+    };
+  }, [timerActive, timeLeft]);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(
+      remainingSeconds
+    ).padStart(2, "0")}`;
+  };
   return (
     <div>
-      <h2>Assignments for {subjectId}</h2>
-      {user && <p>Student: {user.name}</p>}
-
-      {!currentAssignment ? (
-        <Grid container spacing={2}>
-          {assignments.map((assignment) => (
-            <Grid item xs={12} sm={6} md={4} key={assignment.id}>
-              <Card
-                variant="outlined"
-                className="hover:shadow-lg transition-shadow duration-300"
-              >
-                <CardContent>
-                  <Typography variant="h6">{assignment.title}</Typography>
-                  <div className="flex gap-2 mt-2">
-                    {assignment.score === null ? (
-                      <Button
-                        variant="contained"
-                        sx={{
-                          bgcolor: "#207E68",
-                          "&:hover": { bgcolor: "#1a5b4f" },
-                        }}
-                        onClick={() => handleTakeAssignment(assignment)}
-                      >
-                        Take Assignment
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outlined"
-                        onClick={() => handleViewScore(assignment)}
-                      >
-                        View Score
-                      </Button>
-                    )}
-                    <Button
-                      variant="outlined"
-                      onClick={() => handleViewDetails(assignment)}
-                    >
-                      View Details
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </Grid>
+      {currentAssignment && takeAssignment ? (
+        <div>
+          <button onClick={() => setTakeAssignment(false)}>back</button>
+          <h4>{currentAssignment.title} Questions</h4>
+          <Typography variant="h6">
+            Time Left: {formatTime(timeLeft)}
+          </Typography>
+          {currentAssignment.questions.map((question, index) => (
+            <div key={index} className="mb-4">
+              <p>
+                {index + 1}. {question.questionText}
+              </p>{" "}
+              <FormControl component="fieldset">
+                <RadioGroup
+                  onChange={(e) =>
+                    handleAnswerChange(index, Number(e.target.value))
+                  }
+                >
+                  {question.options.map((option, choiceIndex) => (
+                    <FormControlLabel
+                      key={choiceIndex}
+                      value={choiceIndex}
+                      control={<Radio />}
+                      label={option.optionText}
+                    />
+                  ))}
+                </RadioGroup>
+              </FormControl>
+            </div>
           ))}
-        </Grid>
-      ) : (
-        <div className="mt-4">
-          <h4>{currentAssignment.title} Assignment Form</h4>
-          <TextField
-            label="Your Answer"
-            variant="outlined"
-            fullWidth
-            multiline
-            value={currentAssignment.answer}
-            onChange={(e) => handleAnswerChange(e.target.value)}
-          />
           <Button
             variant="contained"
-            onClick={handleSubmit}
-            className="mt-2"
             sx={{
-              bgcolor: "#207E68",
               mt: 2,
-              borderColor: "#207E68",
+              bgcolor: "#207E68",
               "&:hover": { bgcolor: "#1a5b4f" },
             }}
+            onClick={handleSubmit}
           >
             Submit Assignment
-          </Button>
+          </Button>{" "}
         </div>
-      )}
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-      >
-        <Alert onClose={handleSnackbarClose} severity="info">
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-
-      {/* Details Dialog */}
-      <Dialog open={detailsOpen} onClose={handleCloseDetails}>
-        <DialogTitle>Assignment Details</DialogTitle>
-        <DialogContent>
-          {selectedAssignment && (
-            <>
-              <Typography variant="h6">{selectedAssignment.title}</Typography>
-              <Typography variant="body1">
-                {selectedAssignment.description}
-              </Typography>
-              <Typography variant="body2">
-                Duration: {selectedAssignment.duration} mins
-              </Typography>
-              <Typography variant="body2">
-                Total Marks: {selectedAssignment.totalMarks}
-              </Typography>
-              <Typography variant="body2">
-                Pass Marks: {selectedAssignment.passMarks}
-              </Typography>
-              <Typography variant="body2">
-                Deadline:{" "}
-                {new Date(selectedAssignment.deadline).toLocaleString()}
-              </Typography>
-              <Typography variant="h6">Questions:</Typography>
-              {selectedAssignment.questions.map((question, index) => (
-                <div key={index}>
-                  <Typography variant="body2">
-                    {index + 1}. {question.questionText}
-                  </Typography>
-                  <ul>
-                    {question.options.map((option, optIndex) => (
-                      <li key={optIndex}>{option.optionText}</li>
-                    ))}
-                  </ul>
-                </div>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead bgColor="#cdcdcd">
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>Title</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Duration</TableCell>
+                <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                  Actions
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {assignments.map((assignment) => (
+                <TableRow key={assignment._id}>
+                  <TableCell>{assignment.title}</TableCell>
+                  <TableCell>{assignment.duration}</TableCell>
+                  <TableCell align="right">
+                    {assignment.scores.some(
+                      (score) => score.studentId === user
+                    ) ? (
+                      <Typography color="green">Completed </Typography>
+                    ) : (
+                      <>
+                        <IconButton
+                          onClick={(e) => handleOpenMenu(e, assignment)}
+                        >
+                          <MoreHorizIcon />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={Boolean(
+                            anchorEl &&
+                              selectedAssignment?._id === assignment._id
+                          )}
+                          onClose={handleCloseMenu}
+                        >
+                          <MenuItem
+                            onClick={() => handleTakeAssignment(assignment)}
+                          >
+                            Take assignment
+                          </MenuItem>
+                        </Menu>
+                      </>
+                    )}
+                  </TableCell>{" "}
+                </TableRow>
               ))}
-            </>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDetails} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </div>
   );
 };

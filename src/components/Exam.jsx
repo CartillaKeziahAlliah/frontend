@@ -2,34 +2,38 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Button,
-  TextField,
   FormControl,
   FormControlLabel,
   Radio,
   RadioGroup,
-  Card,
-  CardContent,
   Typography,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 // Define your API URL
 const apiUrl = "http://localhost:5000";
 
-// Component for the Exam
 const Exam = ({ subjectId, user, subject }) => {
   const [exams, setExams] = useState([]);
   const [currentExam, setCurrentExam] = useState(null);
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const [answers, setAnswers] = useState({});
   const [takeExam, setTakeExam] = useState(false);
-  const [viewScore, setViewScore] = useState(null); // New state for viewing score
+  const [viewScore, setViewScore] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null); // Anchor for the menu
+  const [selectedExam, setSelectedExam] = useState(null); // Track selected exam for menu actions
+  const [timeLeft, setTimeLeft] = useState(0); // Track remaining time
+  const [timerActive, setTimerActive] = useState(false); // To control the timer state
 
-  // Fetch exams when the component mounts
   useEffect(() => {
     const fetchExams = async () => {
       try {
@@ -46,33 +50,36 @@ const Exam = ({ subjectId, user, subject }) => {
     fetchExams();
   }, [subjectId]);
 
-  // Handle when a user starts taking an exam
   const handleTakeExam = (exam) => {
     setCurrentExam(exam);
     setTakeExam(true);
-    setAnswers({}); // Reset answers
+    setAnswers({});
+    handleCloseMenu();
+
+    // Initialize the timer with the exam duration (converted to milliseconds)
+    setTimeLeft(exam.duration * 60); // duration in minutes * 60 seconds
+    setTimerActive(true);
   };
 
-  // Handle answer selection for each question
   const handleAnswerChange = (questionIndex, value) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
-      [questionIndex]: value, // Store answer as the index of the selected option
+      [questionIndex]: value,
     }));
   };
 
-  // Submit answers for grading
   const handleSubmit = async () => {
     try {
+      // Submit the answers, allowing empty answers if not filled out
       const response = await axios.post(
         `${apiUrl}/api/exam/${currentExam._id}/take`,
         {
           studentId: user._id,
-          answers: Object.values(answers), // Convert answers object to array for backend
+          answers:
+            Object.values(answers).length > 0 ? Object.values(answers) : null, // Submit answers or null
         }
       );
 
-      // Update the exam score in local state
       const updatedExams = exams.map((exam) =>
         exam._id === currentExam._id
           ? { ...exam, score: response.data.obtainedMarks }
@@ -81,36 +88,64 @@ const Exam = ({ subjectId, user, subject }) => {
       setExams(updatedExams);
       setCurrentExam(null);
 
-      // Show result to the student
       alert(
         `Exam submitted! Your score: ${response.data.obtainedMarks}/${
           response.data.totalMarks
         }. Passed: ${response.data.passed ? "Yes" : "No"}`
       );
+      window.location.reload();
     } catch (error) {
       console.error("Failed to submit exam:", error);
     }
   };
 
-  // View detailed exam information
-  const handleViewScore = (exam) => {
-    const studentScore = exam.scores.find(
-      (score) => score.studentId.toString() === user._id.toString()
-    );
-    setViewScore(studentScore);
+  const handleOpenMenu = (event, exam) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedExam(exam);
   };
-  const handleCloseScore = () => {
-    setViewScore(null);
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+    setSelectedExam(null);
   };
+
+  useEffect(() => {
+    let timer;
+
+    if (timerActive && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000); // Decrease time every second
+    }
+
+    if (timeLeft === 0) {
+      // Time's up, auto-submit the exam
+      handleSubmit();
+    }
+
+    return () => {
+      clearInterval(timer); // Clean up the interval on unmount or when timer is inactive
+    };
+  }, [timerActive, timeLeft]);
+
+  // Function to format timeLeft into MM:SS format
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(
+      remainingSeconds
+    ).padStart(2, "0")}`;
+  };
+
   return (
     <div>
-      <h2>Exams for {subject.subject_name}</h2>
-      {user && <p>Student: {user.name}</p>}
-
       {currentExam && takeExam ? (
         <div>
           <button onClick={() => setTakeExam(false)}>Back</button>
           <h4>{currentExam.title} Questions</h4>
+          <Typography variant="h6">
+            Time Left: {formatTime(timeLeft)}
+          </Typography>
           {currentExam.questions.map((question, index) => (
             <div key={index} className="mb-4">
               <p>{question.questionText}</p>
@@ -123,7 +158,7 @@ const Exam = ({ subjectId, user, subject }) => {
                   {question.options.map((option, choiceIndex) => (
                     <FormControlLabel
                       key={choiceIndex}
-                      value={choiceIndex} // Value is choiceIndex (index of the option)
+                      value={choiceIndex}
                       control={<Radio />}
                       label={option.optionText}
                     />
@@ -137,7 +172,6 @@ const Exam = ({ subjectId, user, subject }) => {
             sx={{
               mt: 2,
               bgcolor: "#207E68",
-              borderColor: "#207E68",
               "&:hover": { bgcolor: "#1a5b4f" },
             }}
             onClick={handleSubmit}
@@ -146,71 +180,53 @@ const Exam = ({ subjectId, user, subject }) => {
           </Button>
         </div>
       ) : (
-        <Grid container spacing={2}>
-          {exams.map((exam) => (
-            <Grid item xs={12} sm={6} md={4} key={exam._id}>
-              <Card
-                variant="outlined"
-                className="hover:shadow-lg transition-shadow duration-300"
-              >
-                <CardContent>
-                  <Typography variant="h6">{exam.title}</Typography>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead bgcolor="#cdcdcd">
+              <TableRow>
+                <TableCell sx={{ fontWeight: "bold" }}>Title</TableCell>
+                <TableCell sx={{ fontWeight: "bold" }}>Duration</TableCell>
+                <TableCell align="right" sx={{ fontWeight: "bold" }}>
+                  Actions
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {exams.map((exam) => (
+                <TableRow key={exam._id}>
+                  <TableCell>{exam.title}</TableCell>
+                  <TableCell>{exam.duration} mins.</TableCell>
 
-                  <div className="flex gap-2 mt-2">
+                  <TableCell align="right">
                     {exam.scores.some(
                       (score) =>
-                        score.studentId.toString() === user._id.toString()
+                        score.studentId._id.toString() === user._id.toString()
                     ) ? (
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => handleViewScore(exam)}
-                      >
-                        View Score
-                      </Button>
+                      <Typography color="green">Completed</Typography>
                     ) : (
-                      <Button
-                        variant="contained"
-                        onClick={() => handleTakeExam(exam)}
-                        sx={{
-                          mt: 2,
-                          bgcolor: "#207E68",
-                          borderColor: "#207E68",
-                          "&:hover": { bgcolor: "#1a5b4f" },
-                        }}
-                      >
-                        Take Exam
-                      </Button>
+                      <>
+                        <IconButton onClick={(e) => handleOpenMenu(e, exam)}>
+                          <MoreHorizIcon />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={Boolean(
+                            anchorEl && selectedExam?._id === exam._id
+                          )}
+                          onClose={handleCloseMenu}
+                        >
+                          <MenuItem onClick={() => handleTakeExam(exam)}>
+                            Take Exam
+                          </MenuItem>
+                        </Menu>
+                      </>
                     )}
-                  </div>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
-      {viewScore && (
-        <Dialog open={Boolean(viewScore)} onClose={handleCloseScore}>
-          <DialogTitle>Exam Score</DialogTitle>
-          <DialogContent>
-            <Typography>Score: {viewScore.obtainedMarks}</Typography>
-            <Typography>Passed: {viewScore.passed ? "Yes" : "No"} </Typography>
-            <Typography>
-              Exam Date:{" "}
-              {new Date(viewScore.examDate).toLocaleString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseScore} color="primary">
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
     </div>
   );

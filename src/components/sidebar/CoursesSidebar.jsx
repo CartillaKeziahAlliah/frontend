@@ -13,8 +13,8 @@ const CoursesSidebar = ({
       <div
         key={course.subjectId} // Use a unique identifier for the key
         onClick={() => handleCourseSelect(course.subjectId)} // Pass the subjectId for selection
-        className={`p-2 hover:bg-gray-300 rounded flex items-center gap-2 ${
-          active === course.subjectId ? "bg-[#4a8e8b]" : ""
+        className={`p-2 hover:bg-gray-300 rounded-full flex items-center gap-2 ${
+          active === course.subjectId ? "bg-[#207E68]" : ""
         }`}
       >
         <p

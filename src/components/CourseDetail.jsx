@@ -7,8 +7,8 @@ import Exam from "./Exam";
 import Discussion from "./Discussion";
 import Assignment from "./Assignment";
 import axios from "axios";
-const apiUrl = "http://localhost:5000"; // Your API URL
-// const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 const CourseDetail = () => {
   const { subjectId } = useParams();
   const [section, setSection] = useState("Exams");
@@ -34,13 +34,7 @@ const CourseDetail = () => {
     <div className="course-detail-container p-4">
       <h1 className="text-3xl font-bold mb-4">{subjectData.subject_name}</h1>
 
-      {user && (
-        <div className="user-info mb-4">
-          <p>Welcome, {user.name}!</p>
-        </div>
-      )}
-
-      <div className="section-buttons w-full mb-4 flex gap-2">
+      <div className="section-buttons justify-between w-full mb-4 flex gap-2">
         <Button
           variant={section === "Exams" ? "contained" : "outlined"}
           onClick={() => setSection("Exams")}
@@ -101,9 +95,24 @@ const CourseDetail = () => {
         >
           Quizzes
         </Button>
+        <Button
+          variant={section === "Scores" ? "contained" : "outlined"}
+          onClick={() => setSection("Scores")}
+          sx={{
+            bgcolor: section === "Scores" ? "#2c6975" : "transparent",
+            borderColor: section === "Scores" ? "#2c6975" : "#4a8e8b",
+            color: section === "Scores" ? "#fff" : "#2c6975",
+            "&:hover": {
+              bgcolor: section === "Scores" ? "#1a5b4f" : "#f0f0f0",
+              borderColor: section === "Scores" ? "#1a5b4f" : "#4a8e8b",
+            },
+          }}
+        >
+          Scores
+        </Button>
       </div>
 
-      <div className="section-content">
+      <div className="section-content bg-white p-2 shadow-md border borde-1">
         {section === "Exams" && (
           <Exam subjectId={subjectId} user={user} subject={subjectData} />
         )}
@@ -113,9 +122,7 @@ const CourseDetail = () => {
         {section === "Assignments" && (
           <Assignment subjectId={subjectId} userId={user._id} />
         )}
-        {section === "Quizzes" && (
-          <Quiz subjectId={subjectId} userId={user._id} />
-        )}
+        {section === "Quizzes" && <Quiz subjectId={subjectId} />}
       </div>
     </div>
   );
