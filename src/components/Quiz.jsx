@@ -44,7 +44,10 @@ const Quiz = ({ subjectId }) => {
         const response = await axios.get(
           `${apiUrl}/api/quiz/bysubject/${subjectId}`
         );
-        setQuizzes(response.data);
+        const sortedQuiz = response.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setQuizzes(sortedQuiz);
         console.log("Quiz fetched:", response.data);
       } catch (error) {
         console.error("Error fetching quizzes:", error);

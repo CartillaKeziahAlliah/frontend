@@ -7,6 +7,7 @@ import Exam from "./Exam";
 import Discussion from "./Discussion";
 import Assignment from "./Assignment";
 import axios from "axios";
+import UserScores from "./UserScores";
 // const apiUrl = "http://localhost:5000"; // Your API URL
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 const CourseDetail = () => {
@@ -123,6 +124,7 @@ const CourseDetail = () => {
           <Assignment subjectId={subjectId} userId={user._id} />
         )}
         {section === "Quizzes" && <Quiz subjectId={subjectId} />}
+        {section === "Scores" && <UserScores userId={user._id} />}
       </div>
     </div>
   );

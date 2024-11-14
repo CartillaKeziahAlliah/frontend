@@ -14,6 +14,8 @@ import {
   MenuBookOutlined,
   Person2Outlined,
 } from "@mui/icons-material";
+
+import { logo } from "../../constants/logo";
 // const apiUrl = "http://localhost:5000"; // Your API URL
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 const Sidebar = ({ user, logout }) => {
@@ -23,13 +25,13 @@ const Sidebar = ({ user, logout }) => {
   const [showSections, setShowSections] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [open, setOpen] = useState(false);
-
   const [courses, setCourses] = useState([]);
 
   const handleAccountClick = () => {
     setShowCourses(false);
     setShowSections(false);
     setActive("Account");
+    navigate("/updateprofile");
   };
   const handleCoursesClick = async () => {
     setShowCourses((prev) => !prev);
@@ -111,29 +113,41 @@ const Sidebar = ({ user, logout }) => {
             <MenuIcon onClick={toggleMenu} className="cursor-pointer" />
           </Tooltip>
         </div>
-        <div className="flex flex-row items-center justify-center w-[90%] gap-1 p-2 rounded-md border border-white">
-          {user.avatar ? (
-            <img
-              src={user.avatar}
-              alt="User Avatar"
-              className="w-10 h-10 rounded-full"
-            />
-          ) : (
-            <Avatar sx={{ width: 40, height: 40 }} />
-          )}
-          <div className="flex flex-col items-center justify-center">
-            {!isCollapsed && (
-              <Tooltip title="User Name">
-                <p className="capitalize text-white">{user.name}</p>
-              </Tooltip>
+        <img
+          src={logo}
+          alt="User Avatar"
+          className={` rounded-full m-2 ${
+            isCollapsed ? "w-13 h-15" : "w-20 h-20 "
+          }`}
+        />
+        <Tooltip title="Profile" arrow>
+          <div
+            onClick={handleAccountClick}
+            className="flex flex-row cursor-pointer items-center justify-center w-[90%] gap-1 p-2 rounded-md border border-white"
+          >
+            {user.avatar ? (
+              <img
+                src={user.avatar}
+                alt="User Avatar"
+                className="w-10 h-10 rounded-full"
+              />
+            ) : (
+              <Avatar sx={{ width: 40, height: 40 }} />
             )}
-            {!isCollapsed && (
-              <Tooltip title="User Role">
-                <p className="capitalize text-white">{user.role}</p>
-              </Tooltip>
-            )}
+            <div className="flex flex-col items-center justify-center">
+              {!isCollapsed && (
+                <Tooltip title="User Name">
+                  <p className="capitalize text-white">{user.name}</p>
+                </Tooltip>
+              )}
+              {!isCollapsed && (
+                <Tooltip title="User Role">
+                  <p className="capitalize text-white">{user.role}</p>
+                </Tooltip>
+              )}
+            </div>
           </div>
-        </div>
+        </Tooltip>
 
         <div
           className={`flex flex-col gap-5 pt-10 p-2 ${
@@ -207,18 +221,6 @@ const Sidebar = ({ user, logout }) => {
               </Link>
             </>
           )}
-          <Link
-            onClick={handleAccountClick}
-            to="/updateprofile"
-            className={`flex flex-row hover:bg-gray-800 gap-2 items-center ${
-              active === "Account"
-                ? "bg-[#000] text-white"
-                : "text-black bg-[#C2E8F8]"
-            } p-3 rounded-md`}
-          >
-            <Person2Outlined />
-            {!isCollapsed && <p className="capitalize">My Account</p>}
-          </Link>
         </div>
 
         <div className="text-white w-full px-4 pb-4">

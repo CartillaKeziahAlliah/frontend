@@ -12,17 +12,17 @@ import {
   Typography,
   Alert,
 } from "@mui/material";
+import Swal from "sweetalert2";
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const UpdateProfile = () => {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     password: "",
     avatar: null,
   });
   const { user } = useAuth();
-  const { name, email, password, avatar } = formData;
+  const { name, password, avatar } = formData;
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -55,13 +55,28 @@ const UpdateProfile = () => {
     setErrorMessage("");
     setSuccessMessage("");
 
-    if (!name || !email) {
-      setErrorMessage("Name and email are required.");
+    if (!name) {
+      setErrorMessage("Name required.");
       setLoading(false);
       return;
     }
 
     try {
+      const confirmation = await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to update your profile?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, update it!",
+      });
+
+      if (!confirmation.isConfirmed) {
+        setLoading(false);
+        return; // Exit if the user cancels
+      }
+
       const config = {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -71,7 +86,6 @@ const UpdateProfile = () => {
 
       const formDataToSubmit = new FormData();
       formDataToSubmit.append("name", name);
-      formDataToSubmit.append("email", email);
       if (password) formDataToSubmit.append("password", password);
       if (avatar) formDataToSubmit.append("avatar", avatar);
 
@@ -97,7 +111,6 @@ const UpdateProfile = () => {
     setFormData({
       ...formData,
       name: user.name || "",
-      email: user.email || "",
     });
     setIsEditMode(true);
   };
@@ -106,7 +119,6 @@ const UpdateProfile = () => {
     <Box
       display="flex"
       flexDirection="column"
-      alignItems="center"
       justifyContent="center"
       mt={10}
       p={3}
@@ -121,15 +133,45 @@ const UpdateProfile = () => {
             borderRadius: 2,
             boxShadow: 2,
             width: "100%",
-            maxWidth: "500px",
+            maxWidth: "1000px",
+            alignSelf: "center",
           }}
         >
-          <Typography variant="h4" fontWeight="bold" mb={2}>
-            Update Profile
-          </Typography>
-
           {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
           {successMessage && <Alert severity="success">{successMessage}</Alert>}
+          <div className="relative mb-10">
+            {user.avatar && !preview && (
+              <Avatar src={user.avatar} sx={{ width: 128, height: 128 }} />
+            )}
+            {preview && (
+              <Avatar src={preview} sx={{ width: 128, height: 128 }} />
+            )}
+            <IconButton
+              sx={{
+                width: 128,
+                height: 128,
+                position: "absolute",
+                top: "50%",
+                left: "0",
+                transform: "translateY(-50%)",
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                "&:hover": {
+                  backgroundColor: "rgba(0, 0, 0, 0.7)",
+                },
+              }}
+            >
+              <Button component="label" sx={{ padding: 0, minWidth: "auto" }}>
+                <Typography
+                  sx={{ color: "#fff" }}
+                  variant="h4"
+                  component="span"
+                >
+                  +
+                </Typography>
+                <input type="file" hidden onChange={handleFileChange} />
+              </Button>
+            </IconButton>
+          </div>
 
           <Box mb={2}>
             <TextField
@@ -146,19 +188,6 @@ const UpdateProfile = () => {
           <Box mb={2}>
             <TextField
               fullWidth
-              label="Email"
-              name="email"
-              value={email}
-              onChange={handleChange}
-              required
-              type="email"
-              variant="outlined"
-            />
-          </Box>
-
-          <Box mb={2}>
-            <TextField
-              fullWidth
               label="Password (Optional)"
               name="password"
               value={password}
@@ -168,71 +197,78 @@ const UpdateProfile = () => {
             />
           </Box>
 
-          <Box mb={2}>
-            <Button variant="contained" component="label">
-              Upload Profile Picture (Optional)
-              <input type="file" hidden onChange={handleFileChange} />
+          <div className="flex gap-2 justify-end">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              sx={{ bgcolor: "#207E68" }}
+            >
+              {loading ? <CircularProgress size={24} /> : "Save"}
             </Button>
-          </Box>
-
-          {preview && (
-            <Box textAlign="center" mb={2}>
-              <Avatar
-                src={preview}
-                sx={{ width: 100, height: 100, mx: "auto" }}
-              />
-            </Box>
-          )}
-
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            disabled={loading}
-            sx={{ mt: 2 }}
-          >
-            {loading ? <CircularProgress size={24} /> : "Update Profile"}
-          </Button>
+            <Button
+              sx={{ color: "#207E68", borderColor: "#207E68" }}
+              onClick={() => setIsEditMode(false)}
+              variant="outlined"
+            >
+              Back
+            </Button>
+          </div>
         </Box>
       ) : (
-        <Box textAlign="center">
-          <Box position="relative">
-            {user?.avatar ? (
-              <Avatar
-                src={user.avatar}
-                sx={{ width: 128, height: 128, mx: "auto" }}
-              />
-            ) : (
-              <Avatar
-                sx={{
-                  width: 128,
-                  height: 128,
-                  mx: "auto",
-                  backgroundColor: "grey.300",
-                }}
-              />
-            )}
-            <IconButton
-              onClick={triggerEditMode}
-              sx={{
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                bgcolor: "primary.main",
-                color: "white",
-                "&:hover": { bgcolor: "primary.dark" },
-              }}
-            >
-              <FaEdit />
-            </IconButton>
+        <Box display="flex" flexDirection="column" justifyContent="center">
+          <Box fullWidth>
+            <div className="flex flex-col justify-center items-center">
+              {user?.avatar ? (
+                <Avatar
+                  src={user.avatar}
+                  sx={{ width: 128, height: 128, mx: "auto" }}
+                />
+              ) : (
+                <Avatar
+                  sx={{
+                    width: 128,
+                    height: 128,
+                    mx: "auto",
+                    backgroundColor: "grey.300",
+                  }}
+                />
+              )}
+              <IconButton onClick={triggerEditMode}>
+                <FaEdit /> Edit Profile
+              </IconButton>
+            </div>
+            <div className="w-full border border-[#cdcdcd] rounded-md mt-10 px-4 py-4 flex flex-col gap-2">
+              <strong className="text-lg text-center font-semibold md:text-2xl uppercase">
+                <p> Student General Information</p>
+              </strong>
+              <div>
+                <label htmlFor="name" className="font-bold">
+                  Name:
+                </label>
+                <Typography variant="body1">
+                  {user?.name || "Your Name"}
+                </Typography>
+              </div>
+              <div>
+                <label htmlFor="name" className="font-bold">
+                  Email Address:
+                </label>
+                <Typography variant="body1">
+                  {user?.email || "your.email@example.com"}
+                </Typography>
+              </div>
+              {user.role === "student" && (
+                <div>
+                  <label htmlFor="LRN" className="font-bold">
+                    LRN:
+                  </label>
+                  <Typography variant="body1">{user?.LRN || "LRN"}</Typography>
+                </div>
+              )}
+            </div>
           </Box>
-          <Typography variant="h6" mt={2}>
-            {user?.name || "Your Name"}
-          </Typography>
-          <Typography variant="body1" color="textSecondary">
-            {user?.email || "your.email@example.com"}
-          </Typography>
         </Box>
       )}
     </Box>

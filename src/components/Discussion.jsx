@@ -38,7 +38,10 @@ const Discussion = ({ subjectId, userId }) => {
         const response = await axios.get(
           `${apiUrl}/api/discussion/subject/${subjectId}`
         );
-        setDiscussions(response.data);
+        const sortedDiscussion = response.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setDiscussions(sortedDiscussion);
         setLoading(false); // Set loading to false after data is fetched
       } catch (error) {
         console.error("Error fetching discussions:", error);

@@ -40,8 +40,14 @@ const Exam = ({ subjectId, user, subject }) => {
         const response = await axios.get(
           `${apiUrl}/api/exam/bysubject/${subjectId}`
         );
-        setExams(response.data);
-        console.log("Exams fetched:", response.data);
+
+        // Sort exams by createdAt field in descending order (most recent first)
+        const sortedExams = response.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        setExams(sortedExams);
+        console.log("Exams fetched and sorted:", sortedExams);
       } catch (error) {
         console.error("Failed to fetch exams:", error);
       }

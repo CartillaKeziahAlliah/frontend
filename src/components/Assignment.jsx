@@ -57,7 +57,10 @@ const Assignment = ({ subjectId, user }) => {
         const response = await axios.get(
           `${apiUrl}/api/assignment/bysubject/${subjectId}`
         );
-        setAssignments(response.data);
+        const sortedAssignments = response.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setAssignments(sortedAssignments);
       } catch (error) {
         console.error("Error fetching assignments:", error);
         setSnackbarMessage("Failed to fetch assignments.");
