@@ -20,10 +20,17 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import axios from "axios";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { useAuth } from "../context/AuthContext";
+
+import { Close } from "@mui/icons-material";
 
 const apiUrl = "http://localhost:5000";
 // const apiUrl = "https://server-production-dd7a.up.railway.app";
@@ -37,6 +44,8 @@ const Quiz = ({ subjectId }) => {
   const { user } = useAuth();
   const [timeLeft, setTimeLeft] = useState(0); // Track remaining time
   const [timerActive, setTimerActive] = useState(false); // To control the timer state
+  const [openResultDialog, setOpenResultDialog] = useState(false); // For dialog state
+  const [quizResult, setQuizResult] = useState(null); // Store quiz result
 
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -90,16 +99,18 @@ const Quiz = ({ subjectId }) => {
       );
       setQuizzes(updatedQuiz);
       setCurrentQuiz(null);
-      alert(
-        `Exam submitted! Your score: ${response.data.obtainedMarks}/${
-          response.data.totalMarks
-        }. Passed: ${response.data.passed ? "Yes" : "No"}`
-      );
-      window.location.reload();
+      setQuizResult(response.data); // Set result data for dialog
+      setOpenResultDialog(true); // Open dialog
     } catch (error) {
       console.error("Error submitting quiz:", error);
     }
   };
+
+  const handleCloseResultDialog = () => {
+    setOpenResultDialog(false);
+    window.location.reload(); // Reload page to reflect changes
+  };
+
   const handleOpenMenu = (event, quiz) => {
     setAnchorEl(event.currentTarget);
     setSelectedQuiz(quiz);
@@ -228,6 +239,43 @@ const Quiz = ({ subjectId }) => {
           </Table>
         </TableContainer>
       )}
+
+      {/* Result Dialog */}
+      <Dialog
+        open={openResultDialog}
+        onClose={handleCloseResultDialog}
+        maxWidth="md"
+        fullWidth
+        sx={{
+          "& .MuiDialog-paper": { width: "50%" },
+          textAlign: "center",
+        }}
+      >
+        <DialogActions>
+          <Button onClick={handleCloseResultDialog} color="primary">
+            <Close />
+          </Button>
+        </DialogActions>
+        <DialogTitle variant="h4" className="text-center text-green-700">
+          Successfuly Submitted
+        </DialogTitle>{" "}
+        <DialogContent>
+          <Typography sx={{ fontWeight: "bold" }} className="text-center">
+            Your Score:
+          </Typography>
+          <DialogContentText
+            variant="h2"
+          >
+            {quizResult?.obtainedMarks}/{quizResult?.totalMarks}
+          </DialogContentText>
+          <Typography
+            variant="h2"
+            sx={{ color: quizResult?.passed ? "green" : "red" }}
+          >
+            {quizResult?.passed ? "PASSED" : "FAILED"}
+          </Typography>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -17,10 +17,14 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { Close } from "@mui/icons-material";
 
-// Define your API URL
 const apiUrl = "http://localhost:5000";
 
 const Exam = ({ subjectId, user, subject }) => {
@@ -29,10 +33,11 @@ const Exam = ({ subjectId, user, subject }) => {
   const [answers, setAnswers] = useState({});
   const [takeExam, setTakeExam] = useState(false);
   const [viewScore, setViewScore] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null); // Anchor for the menu
-  const [selectedExam, setSelectedExam] = useState(null); // Track selected exam for menu actions
-  const [timeLeft, setTimeLeft] = useState(0); // Track remaining time
-  const [timerActive, setTimerActive] = useState(false); // To control the timer state
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedExam, setSelectedExam] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [timerActive, setTimerActive] = useState(false);
+  const [resultDialogOpen, setResultDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchExams = async () => {
@@ -40,19 +45,15 @@ const Exam = ({ subjectId, user, subject }) => {
         const response = await axios.get(
           `${apiUrl}/api/exam/bysubject/${subjectId}`
         );
-
-        // Sort exams by createdAt field in descending order (most recent first)
         const sortedExams = response.data.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-
         setExams(sortedExams);
         console.log("Exams fetched and sorted:", sortedExams);
       } catch (error) {
         console.error("Failed to fetch exams:", error);
       }
     };
-
     fetchExams();
   }, [subjectId]);
 
@@ -61,9 +62,7 @@ const Exam = ({ subjectId, user, subject }) => {
     setTakeExam(true);
     setAnswers({});
     handleCloseMenu();
-
-    // Initialize the timer with the exam duration (converted to milliseconds)
-    setTimeLeft(exam.duration * 60); // duration in minutes * 60 seconds
+    setTimeLeft(exam.duration * 60);
     setTimerActive(true);
   };
 
@@ -76,16 +75,14 @@ const Exam = ({ subjectId, user, subject }) => {
 
   const handleSubmit = async () => {
     try {
-      // Submit the answers, allowing empty answers if not filled out
       const response = await axios.post(
         `${apiUrl}/api/exam/${currentExam._id}/take`,
         {
           studentId: user._id,
           answers:
-            Object.values(answers).length > 0 ? Object.values(answers) : null, // Submit answers or null
+            Object.values(answers).length > 0 ? Object.values(answers) : null,
         }
       );
-
       const updatedExams = exams.map((exam) =>
         exam._id === currentExam._id
           ? { ...exam, score: response.data.obtainedMarks }
@@ -93,13 +90,12 @@ const Exam = ({ subjectId, user, subject }) => {
       );
       setExams(updatedExams);
       setCurrentExam(null);
-
-      alert(
-        `Exam submitted! Your score: ${response.data.obtainedMarks}/${
-          response.data.totalMarks
-        }. Passed: ${response.data.passed ? "Yes" : "No"}`
-      );
-      window.location.reload();
+      setViewScore({
+        score: response.data.obtainedMarks,
+        totalMarks: response.data.totalMarks,
+        passed: response.data.passed,
+      });
+      setResultDialogOpen(true); // Open the result dialog
     } catch (error) {
       console.error("Failed to submit exam:", error);
     }
@@ -117,24 +113,17 @@ const Exam = ({ subjectId, user, subject }) => {
 
   useEffect(() => {
     let timer;
-
     if (timerActive && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
-      }, 1000); // Decrease time every second
+      }, 1000);
     }
-
     if (timeLeft === 0) {
-      // Time's up, auto-submit the exam
       handleSubmit();
     }
-
-    return () => {
-      clearInterval(timer); // Clean up the interval on unmount or when timer is inactive
-    };
+    return () => clearInterval(timer);
   }, [timerActive, timeLeft]);
 
-  // Function to format timeLeft into MM:SS format
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -202,7 +191,6 @@ const Exam = ({ subjectId, user, subject }) => {
                 <TableRow key={exam._id}>
                   <TableCell>{exam.title}</TableCell>
                   <TableCell>{exam.duration} mins.</TableCell>
-
                   <TableCell align="right">
                     {exam.scores.some(
                       (score) =>
@@ -234,6 +222,42 @@ const Exam = ({ subjectId, user, subject }) => {
           </Table>
         </TableContainer>
       )}
+
+      {/* Dialog for Exam Results */}
+      <Dialog
+        open={resultDialogOpen}
+        onClose={() => setResultDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+        sx={{
+          "& .MuiDialog-paper": { width: "50%" },
+          textAlign: "center",
+        }}
+      >
+        <DialogActions>
+          <Button onClick={() => setResultDialogOpen(false)} color="primary">
+            <Close sx={{ color: "black" }} />
+          </Button>
+        </DialogActions>
+        <DialogTitle variant="h4" className="text-center text-green-700">
+          Successfuly Submitted
+        </DialogTitle>
+
+        <DialogContent>
+          <Typography sx={{ fontWeight: "bold" }} className="text-center">
+            Your Score:
+          </Typography>
+          <Typography variant="h3">
+            {viewScore?.score}/{viewScore?.totalMarks}
+          </Typography>
+          <Typography
+            variant="h2"
+            sx={{ color: viewScore?.passed ? "green" : "red" }}
+          >
+            {viewScore?.passed ? "PASSED" : "FAILED"}
+          </Typography>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

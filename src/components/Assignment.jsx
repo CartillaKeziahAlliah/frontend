@@ -30,6 +30,7 @@ import MuiAlert from "@mui/material/Alert";
 import axios from "axios"; // Import axios for HTTP requests
 import { useAuth } from "../context/AuthContext";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { Close } from "@mui/icons-material";
 const apiUrl = "http://localhost:5000";
 
 // const apiUrl = "https://server-production-dd7a.up.railway.app";
@@ -38,7 +39,7 @@ const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 ));
 
-const Assignment = ({ subjectId, user }) => {
+const Assignment = ({ subjectId, userId }) => {
   const [assignments, setAssignments] = useState([]);
   const [currentAssignment, setCurrentAssignment] = useState(null);
   const [answers, setAnswers] = useState({});
@@ -49,7 +50,10 @@ const Assignment = ({ subjectId, user }) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [timeLeft, setTimeLeft] = useState(0); // Track remaining time
-  const [timerActive, setTimerActive] = useState(false); // To control the timer state
+  const [timerActive, setTimerActive] = useState(false);
+  const [assResult, setAssResult] = useState(null); // Store quiz result
+  const [resultDialogOpen, setResultDialogOpen] = useState(false); // Dialog for result display
+  const { userLoggedin } = useAuth();
   // Fetch assignments from the backend when the component mounts
   useEffect(() => {
     const fetchAssignments = async () => {
@@ -61,6 +65,7 @@ const Assignment = ({ subjectId, user }) => {
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
         setAssignments(sortedAssignments);
+        console.log(sortedAssignments);
       } catch (error) {
         console.error("Error fetching assignments:", error);
         setSnackbarMessage("Failed to fetch assignments.");
@@ -72,7 +77,6 @@ const Assignment = ({ subjectId, user }) => {
   }, [subjectId]);
 
   const handleTakeAssignment = async (assignment) => {
-    console.log(assignment._id);
     setCurrentAssignment(assignment);
     setTakeAssignment(true);
     setAnswers({});
@@ -89,42 +93,33 @@ const Assignment = ({ subjectId, user }) => {
   };
 
   const handleSubmit = async () => {
-    console.log("user id", user); // Now this is safe because we already checked if currentAssignment exists
-
     try {
       const response = await axios.post(
         `${apiUrl}/api/assignment/${currentAssignment._id}/take`,
         {
-          studentId: user,
+          studentId: userId,
           answers: Object.values(answers),
         }
       );
 
       const updatedAssignments = assignments.map((assignment) =>
         assignment._id === currentAssignment._id
-          ? { ...assignment, score: response.data.obtainedMarks } // Replace with dynamic scoring as needed
+          ? { ...assignment, score: response.data.obtainedMarks }
           : assignment
       );
 
       setAssignments(updatedAssignments);
       setCurrentAssignment(null);
-      setSnackbarMessage("Assignment submitted successfully!");
       setSnackbarOpen(true);
-      window.location.reload(); // You may want to optimize this to avoid full page reload
+      setAssResult(response.data);
+      setResultDialogOpen(true); // Open dialog to display the result
+      setTakeAssignment(false);
     } catch (error) {
       console.error("Error submitting assignment:", error);
       setSnackbarOpen(true);
     }
   };
 
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
-
-  const handleCloseDetails = () => {
-    setDetailsOpen(false);
-    setSelectedAssignment(null);
-  };
   const handleOpenMenu = (event, assignment) => {
     setAnchorEl(event.currentTarget);
     setSelectedAssignment(assignment);
@@ -134,22 +129,27 @@ const Assignment = ({ subjectId, user }) => {
     setAnchorEl(null);
     setSelectedAssignment(null);
   };
+
+  const handleResultDialogClose = () => {
+    setResultDialogOpen(false);
+    setAssResult(null);
+  };
+
   useEffect(() => {
     let timer;
 
     if (timerActive && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
-      }, 1000); // Decrease time every second
+      }, 1000);
     }
 
     if (timeLeft === 0) {
-      // Time's up, auto-submit the exam
       handleSubmit();
     }
 
     return () => {
-      clearInterval(timer); // Clean up the interval on unmount or when timer is inactive
+      clearInterval(timer);
     };
   }, [timerActive, timeLeft]);
 
@@ -160,11 +160,12 @@ const Assignment = ({ subjectId, user }) => {
       remainingSeconds
     ).padStart(2, "0")}`;
   };
+
   return (
     <div>
       {currentAssignment && takeAssignment ? (
         <div>
-          <button onClick={() => setTakeAssignment(false)}>back</button>
+          <button onClick={() => setTakeAssignment(false)}>Back</button>
           <h4>{currentAssignment.title} Questions</h4>
           <Typography variant="h6">
             Time Left: {formatTime(timeLeft)}
@@ -173,7 +174,7 @@ const Assignment = ({ subjectId, user }) => {
             <div key={index} className="mb-4">
               <p>
                 {index + 1}. {question.questionText}
-              </p>{" "}
+              </p>
               <FormControl component="fieldset">
                 <RadioGroup
                   onChange={(e) =>
@@ -202,7 +203,7 @@ const Assignment = ({ subjectId, user }) => {
             onClick={handleSubmit}
           >
             Submit Assignment
-          </Button>{" "}
+          </Button>
         </div>
       ) : (
         <TableContainer component={Paper}>
@@ -223,9 +224,9 @@ const Assignment = ({ subjectId, user }) => {
                   <TableCell>{assignment.duration}</TableCell>
                   <TableCell align="right">
                     {assignment.scores.some(
-                      (score) => score.studentId === user
+                      (score) => score.studentId === userId
                     ) ? (
-                      <Typography color="green">Completed </Typography>
+                      <Typography color="green">Completed</Typography>
                     ) : (
                       <>
                         <IconButton
@@ -249,13 +250,48 @@ const Assignment = ({ subjectId, user }) => {
                         </Menu>
                       </>
                     )}
-                  </TableCell>{" "}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       )}
+
+      {/* Result Dialog */}
+      <Dialog
+        open={resultDialogOpen}
+        onClose={handleResultDialogClose}
+        maxWidth="md"
+        fullWidth
+        sx={{
+          "& .MuiDialog-paper": { width: "50%" },
+          textAlign: "center",
+        }}
+      >
+        <DialogActions>
+          <Button onClick={handleResultDialogClose} color="primary">
+            <Close />
+          </Button>
+        </DialogActions>
+        <DialogTitle variant="h4" className="text-center text-green-700">
+          Successfuly Submitted
+        </DialogTitle>{" "}
+        <DialogContent>
+          <Typography sx={{ fontWeight: "bold" }} className="text-center">
+            Your Score:
+          </Typography>
+          <Typography variant="h2">
+            {assResult?.obtainedMarks} / {assResult?.totalMarks}
+          </Typography>
+          <Typography
+            variant="h2"
+            sx={{ color: assResult?.passed ? "green" : "red" }}
+          >
+            {assResult?.passed ? "PASSED" : "FAILED"}
+          </Typography>{" "}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
