@@ -241,7 +241,7 @@ const UpdateProfile = () => {
             </div>
             <div className="w-full border border-[#cdcdcd] rounded-md mt-10 px-4 py-4 flex flex-col gap-2">
               <strong className="text-lg text-center font-semibold md:text-2xl uppercase">
-                <p> Student General Information</p>
+                <p> {user.role}'s General Information</p>
               </strong>
               <div>
                 <label htmlFor="name" className="font-bold">

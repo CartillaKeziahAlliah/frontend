@@ -14,8 +14,8 @@ import {
   MenuBookOutlined,
   Person2Outlined,
 } from "@mui/icons-material";
-
 import { logo } from "../../constants/logo";
+
 // const apiUrl = "http://localhost:5000"; // Your API URL
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 const Sidebar = ({ user, logout }) => {
@@ -67,6 +67,7 @@ const Sidebar = ({ user, logout }) => {
     setShowCourses(false);
     setShowSections(false);
     setActive("Dashboard");
+    localStorage.removeItem("activeView"); // Explicitly clear saved state
   };
   const handleSectionsClick = () => {
     setShowSections((prev) => !prev);
@@ -91,6 +92,7 @@ const Sidebar = ({ user, logout }) => {
   const handleLogout = async () => {
     try {
       await logout();
+
       window.location.href = "/";
     } catch (error) {
       console.error("Logout Failed", error);
@@ -197,19 +199,8 @@ const Sidebar = ({ user, logout }) => {
           {user.role !== "student" && user.role !== "teacher" && (
             <>
               <Link
-                onClick={handleAdminClick}
-                className={`flex flex-row hover:bg-gray-800 gap-2 items-center ${
-                  active === "Admin"
-                    ? "bg-[#000] text-white"
-                    : "text-black bg-[#C2E8F8]"
-                } p-3 rounded-md`}
-              >
-                <AdminPanelSettingsOutlined />
-                {!isCollapsed && <p className="capitalize">Admin</p>}
-              </Link>
-
-              <Link
                 onClick={handleManageClick}
+                to="/admin"
                 className={`flex flex-row hover:bg-gray-800 gap-2 items-center ${
                   active === "Manage"
                     ? "bg-[#000] text-white"

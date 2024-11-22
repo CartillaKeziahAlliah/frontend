@@ -39,6 +39,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("activeView");
     setUser(null);
   };
 
