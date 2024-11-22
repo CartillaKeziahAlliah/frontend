@@ -2,7 +2,7 @@ import "react-calendar/dist/Calendar.css";
 import { Button } from "@mui/material";
 import React, { useState } from "react";
 import EventCalendar from "./AnnouncementCalendar";
-import SectionsList from "./teacherSection";
+import SectionsList from "./teacher/teacherSection";
 import { useAuth } from "../context/AuthContext";
 import AnnouncementApp from "./Announcement";
 import SubjectsList from "./student.subjects";

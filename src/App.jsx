@@ -5,12 +5,10 @@ import AuthPage from "./pages/AuthPage";
 import "./App.css";
 import ProtectedRoute from "./Privateroute";
 import { AnotherExample } from "./pages/admin/index";
-import TablePages from "./components/TablePages";
-import CourseDetail from "./components/CourseDetail";
+import CourseDetail from "./components/students/CourseDetail";
 import Dashboard from "./components/dashboard";
 import UpdateProfile from "./components/UpdateProfile";
-import SectionDetail from "./components/SectionsDetails";
-import EventCalendar from "./components/AnnouncementCalendar";
+import SectionDetail from "./components/teacher/SectionsDetails";
 
 function App() {
   return (
@@ -22,7 +20,6 @@ function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route path="/anotherExample" element={<AnotherExample />} />
-            <Route path="/table" element={<TablePages />} />
             <Route path="/Dashboard" element={<Dashboard />} />
             <Route path="/updateprofile" element={<UpdateProfile />} />
             <Route path="/course/:subjectId" element={<CourseDetail />} />

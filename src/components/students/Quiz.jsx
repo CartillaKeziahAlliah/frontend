@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   TextField,
@@ -6,82 +6,72 @@ import {
   CardContent,
   Typography,
   Grid,
-  Snackbar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TableContainer,
-  Paper,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-  IconButton,
-  Menu,
-  MenuItem,
-  TableHead,
   FormControl,
   RadioGroup,
   FormControlLabel,
   Radio,
+  TableContainer,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  IconButton,
+  Menu,
+  MenuItem,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
-import MuiAlert from "@mui/material/Alert";
-import axios from "axios"; // Import axios for HTTP requests
-import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { useAuth } from "../../context/AuthContext";
+
 import { Close } from "@mui/icons-material";
+
 const apiUrl = "http://localhost:5000";
-
 // const apiUrl = "https://server-production-dd7a.up.railway.app";
-
-const Alert = React.forwardRef((props, ref) => (
-  <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
-));
-
-const Assignment = ({ subjectId, userId }) => {
-  const [assignments, setAssignments] = useState([]);
-  const [currentAssignment, setCurrentAssignment] = useState(null);
+const Quiz = ({ subjectId }) => {
+  const [quizzes, setQuizzes] = useState([]);
+  const [currentQuiz, setCurrentQuiz] = useState(null);
   const [answers, setAnswers] = useState({});
-  const [takeAssignment, setTakeAssignment] = useState(false);
+  const [takeQuiz, setTakeQuiz] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null); // Anchor for the menu
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [selectedQuiz, setSelectedQuiz] = useState(null); // Track selected quiz for menu actions
+  const { user } = useAuth();
   const [timeLeft, setTimeLeft] = useState(0); // Track remaining time
-  const [timerActive, setTimerActive] = useState(false);
-  const [assResult, setAssResult] = useState(null); // Store quiz result
-  const [resultDialogOpen, setResultDialogOpen] = useState(false); // Dialog for result display
-  const { userLoggedin } = useAuth();
-  // Fetch assignments from the backend when the component mounts
+  const [timerActive, setTimerActive] = useState(false); // To control the timer state
+  const [openResultDialog, setOpenResultDialog] = useState(false); // For dialog state
+  const [quizResult, setQuizResult] = useState(null); // Store quiz result
+
   useEffect(() => {
-    const fetchAssignments = async () => {
+    const fetchQuizzes = async () => {
       try {
         const response = await axios.get(
-          `${apiUrl}/api/assignment/bysubject/${subjectId}`
+          `${apiUrl}/api/quiz/bysubject/${subjectId}`
         );
-        const sortedAssignments = response.data.sort(
+        const sortedQuiz = response.data.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-        setAssignments(sortedAssignments);
-        console.log(sortedAssignments);
+        setQuizzes(sortedQuiz);
+        console.log("Quiz fetched:", response.data);
       } catch (error) {
-        console.error("Error fetching assignments:", error);
-        setSnackbarMessage("Failed to fetch assignments.");
-        setSnackbarOpen(true);
+        console.error("Error fetching quizzes:", error);
       }
     };
 
-    fetchAssignments();
+    fetchQuizzes();
   }, [subjectId]);
 
-  const handleTakeAssignment = async (assignment) => {
-    setCurrentAssignment(assignment);
-    setTakeAssignment(true);
+  const handleTakeQuiz = async (quiz) => {
+    setCurrentQuiz(quiz);
+    setTakeQuiz(true);
     setAnswers({});
     handleCloseMenu();
-    setTimeLeft(assignment.duration * 60);
+    setTimeLeft(quiz.duration * 60); // duration in minutes * 60 seconds
     setTimerActive(true);
   };
 
@@ -95,44 +85,40 @@ const Assignment = ({ subjectId, userId }) => {
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
-        `${apiUrl}/api/assignment/${currentAssignment._id}/take`,
+        `${apiUrl}/api/quiz/${currentQuiz._id}/take`,
         {
-          studentId: userId,
+          studentId: user._id,
           answers: Object.values(answers),
         }
       );
 
-      const updatedAssignments = assignments.map((assignment) =>
-        assignment._id === currentAssignment._id
-          ? { ...assignment, score: response.data.obtainedMarks }
-          : assignment
+      const updatedQuiz = quizzes.map((quiz) =>
+        quiz._id === currentQuiz._id
+          ? { ...quiz, score: response.data.obtainedMarks }
+          : quiz
       );
-
-      setAssignments(updatedAssignments);
-      setCurrentAssignment(null);
-      setSnackbarOpen(true);
-      setAssResult(response.data);
-      setResultDialogOpen(true); // Open dialog to display the result
-      setTakeAssignment(false);
+      setQuizzes(updatedQuiz);
+      setCurrentQuiz(null);
+      setQuizResult(response.data); // Set result data for dialog
+      setOpenResultDialog(true); // Open dialog
     } catch (error) {
-      console.error("Error submitting assignment:", error);
-      setSnackbarOpen(true);
+      console.error("Error submitting quiz:", error);
     }
   };
 
-  const handleOpenMenu = (event, assignment) => {
+  const handleCloseResultDialog = () => {
+    setOpenResultDialog(false);
+    window.location.reload(); // Reload page to reflect changes
+  };
+
+  const handleOpenMenu = (event, quiz) => {
     setAnchorEl(event.currentTarget);
-    setSelectedAssignment(assignment);
+    setSelectedQuiz(quiz);
   };
 
   const handleCloseMenu = () => {
     setAnchorEl(null);
-    setSelectedAssignment(null);
-  };
-
-  const handleResultDialogClose = () => {
-    setResultDialogOpen(false);
-    setAssResult(null);
+    setSelectedQuiz(null);
   };
 
   useEffect(() => {
@@ -141,15 +127,16 @@ const Assignment = ({ subjectId, userId }) => {
     if (timerActive && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
-      }, 1000);
+      }, 1000); // Decrease time every second
     }
 
     if (timeLeft === 0) {
+      // Time's up, auto-submit the exam
       handleSubmit();
     }
 
     return () => {
-      clearInterval(timer);
+      clearInterval(timer); // Clean up the interval on unmount or when timer is inactive
     };
   }, [timerActive, timeLeft]);
 
@@ -163,18 +150,18 @@ const Assignment = ({ subjectId, userId }) => {
 
   return (
     <div>
-      {currentAssignment && takeAssignment ? (
+      {currentQuiz && takeQuiz ? (
         <div>
-          <button onClick={() => setTakeAssignment(false)}>Back</button>
-          <h4>{currentAssignment.title} Questions</h4>
+          <button onClick={() => setTakeQuiz(false)}>back</button>
+          <h4>{currentQuiz.title} Questions</h4>
           <Typography variant="h6">
             Time Left: {formatTime(timeLeft)}
           </Typography>
-          {currentAssignment.questions.map((question, index) => (
+          {currentQuiz.questions.map((question, index) => (
             <div key={index} className="mb-4">
               <p>
                 {index + 1}. {question.questionText}
-              </p>
+              </p>{" "}
               <FormControl component="fieldset">
                 <RadioGroup
                   onChange={(e) =>
@@ -202,13 +189,13 @@ const Assignment = ({ subjectId, userId }) => {
             }}
             onClick={handleSubmit}
           >
-            Submit Assignment
-          </Button>
+            Submit quiz
+          </Button>{" "}
         </div>
       ) : (
         <TableContainer component={Paper}>
           <Table>
-            <TableHead bgColor="#cdcdcd">
+            <TableHead bgcolor="#cdcdcd">
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Title</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Duration</TableCell>
@@ -218,39 +205,34 @@ const Assignment = ({ subjectId, userId }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {assignments.map((assignment) => (
-                <TableRow key={assignment._id}>
-                  <TableCell>{assignment.title}</TableCell>
-                  <TableCell>{assignment.duration}</TableCell>
+              {quizzes.map((quiz) => (
+                <TableRow key={quiz._id}>
+                  <TableCell>{quiz.title}</TableCell>
+                  <TableCell>{quiz.duration}</TableCell>
                   <TableCell align="right">
-                    {assignment.scores.some(
-                      (score) => score.studentId === userId
+                    {quiz.scores.some(
+                      (score) => score.studentId === user._id
                     ) ? (
-                      <Typography color="green">Completed</Typography>
+                      <Typography color="green">Completed </Typography>
                     ) : (
                       <>
-                        <IconButton
-                          onClick={(e) => handleOpenMenu(e, assignment)}
-                        >
+                        <IconButton onClick={(e) => handleOpenMenu(e, quiz)}>
                           <MoreHorizIcon />
                         </IconButton>
                         <Menu
                           anchorEl={anchorEl}
                           open={Boolean(
-                            anchorEl &&
-                              selectedAssignment?._id === assignment._id
+                            anchorEl && selectedQuiz?._id === quiz._id
                           )}
                           onClose={handleCloseMenu}
                         >
-                          <MenuItem
-                            onClick={() => handleTakeAssignment(assignment)}
-                          >
-                            Take assignment
+                          <MenuItem onClick={() => handleTakeQuiz(quiz)}>
+                            Take quiz
                           </MenuItem>
                         </Menu>
                       </>
                     )}
-                  </TableCell>
+                  </TableCell>{" "}
                 </TableRow>
               ))}
             </TableBody>
@@ -260,8 +242,8 @@ const Assignment = ({ subjectId, userId }) => {
 
       {/* Result Dialog */}
       <Dialog
-        open={resultDialogOpen}
-        onClose={handleResultDialogClose}
+        open={openResultDialog}
+        onClose={handleCloseResultDialog}
         maxWidth="md"
         fullWidth
         sx={{
@@ -270,7 +252,7 @@ const Assignment = ({ subjectId, userId }) => {
         }}
       >
         <DialogActions>
-          <Button onClick={handleResultDialogClose} color="primary">
+          <Button onClick={handleCloseResultDialog} color="primary">
             <Close />
           </Button>
         </DialogActions>
@@ -281,19 +263,21 @@ const Assignment = ({ subjectId, userId }) => {
           <Typography sx={{ fontWeight: "bold" }} className="text-center">
             Your Score:
           </Typography>
-          <Typography variant="h2">
-            {assResult?.obtainedMarks} / {assResult?.totalMarks}
-          </Typography>
+          <DialogContentText
+            variant="h2"
+          >
+            {quizResult?.obtainedMarks}/{quizResult?.totalMarks}
+          </DialogContentText>
           <Typography
             variant="h2"
-            sx={{ color: assResult?.passed ? "green" : "red" }}
+            sx={{ color: quizResult?.passed ? "green" : "red" }}
           >
-            {assResult?.passed ? "PASSED" : "FAILED"}
-          </Typography>{" "}
+            {quizResult?.passed ? "PASSED" : "FAILED"}
+          </Typography>
         </DialogContent>
       </Dialog>
     </div>
   );
 };
 
-export default Assignment;
+export default Quiz;

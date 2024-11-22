@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
 import CreateExam from "./exam/createExam";
 import {
@@ -31,7 +31,7 @@ import CreateQuiz from "./quiz/createQuiz";
 import QuizList from "./quiz/quizList";
 import CreateDiscussion from "./discussion/CreateDiscussion";
 import DiscussionList from "./discussion/DiscussionList";
-import StudentsComponent from "./studentList/studentlist";
+import StudentsComponent from "../studentList/studentlist";
 import ExamScoresView from "./exam/ExamScoresView";
 import AddIcon from "@mui/icons-material/Add";
 

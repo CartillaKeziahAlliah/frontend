@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -6,72 +6,77 @@ import {
   CardContent,
   Typography,
   Grid,
+  Snackbar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TableContainer,
+  Paper,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  IconButton,
+  Menu,
+  MenuItem,
+  TableHead,
   FormControl,
   RadioGroup,
   FormControlLabel,
   Radio,
-  TableContainer,
-  Paper,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  IconButton,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
 } from "@mui/material";
-import axios from "axios";
+import MuiAlert from "@mui/material/Alert";
+import axios from "axios"; // Import axios for HTTP requests
+import { useAuth } from "../../context/AuthContext";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { useAuth } from "../context/AuthContext";
-
 import { Close } from "@mui/icons-material";
-
 const apiUrl = "http://localhost:5000";
-// const apiUrl = "https://server-production-dd7a.up.railway.app";
-const Quiz = ({ subjectId }) => {
-  const [quizzes, setQuizzes] = useState([]);
-  const [currentQuiz, setCurrentQuiz] = useState(null);
-  const [answers, setAnswers] = useState({});
-  const [takeQuiz, setTakeQuiz] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null); // Anchor for the menu
-  const [selectedQuiz, setSelectedQuiz] = useState(null); // Track selected quiz for menu actions
-  const { user } = useAuth();
-  const [timeLeft, setTimeLeft] = useState(0); // Track remaining time
-  const [timerActive, setTimerActive] = useState(false); // To control the timer state
-  const [openResultDialog, setOpenResultDialog] = useState(false); // For dialog state
-  const [quizResult, setQuizResult] = useState(null); // Store quiz result
 
+// const apiUrl = "https://server-production-dd7a.up.railway.app";
+
+const Alert = React.forwardRef((props, ref) => (
+  <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+));
+
+const Assignment = ({ subjectId, userId }) => {
+  const [assignments, setAssignments] = useState([]);
+  const [currentAssignment, setCurrentAssignment] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [takeAssignment, setTakeAssignment] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null); // Anchor for the menu
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0); // Track remaining time
+  const [timerActive, setTimerActive] = useState(false);
+  const [assResult, setAssResult] = useState(null); // Store quiz result
+  const [resultDialogOpen, setResultDialogOpen] = useState(false); // Dialog for result display
   useEffect(() => {
-    const fetchQuizzes = async () => {
+    const fetchAssignments = async () => {
       try {
         const response = await axios.get(
-          `${apiUrl}/api/quiz/bysubject/${subjectId}`
+          `${apiUrl}/api/assignment/bysubject/${subjectId}`
         );
-        const sortedQuiz = response.data.sort(
+        const sortedAssignments = response.data.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-        setQuizzes(sortedQuiz);
-        console.log("Quiz fetched:", response.data);
+        setAssignments(sortedAssignments);
+        console.log(sortedAssignments);
       } catch (error) {
-        console.error("Error fetching quizzes:", error);
+        console.error("Error fetching assignments:", error);
+        setSnackbarMessage("Failed to fetch assignments.");
+        setSnackbarOpen(true);
       }
     };
 
-    fetchQuizzes();
+    fetchAssignments();
   }, [subjectId]);
 
-  const handleTakeQuiz = async (quiz) => {
-    setCurrentQuiz(quiz);
-    setTakeQuiz(true);
+  const handleTakeAssignment = async (assignment) => {
+    setCurrentAssignment(assignment);
+    setTakeAssignment(true);
     setAnswers({});
     handleCloseMenu();
-    setTimeLeft(quiz.duration * 60); // duration in minutes * 60 seconds
+    setTimeLeft(assignment.duration * 60);
     setTimerActive(true);
   };
 
@@ -85,40 +90,44 @@ const Quiz = ({ subjectId }) => {
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
-        `${apiUrl}/api/quiz/${currentQuiz._id}/take`,
+        `${apiUrl}/api/assignment/${currentAssignment._id}/take`,
         {
-          studentId: user._id,
+          studentId: userId,
           answers: Object.values(answers),
         }
       );
 
-      const updatedQuiz = quizzes.map((quiz) =>
-        quiz._id === currentQuiz._id
-          ? { ...quiz, score: response.data.obtainedMarks }
-          : quiz
+      const updatedAssignments = assignments.map((assignment) =>
+        assignment._id === currentAssignment._id
+          ? { ...assignment, score: response.data.obtainedMarks }
+          : assignment
       );
-      setQuizzes(updatedQuiz);
-      setCurrentQuiz(null);
-      setQuizResult(response.data); // Set result data for dialog
-      setOpenResultDialog(true); // Open dialog
+
+      setAssignments(updatedAssignments);
+      setCurrentAssignment(null);
+      setSnackbarOpen(true);
+      setAssResult(response.data);
+      setResultDialogOpen(true); // Open dialog to display the result
+      setTakeAssignment(false);
     } catch (error) {
-      console.error("Error submitting quiz:", error);
+      console.error("Error submitting assignment:", error);
+      setSnackbarOpen(true);
     }
   };
 
-  const handleCloseResultDialog = () => {
-    setOpenResultDialog(false);
-    window.location.reload(); // Reload page to reflect changes
-  };
-
-  const handleOpenMenu = (event, quiz) => {
+  const handleOpenMenu = (event, assignment) => {
     setAnchorEl(event.currentTarget);
-    setSelectedQuiz(quiz);
+    setSelectedAssignment(assignment);
   };
 
   const handleCloseMenu = () => {
     setAnchorEl(null);
-    setSelectedQuiz(null);
+    setSelectedAssignment(null);
+  };
+
+  const handleResultDialogClose = () => {
+    setResultDialogOpen(false);
+    setAssResult(null);
   };
 
   useEffect(() => {
@@ -127,16 +136,15 @@ const Quiz = ({ subjectId }) => {
     if (timerActive && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
-      }, 1000); // Decrease time every second
+      }, 1000);
     }
 
     if (timeLeft === 0) {
-      // Time's up, auto-submit the exam
       handleSubmit();
     }
 
     return () => {
-      clearInterval(timer); // Clean up the interval on unmount or when timer is inactive
+      clearInterval(timer);
     };
   }, [timerActive, timeLeft]);
 
@@ -150,18 +158,18 @@ const Quiz = ({ subjectId }) => {
 
   return (
     <div>
-      {currentQuiz && takeQuiz ? (
+      {currentAssignment && takeAssignment ? (
         <div>
-          <button onClick={() => setTakeQuiz(false)}>back</button>
-          <h4>{currentQuiz.title} Questions</h4>
+          <button onClick={() => setTakeAssignment(false)}>Back</button>
+          <h4>{currentAssignment.title} Questions</h4>
           <Typography variant="h6">
             Time Left: {formatTime(timeLeft)}
           </Typography>
-          {currentQuiz.questions.map((question, index) => (
+          {currentAssignment.questions.map((question, index) => (
             <div key={index} className="mb-4">
               <p>
                 {index + 1}. {question.questionText}
-              </p>{" "}
+              </p>
               <FormControl component="fieldset">
                 <RadioGroup
                   onChange={(e) =>
@@ -189,13 +197,13 @@ const Quiz = ({ subjectId }) => {
             }}
             onClick={handleSubmit}
           >
-            Submit quiz
-          </Button>{" "}
+            Submit Assignment
+          </Button>
         </div>
       ) : (
         <TableContainer component={Paper}>
           <Table>
-            <TableHead bgcolor="#cdcdcd">
+            <TableHead bgColor="#cdcdcd">
               <TableRow>
                 <TableCell sx={{ fontWeight: "bold" }}>Title</TableCell>
                 <TableCell sx={{ fontWeight: "bold" }}>Duration</TableCell>
@@ -205,34 +213,39 @@ const Quiz = ({ subjectId }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {quizzes.map((quiz) => (
-                <TableRow key={quiz._id}>
-                  <TableCell>{quiz.title}</TableCell>
-                  <TableCell>{quiz.duration}</TableCell>
+              {assignments.map((assignment) => (
+                <TableRow key={assignment._id}>
+                  <TableCell>{assignment.title}</TableCell>
+                  <TableCell>{assignment.duration}</TableCell>
                   <TableCell align="right">
-                    {quiz.scores.some(
-                      (score) => score.studentId === user._id
+                    {assignment.scores.some(
+                      (score) => score.studentId === userId
                     ) ? (
-                      <Typography color="green">Completed </Typography>
+                      <Typography color="green">Completed</Typography>
                     ) : (
                       <>
-                        <IconButton onClick={(e) => handleOpenMenu(e, quiz)}>
+                        <IconButton
+                          onClick={(e) => handleOpenMenu(e, assignment)}
+                        >
                           <MoreHorizIcon />
                         </IconButton>
                         <Menu
                           anchorEl={anchorEl}
                           open={Boolean(
-                            anchorEl && selectedQuiz?._id === quiz._id
+                            anchorEl &&
+                              selectedAssignment?._id === assignment._id
                           )}
                           onClose={handleCloseMenu}
                         >
-                          <MenuItem onClick={() => handleTakeQuiz(quiz)}>
-                            Take quiz
+                          <MenuItem
+                            onClick={() => handleTakeAssignment(assignment)}
+                          >
+                            Take assignment
                           </MenuItem>
                         </Menu>
                       </>
                     )}
-                  </TableCell>{" "}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -242,8 +255,8 @@ const Quiz = ({ subjectId }) => {
 
       {/* Result Dialog */}
       <Dialog
-        open={openResultDialog}
-        onClose={handleCloseResultDialog}
+        open={resultDialogOpen}
+        onClose={handleResultDialogClose}
         maxWidth="md"
         fullWidth
         sx={{
@@ -252,7 +265,7 @@ const Quiz = ({ subjectId }) => {
         }}
       >
         <DialogActions>
-          <Button onClick={handleCloseResultDialog} color="primary">
+          <Button onClick={handleResultDialogClose} color="primary">
             <Close />
           </Button>
         </DialogActions>
@@ -263,21 +276,19 @@ const Quiz = ({ subjectId }) => {
           <Typography sx={{ fontWeight: "bold" }} className="text-center">
             Your Score:
           </Typography>
-          <DialogContentText
-            variant="h2"
-          >
-            {quizResult?.obtainedMarks}/{quizResult?.totalMarks}
-          </DialogContentText>
+          <Typography variant="h2">
+            {assResult?.obtainedMarks} / {assResult?.totalMarks}
+          </Typography>
           <Typography
             variant="h2"
-            sx={{ color: quizResult?.passed ? "green" : "red" }}
+            sx={{ color: assResult?.passed ? "green" : "red" }}
           >
-            {quizResult?.passed ? "PASSED" : "FAILED"}
-          </Typography>
+            {assResult?.passed ? "PASSED" : "FAILED"}
+          </Typography>{" "}
         </DialogContent>
       </Dialog>
     </div>
   );
 };
 
-export default Quiz;
+export default Assignment;

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import Quiz from "./Quiz";
 import Exam from "./Exam";
 import Discussion from "./Discussion";
-import Assignment from "./Assignment";
+import Assignment from "../students/Assignment";
 import axios from "axios";
-import UserScores from "./UserScores";
+import UserScores from "../UserScores";
 // const apiUrl = "http://localhost:5000"; // Your API URL
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 const CourseDetail = () => {

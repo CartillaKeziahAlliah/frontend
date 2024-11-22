@@ -20,7 +20,7 @@ import {
 } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 import AssScoresView from "./AssScoresView";
 import AddIcon from "@mui/icons-material/Add";
 

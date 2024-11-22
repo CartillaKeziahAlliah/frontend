@@ -11,8 +11,6 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import {
-  AddCircleOutline,
-  CheckCircleOutline,
   DescriptionOutlined,
   DragIndicator,
   MoreVert,
@@ -20,7 +18,7 @@ import {
 } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 import QuizView from "./QuizView";
 import QuizScoresView from "./QuizScoresView";
 
