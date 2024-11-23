@@ -7,6 +7,10 @@ import Section from "../../assets/sections.png";
 import Students from "../../assets/students.png";
 import Request from "../../assets/request.png";
 import Instructors from "./ManageComponents/instructors";
+import AdminTable from "./ManageComponents/Administrator";
+import SubjectsTable from "./ManageComponents/Subjects";
+import Sections from "./ManageComponents/sections";
+import Student from "./ManageComponents/student";
 
 const MainPage = () => {
   const [activeView, setActiveView] = useState(() => {
@@ -71,46 +75,22 @@ const MainPage = () => {
       )}
       {activeView === "admin" && (
         <>
-          <div>Administrators</div>
-          <button
-            className="mt-4 p-2 bg-blue-500 text-white rounded"
-            onClick={handleBackToDashboard}
-          >
-            Back to Dashboard
-          </button>
+          <AdminTable handleBackToDashboard={handleBackToDashboard} />
         </>
       )}
       {activeView === "subject" && (
         <>
-          <div>Subjects</div>
-          <button
-            className="mt-4 p-2 bg-blue-500 text-white rounded"
-            onClick={handleBackToDashboard}
-          >
-            Back to Dashboard
-          </button>
+          <SubjectsTable handleBackToDashboard={handleBackToDashboard} />
         </>
       )}
       {activeView === "section" && (
         <>
-          <div>Sections</div>
-          <button
-            className="mt-4 p-2 bg-blue-500 text-white rounded"
-            onClick={handleBackToDashboard}
-          >
-            Back to Dashboard
-          </button>
+          <Sections handleBackToDashboard={handleBackToDashboard} />
         </>
       )}
       {activeView === "student" && (
         <>
-          <div>Students</div>
-          <button
-            className="mt-4 p-2 bg-blue-500 text-white rounded"
-            onClick={handleBackToDashboard}
-          >
-            Back to Dashboard
-          </button>
+          <Student handleBackToDashboard={handleBackToDashboard} />
         </>
       )}
       {activeView === "request" && (

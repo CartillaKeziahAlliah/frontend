@@ -19,6 +19,7 @@ import {
   Paper,
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
+import Swal from "sweetalert2";
 
 // Simulating fetching teachers using axios
 const fetchTeachers = async () => {
@@ -33,7 +34,7 @@ const fetchTeachers = async () => {
   }
 };
 
-const Instructors = ({ handleBackToDashboard, currentUser }) => {
+const Instructors = ({ handleBackToDashboard }) => {
   const [teachers, setTeachers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(0); // MUI pagination starts at 0
@@ -151,7 +152,7 @@ const Instructors = ({ handleBackToDashboard, currentUser }) => {
 
   return (
     <div className="w-full p-[2%]">
-      <div className="flex justify-between gap-2">
+      <div className="flex justify-between gap-2 mb-4">
         <button
           className="mt-4 p-2 bg-[#207E68] border border-1 text-[white] rounded-full"
           onClick={handleBackToDashboard}
