@@ -120,10 +120,13 @@ const Sections = ({ handleBackToDashboard }) => {
         section_name: editSection.section_name,
         adviser: selectedTeacher, // Use the selected teacher for the adviser
       };
+
       await axios.put(
         `${apiUrl}/api/section/${editSection._id}`,
         updatedSection
       );
+
+      // Update the sections list
       setSections(
         sections.map((section) =>
           section._id === editSection._id
@@ -131,7 +134,11 @@ const Sections = ({ handleBackToDashboard }) => {
             : section
         )
       );
+
+      // Close the dialog first
       setOpenEditDialog(false);
+
+      // Reset the input fields after the dialog is closed
 
       // Show success swal
       Swal.fire({
@@ -139,8 +146,12 @@ const Sections = ({ handleBackToDashboard }) => {
         title: "Section Updated Successfully",
         text: "The section has been updated successfully.",
       }).then(() => {
-        // Redirect to a new location after the success
-        window.location.reload(); // Replace with the desired URL
+        window.location.reload(); // Replace with the desired URL if needed
+      });
+      setEditSection({
+        section_name: null,
+        grade_level: null,
+        adviser: null,
       });
     } catch (error) {
       console.error("Error editing section:", error);
@@ -153,6 +164,7 @@ const Sections = ({ handleBackToDashboard }) => {
       });
     }
   };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setSectionData((prevData) => ({
