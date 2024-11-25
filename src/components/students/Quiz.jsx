@@ -32,8 +32,8 @@ import { useAuth } from "../../context/AuthContext";
 
 import { Close } from "@mui/icons-material";
 
-const apiUrl = "http://localhost:5000";
-// const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "http://localhost:5000";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 const Quiz = ({ subjectId }) => {
   const [quizzes, setQuizzes] = useState([]);
   const [currentQuiz, setCurrentQuiz] = useState(null);
@@ -263,9 +263,7 @@ const Quiz = ({ subjectId }) => {
           <Typography sx={{ fontWeight: "bold" }} className="text-center">
             Your Score:
           </Typography>
-          <DialogContentText
-            variant="h2"
-          >
+          <DialogContentText variant="h2">
             {quizResult?.obtainedMarks}/{quizResult?.totalMarks}
           </DialogContentText>
           <Typography

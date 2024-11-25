@@ -31,9 +31,9 @@ import axios from "axios"; // Import axios for HTTP requests
 import { useAuth } from "../../context/AuthContext";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Close } from "@mui/icons-material";
-const apiUrl = "http://localhost:5000";
+// const apiUrl = "http://localhost:5000";
 
-// const apiUrl = "https://server-production-dd7a.up.railway.app";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const Alert = React.forwardRef((props, ref) => (
   <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />

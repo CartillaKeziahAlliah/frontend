@@ -24,7 +24,8 @@ import {
 } from "@mui/material";
 import Swal from "sweetalert2";
 import { Add as AddIcon, MoreHoriz } from "@mui/icons-material";
-
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 const Sections = ({ handleBackToDashboard }) => {
   const [teachers, setTeachers] = useState([]);
   const [sections, setSections] = useState([]);
@@ -54,12 +55,12 @@ const Sections = ({ handleBackToDashboard }) => {
   };
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/users/users") // Fetch teachers
+      .get(`${apiUrl}/api/users/users`) // Fetch teachers
       .then((response) => setTeachers(response.data))
       .catch((error) => console.error("Error fetching teachers:", error));
 
     axios
-      .get("http://localhost:5000/api/section/") // Fetch sections
+      .get(`${apiUrl}/api/section/`) // Fetch sections
       .then((response) => setSections(response.data))
       .catch((error) => console.error("Error fetching sections:", error));
   }, []);
@@ -73,7 +74,7 @@ const Sections = ({ handleBackToDashboard }) => {
   const handleAddTeacherDialogOpen = (sectionId) => {
     setEditSection({ _id: sectionId }); // Set the section ID first
     axios
-      .get(`http://localhost:5000/api/users/excludedusers/${sectionId}`) // Use sectionId here
+      .get(`${apiUrl}/api/users/excludedusers/${sectionId}`) // Use sectionId here
       .then((response) => setFreeTeachers(response.data))
       .catch((error) => console.error("Error fetching teachers:", error));
     setOpenAddDialog(true);
@@ -85,10 +86,11 @@ const Sections = ({ handleBackToDashboard }) => {
     try {
       const { section_name, grade_level, adviser } = sectionData;
       // Make API request to add section
-      const response = await axios.post(
-        "http://localhost:5000/api/section", // Replace with your actual API endpoint
-        { section_name, grade_level, adviser }
-      );
+      const response = await axios.post(`${apiUrl}/api/section`, {
+        section_name,
+        grade_level,
+        adviser,
+      });
 
       Swal.fire({
         icon: "success",
@@ -119,7 +121,7 @@ const Sections = ({ handleBackToDashboard }) => {
         adviser: selectedTeacher, // Use the selected teacher for the adviser
       };
       await axios.put(
-        `http://localhost:5000/api/section/${editSection._id}`,
+        `${apiUrl}/api/section/${editSection._id}`,
         updatedSection
       );
       setSections(
@@ -162,7 +164,7 @@ const Sections = ({ handleBackToDashboard }) => {
   const handleAddTeacher = async () => {
     try {
       await axios.put(
-        `http://localhost:5000/api/section/${editSection._id}/teacher/${selectedTeacher}`
+        `${apiUrl}/api/section/${editSection._id}/teacher/${selectedTeacher}`
       );
       setSections(
         sections.map((section) =>
@@ -220,7 +222,7 @@ const Sections = ({ handleBackToDashboard }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:5000/api/section/${id}`)
+          .delete(`${apiUrl}/api/section/${id}`)
           .then(() => {
             setSections(sections.filter((section) => section._id !== id));
             Swal.fire("Deleted!", "The section has been deleted.", "success");

@@ -22,8 +22,8 @@ import { useAuth } from "../../../context/AuthContext";
 import QuizView from "./QuizView";
 import QuizScoresView from "./QuizScoresView";
 
-// const apiUrl = "https://server-production-dd7a.up.railway.app";
-const apiUrl = "http://localhost:5000";
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const QuizList = ({ selectedSubject, setAction }) => {
   const [quizzes, setQuizzes] = useState([]);

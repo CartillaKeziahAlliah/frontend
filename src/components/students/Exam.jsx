@@ -25,8 +25,8 @@ import {
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Close } from "@mui/icons-material";
 
-const apiUrl = "http://localhost:5000";
-
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 const Exam = ({ subjectId, user, subject }) => {
   const [exams, setExams] = useState([]);
   const [currentExam, setCurrentExam] = useState(null);

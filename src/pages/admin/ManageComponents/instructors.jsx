@@ -20,13 +20,12 @@ import {
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import Swal from "sweetalert2";
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
-// Simulating fetching teachers using axios
 const fetchTeachers = async () => {
   try {
-    const response = await axios.get(
-      "http://localhost:5000/api/manage/teachers"
-    );
+    const response = await axios.get(`${apiUrl}/api/manage/teachers`);
     return response.data.data; // Assuming the API response has a 'data' field with the teacher list
   } catch (error) {
     console.error("Error fetching teachers:", error);
@@ -75,7 +74,7 @@ const Instructors = ({ handleBackToDashboard }) => {
   const handleBlockUser = async (userId) => {
     try {
       const response = await axios.patch(
-        `http://localhost:5000/api/manage/block-user/${userId}`
+        `${apiUrl}/api/manage/block-user/${userId}`
       );
       if (response.status === 200) {
         setTeachers(
@@ -93,7 +92,7 @@ const Instructors = ({ handleBackToDashboard }) => {
   const handleUnBlockUser = async (userId) => {
     try {
       const response = await axios.patch(
-        `http://localhost:5000/api/manage/unblock-user/${userId}`
+        `${apiUrl}/api/manage/unblock-user/${userId}`
       );
       if (response.status === 200) {
         setTeachers(
@@ -126,7 +125,7 @@ const Instructors = ({ handleBackToDashboard }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/manage/addInstructor",
+        `${apiUrl}/api/manage/addInstructor`,
         newInstructor
       );
 

@@ -23,7 +23,8 @@ import axios from "axios";
 import { useAuth } from "../../../context/AuthContext";
 import { Add, Delete } from "@mui/icons-material";
 import Swal from "sweetalert2";
-
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 const AdminTable = ({ handleBackToDashboard }) => {
   const [admins, setAdmins] = useState([]);
   const [filteredAdmins, setFilteredAdmins] = useState([]);
@@ -50,7 +51,7 @@ const AdminTable = ({ handleBackToDashboard }) => {
 
       try {
         const response = await axios.put(
-          `http://localhost:5000/api/users/${userId}/master-admin`
+          `${apiUrl}/api/users/${userId}/master-admin`
         );
 
         if (response.status === 200) {
@@ -98,9 +99,7 @@ const AdminTable = ({ handleBackToDashboard }) => {
   const fetchAdmins = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        "http://localhost:5000/api/manage/admins"
-      );
+      const response = await axios.get(`${apiUrl}/api/manage/admins`);
       setAdmins(response.data.data);
       setFilteredAdmins(response.data.data);
       setLoading(false);
@@ -113,7 +112,7 @@ const AdminTable = ({ handleBackToDashboard }) => {
   const handleAddAdmin = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/manage/admins",
+        `${apiUrl}/api/manage/admins`,
         newAdmin
       );
       if (response.status === 201) {
@@ -153,7 +152,7 @@ const AdminTable = ({ handleBackToDashboard }) => {
       });
 
       if (result.isConfirmed) {
-        await axios.delete(`http://localhost:5000/api/manage/admins/${id}`);
+        await axios.delete(`${apiUrl}/api/manage/admins/${id}`);
         const updatedAdmins = admins.filter((admin) => admin._id !== id);
         setAdmins(updatedAdmins);
         setFilteredAdmins(updatedAdmins);

@@ -27,7 +27,8 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 import Swal from "sweetalert2";
-
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 const SubjectsTable = ({ handleBackToDashboard }) => {
   const [subjects, setSubjects] = useState([]);
   const [teachers, setTeachers] = useState([]);
@@ -47,17 +48,17 @@ const SubjectsTable = ({ handleBackToDashboard }) => {
   // Fetch subjects, teachers, and sections from the server
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/manage/")
+      .get(`${apiUrl}/api/manage/`)
       .then((response) => setSubjects(response.data))
       .catch((error) => console.error("Error fetching subjects:", error));
 
     axios
-      .get("http://localhost:5000/api/users/users") // Fetch teachers
+      .get(`${apiUrl}/api/users/users`) // Fetch teachers
       .then((response) => setTeachers(response.data))
       .catch((error) => console.error("Error fetching teachers:", error));
 
     axios
-      .get("http://localhost:5000/api/section/") // Fetch sections
+      .get(`${apiUrl}/api/section/`) // Fetch sections
       .then((response) => setSections(response.data))
       .catch((error) => console.error("Error fetching sections:", error));
   }, []);
@@ -91,10 +92,7 @@ const SubjectsTable = ({ handleBackToDashboard }) => {
       if (result.isConfirmed) {
         // Proceed with the update if the user confirms
         axios
-          .put(
-            `http://localhost:5000/api/manage/subjects/${editSubject._id}`,
-            editSubject
-          )
+          .put(`${apiUrl}/api/manage/subjects/${editSubject._id}`, editSubject)
           .then(() => {
             // Update the subjects list in state with a new array reference
             setSubjects((prevSubjects) =>
@@ -137,7 +135,7 @@ const SubjectsTable = ({ handleBackToDashboard }) => {
       if (result.isConfirmed) {
         // Proceed with the deletion if the user confirms
         axios
-          .delete(`http://localhost:5000/api/manage/subjects/${id}`)
+          .delete(`${apiUrl}/api/manage/subjects/${id}`)
           .then(() => {
             setSubjects(subjects.filter((subject) => subject._id !== id));
             Swal.fire("Deleted!", "The subject has been deleted.", "success");
@@ -172,7 +170,7 @@ const SubjectsTable = ({ handleBackToDashboard }) => {
       if (result.isConfirmed) {
         // Proceed with adding the subject if confirmed
         axios
-          .post("http://localhost:5000/api/manage/add", newSubject)
+          .post(`${apiUrl}/api/manage/add`, newSubject)
           .then((response) => {
             setSubjects((prevSubjects) => [
               ...prevSubjects,

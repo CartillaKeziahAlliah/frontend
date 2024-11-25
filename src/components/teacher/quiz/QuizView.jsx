@@ -5,7 +5,8 @@ import { useAuth } from "../../../context/AuthContext";
 import axios from "axios";
 import { CheckOutlined, Close } from "@mui/icons-material";
 
-const apiUrl = "http://localhost:5000";
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 // Function to check if the user has already taken the quiz
 const checkQuizAttempt = async (userId, quizId) => {

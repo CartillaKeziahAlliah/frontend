@@ -16,7 +16,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { CloseOutlined } from "@mui/icons-material";
 
-const apiUrl = "http://localhost:5000";
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const AssScoresView = ({ assignments, onClose }) => {
   const [scores, setScores] = useState([]);

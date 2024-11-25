@@ -255,7 +255,7 @@ const CreateAssignment = ({ selectedSubject, onclick }) => {
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 required
-                sx={{ mb: 2,flex:1 }}
+                sx={{ mb: 2, flex: 1 }}
               />
               <TextField
                 label="Total Marks"
@@ -263,7 +263,7 @@ const CreateAssignment = ({ selectedSubject, onclick }) => {
                 variant="outlined"
                 value={totalMarks} // Display the calculated total marks
                 InputProps={{ readOnly: true }} // Make it read-only
-                sx={{ mb: 2,flex:1 }}
+                sx={{ mb: 2, flex: 1 }}
               />
               <TextField
                 label="Pass Marks"
@@ -272,7 +272,7 @@ const CreateAssignment = ({ selectedSubject, onclick }) => {
                 value={passMarks}
                 onChange={(e) => setPassMarks(e.target.value)}
                 required
-                sx={{ mb: 2,flex:1}}
+                sx={{ mb: 2, flex: 1 }}
               />
               <TextField
                 label="Deadline"
@@ -281,7 +281,7 @@ const CreateAssignment = ({ selectedSubject, onclick }) => {
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
                 required
-                sx={{ mb: 2,flex:1 }}
+                sx={{ mb: 2, flex: 1 }}
               />
             </Box>
             <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
