@@ -38,6 +38,8 @@ const Sections = ({ handleBackToDashboard }) => {
   const [openSectionAddDialog, setOpenSectionAddDialog] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [sectionName, setSectionName] = useState(""); // State for section name
+
   const [sectionData, setSectionData] = useState({
     section_name: "",
     grade_level: "1st year", // Default value
@@ -117,7 +119,7 @@ const Sections = ({ handleBackToDashboard }) => {
   const handleEditSection = async () => {
     try {
       const updatedSection = {
-        section_name: editSection.section_name,
+        section_name: sectionName, // Use sectionName state instead of editSection.section_name
         adviser: selectedTeacher, // Use the selected teacher for the adviser
       };
 
@@ -125,6 +127,8 @@ const Sections = ({ handleBackToDashboard }) => {
         `${apiUrl}/api/section/${editSection._id}`,
         updatedSection
       );
+      setEditSection(null);
+      setSectionName(""); // Clear sectionName state after the update
 
       // Update the sections list
       setSections(
@@ -138,8 +142,6 @@ const Sections = ({ handleBackToDashboard }) => {
       // Close the dialog first
       setOpenEditDialog(false);
 
-      // Reset the input fields after the dialog is closed
-
       // Show success swal
       Swal.fire({
         icon: "success",
@@ -147,11 +149,6 @@ const Sections = ({ handleBackToDashboard }) => {
         text: "The section has been updated successfully.",
       }).then(() => {
         window.location.reload(); // Replace with the desired URL if needed
-      });
-      setEditSection({
-        section_name: null,
-        grade_level: null,
-        adviser: null,
       });
     } catch (error) {
       console.error("Error editing section:", error);
@@ -381,15 +378,14 @@ const Sections = ({ handleBackToDashboard }) => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>Edit Section</DialogTitle>
+        <DialogTitle>Edit Section </DialogTitle>
         <DialogContent>
           <TextField
             label="Section Name"
-            value={editSection?.section_name || ""}
-            onChange={(e) =>
-              setEditSection({ ...editSection, section_name: e.target.value })
-            }
+            value={sectionName} // Use state for dynamic value
+            onChange={(e) => setSectionName(e.target.value)} // Update state on change
             fullWidth
+            required // Make the input required
           />
           <FormControl fullWidth variant="outlined" margin="normal">
             <InputLabel id="adviser-select-label" shrink>
@@ -419,8 +415,9 @@ const Sections = ({ handleBackToDashboard }) => {
           </Button>
           <Button
             variant="contained"
-            onClick={handleEditSection}
+            onClick={() => handleEditSection(sectionName)} // Pass sectionName to the handler
             color="primary"
+            disabled={!sectionName} // Disable Save button if sectionName is empty
           >
             Save
           </Button>
