@@ -140,11 +140,20 @@ const RequestPage = ({ handleBackToDashboard }) => {
 
       <TableContainer>
         <Table>
-          <TableHead>
+          <TableHead sx={{ bgcolor: "#207E68" }}>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell align="right">Action</TableCell>
+              <TableCell sx={{ color: "white", fontSize: "large" }}>
+                Name
+              </TableCell>
+              <TableCell sx={{ color: "white", fontSize: "large" }}>
+                Email
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{ color: "white", fontSize: "large" }}
+              >
+                Action
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
