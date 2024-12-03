@@ -14,6 +14,7 @@ import {
   IconButton,
   MenuItem,
   Tooltip,
+  Skeleton,
 } from "@mui/material";
 import {
   ChevronLeft,
@@ -110,8 +111,7 @@ const SectionDetail = () => {
         const response = await axios.get(`${apiUrl}/api/subject/${user._id}`);
         setSubjects(response.data);
       } catch (error) {
-        console.error("Error fetching subjects:", error);
-        setError("Failed to load subjects.");
+        setError();
       }
     };
 
@@ -274,11 +274,17 @@ const SectionDetail = () => {
               className="border rounded-3xl mr-2 py-2 px-4 bg-white shadow-lg border-black"
             >
               <option value="">Select a Subject</option>
-              {subjects.map((subject) => (
-                <option key={subject._id} value={subject._id}>
-                  {subject.subject_name}
-                </option>
-              ))}
+              {subjects.length === 0 ? (
+                <Skeleton></Skeleton>
+              ) : (
+                <>
+                  {subjects.map((subject) => (
+                    <option key={subject._id} value={subject._id}>
+                      {subject.subject_name}
+                    </option>
+                  ))}
+                </>
+              )}
             </select>
             <select
               id="view"

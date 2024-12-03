@@ -20,7 +20,7 @@ const SectionsSidebar = ({
         const response = await axios.get(`${apiUrl}/api/section/${teacherId}`);
         setSections(response.data);
       } catch (err) {
-        setError("Error fetching sections");
+        setError();
         console.error(err);
       } finally {
         setLoading(false);

@@ -15,6 +15,7 @@ const CourseDetail = () => {
   const [section, setSection] = useState("Exams");
   const { user } = useAuth();
   const [subjectData, setSubjectData] = useState([]);
+  const [error, setError] = useState(true);
   useEffect(() => {
     // Fetch subject data by subjectId
     const fetchSubjectData = async () => {
@@ -25,12 +26,14 @@ const CourseDetail = () => {
 
         setSubjectData(response.data);
       } catch (error) {
-        console.error("Error fetching subject data:", error);
+        setError(true);
       }
     };
 
     fetchSubjectData();
   }, [subjectId]);
+  if (error)
+    return <div>Error loading subject data. Please try again later.</div>;
   return (
     <div className="course-detail-container p-4">
       <h1 className="text-3xl font-bold mb-4">{subjectData.subject_name}</h1>
