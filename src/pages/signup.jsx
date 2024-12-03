@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 const RegisterForm = () => {
   const [name, setName] = useState("");
@@ -62,13 +63,22 @@ const RegisterForm = () => {
         email,
         password,
       });
-      console.log(response.data);
+
+      // Display a SweetAlert success message
+      Swal.fire({
+        icon: "success",
+        title: "Signup Successful!",
+        text: "Success, Wait for a day for your account to be approved",
+        confirmButtonText: "OK",
+      });
+
+      // Clear the input fields after successful signup
       setEmail("");
       setName("");
       setConfirmPassword("");
       setPassword("");
     } catch (err) {
-      setError(err.response.data.error || "Signup failed");
+      setError(err.response?.data?.error || "Signup failed");
     }
   };
 

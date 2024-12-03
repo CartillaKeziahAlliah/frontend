@@ -6,15 +6,18 @@ import {
   Typography,
   Container,
   Alert,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "axios";
-// const apiUrl = "http://localhost:5000";
 
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
   const handleLogin = async (e) => {
@@ -30,19 +33,16 @@ const LoginForm = () => {
       console.log("Response from login:", response.data);
       localStorage.setItem("token", response.data.token);
 
-      // Redirect based on role
       switch (response.data.role) {
         case "student":
           window.location.href = "/Dashboard";
           break;
-
         default:
           window.location.href = "/Dashboard";
       }
     } catch (err) {
       console.error("Login error:", err);
 
-      // Error handling based on the response status
       if (err.response) {
         switch (err.response.status) {
           case 400:
@@ -127,7 +127,7 @@ const LoginForm = () => {
             required
             fullWidth
             label="Password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -148,6 +148,18 @@ const LoginForm = () => {
                   color: "#207E68",
                 },
               },
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
           />
           <Button
