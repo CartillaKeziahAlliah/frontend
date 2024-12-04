@@ -138,12 +138,13 @@ const Student = ({ handleBackToDashboard }) => {
   };
 
   const handleUpdate = (student) => {
-    setSelectedStudent(student);
     setNewSectionId(student.sections?.[0] || ""); // Pre-fill with current section if available
     setIsModalOpen(true);
   };
-  const handleMenuOpen = (event) => {
+
+  const handleMenuOpen = (event, student) => {
     setAnchorEl(event.currentTarget);
+    setSelectedStudent(student); // Set the selected student here
   };
 
   const handleMenuClose = () => {
@@ -258,9 +259,12 @@ const Student = ({ handleBackToDashboard }) => {
                     <TableCell>{student.name}</TableCell>
                     <TableCell>{student.email}</TableCell>
                     <TableCell>
-                      <IconButton onClick={handleMenuOpen}>
+                      <IconButton
+                        onClick={(event) => handleMenuOpen(event, student)}
+                      >
                         <MoreHoriz />
                       </IconButton>
+
                       <Menu
                         anchorEl={anchorEl}
                         open={Boolean(anchorEl)}
