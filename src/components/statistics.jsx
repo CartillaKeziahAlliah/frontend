@@ -47,11 +47,20 @@ const UserStatistics = () => {
   const allRoles = ["student", "admin", "teacher", "masterAdmin"];
   const allStatuses = ["blocked", "Dropped", "Active"];
 
-  // Fill missing roles or statuses with count 0
+  // Capitalize names and translate masterAdmin to Master Admin
+  const capitalizeName = (name) => {
+    if (name === "masterAdmin") return "Master Admin";
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+
+  // Fill missing roles or statuses with count 0 and update display names
   const fillMissingData = (data, allCategories) => {
     return allCategories.map((category) => {
       const existing = data.find((item) => item.name === category);
-      return existing ? existing : { name: category, value: 0 };
+      const updatedName = capitalizeName(category);
+      return existing
+        ? { ...existing, name: updatedName }
+        : { name: updatedName, value: 0 };
     });
   };
 
@@ -84,6 +93,7 @@ const UserStatistics = () => {
           </PieChart>
         </div>
 
+        {/* Pie Chart for Statuses */}
         <div>
           <PieChart width={500} height={500}>
             <Pie

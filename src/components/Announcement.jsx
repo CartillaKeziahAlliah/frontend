@@ -407,9 +407,11 @@ const AnnouncementApp = () => {
               }}
             >
               <div style={{ display: "flex", alignItems: "start", gap: 2 }}>
-                <Avatar sx={{ marginRight: 1 }}>
-                  <PersonIcon />
-                </Avatar>
+                <img
+                  className="w-12 h-12 rounded-full mx-2 mt-4"
+                  src={announcement.announcer.avatar}
+                  alt=""
+                />
                 <div>
                   <h2 className="capitalize text-xl font-bold">
                     {announcement.announcer.name} -
