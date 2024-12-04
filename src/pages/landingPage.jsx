@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Background from "../assets/building_0.png";
+import ContactUs from "./ContactUs";
+import FAQ from "./Faqs";
 
 const landingPage = () => {
+  const [view, setView] = useState(false);
   const logo =
     "https://static.wixstatic.com/media/a7269e_9526c565a65f452ab7ab04f1fb03b196~mv2.png/v1/fit/w_2500,h_1330,al_c/a7269e_9526c565a65f452ab7ab04f1fb03b196~mv2.png";
 
@@ -20,8 +23,19 @@ const landingPage = () => {
             <h2>Spirituality - Responsibility - Integrity</h2>
           </div>
         </div>
-        <Link to="/Auth">LOGIN</Link>
+        <div className="flex flex-row gap-4 px-10">
+          <button className="hover:border-b" onClick={() => setView("contact")}>
+            CONTACT US
+          </button>
+          <button className="hover:border-b" onClick={() => setView("faqs")}>
+            FAQs
+          </button>
+          <Link to="/Auth">LOGIN</Link>
+        </div>
       </div>
+      {view === "contact" && <ContactUs />}
+      {view === "faqs" && <FAQ />}
+
       <div></div>
     </div>
   );

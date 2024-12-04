@@ -9,6 +9,7 @@ import CourseDetail from "./components/students/CourseDetail";
 import Dashboard from "./components/dashboard";
 import UpdateProfile from "./components/UpdateProfile";
 import SectionDetail from "./components/teacher/SectionsDetails";
+import ContactUs from "./pages/ContactUs";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/Auth" element={<AuthPage />} />
+          <Route path="/ContactUs" element={<ContactUs />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/Dashboard" element={<Dashboard />} />
