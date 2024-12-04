@@ -210,7 +210,7 @@ const SubjectsTable = ({ handleBackToDashboard }) => {
           className=" p-2 mt-4 bg-[#207E68] border border-1 text-[white] rounded-full"
           onClick={handleBackToDashboard}
         >
-          Back to Dashboard
+          Back to Manage
         </button>
         <div className="mt-4 flex-1">
           <input

@@ -156,7 +156,7 @@ const Instructors = ({ handleBackToDashboard }) => {
           className="mt-4 p-2 bg-[#207E68] border border-1 text-[white] rounded-full"
           onClick={handleBackToDashboard}
         >
-          Back to Dashboard
+          Back to Manage
         </button>
         <div className="mt-4 flex-1">
           <input

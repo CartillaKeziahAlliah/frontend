@@ -48,10 +48,14 @@ const Sections = ({ handleBackToDashboard }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  const handleMenuOpen = (event) => {
+  const handleMenuOpen = (event, section) => {
     setAnchorEl(event.currentTarget);
+    setEditSection(section);
+    setSectionName(editSection.section_name);
   };
-
+  useEffect(() => {
+    console.log(editSection);
+  }, [editSection]);
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
@@ -68,7 +72,6 @@ const Sections = ({ handleBackToDashboard }) => {
   }, []);
 
   const handleEditDialogOpen = (section) => {
-    setEditSection(section);
     setSelectedTeacher(section.adviser); // Set the selected teacher based on the current adviser
     setOpenEditDialog(true);
   };
@@ -123,7 +126,7 @@ const Sections = ({ handleBackToDashboard }) => {
         adviser: selectedTeacher, // Use the selected teacher for the adviser
       };
 
-      await axios.put(
+      await axios.patch(
         `${apiUrl}/api/section/${editSection._id}`,
         updatedSection
       );
@@ -301,7 +304,7 @@ const Sections = ({ handleBackToDashboard }) => {
                       <TableCell>{section.adviser.name}</TableCell>
                       <TableCell>
                         <IconButton
-                          onClick={handleMenuOpen}
+                          onClick={(event) => handleMenuOpen(event, section)}
                           aria-controls={open ? "actions-menu" : undefined}
                           aria-haspopup="true"
                           aria-expanded={open ? "true" : undefined}
@@ -325,7 +328,6 @@ const Sections = ({ handleBackToDashboard }) => {
                           <MenuItem
                             onClick={() => {
                               handleEditDialogOpen(section);
-                              handleMenuClose();
                             }}
                           >
                             Edit
@@ -378,10 +380,10 @@ const Sections = ({ handleBackToDashboard }) => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>Edit Section </DialogTitle>
+        <DialogTitle>Edit Section {editSection?.section_name}</DialogTitle>
         <DialogContent>
           <TextField
-            label="Section Name"
+            label="New Section Name"
             value={sectionName} // Use state for dynamic value
             onChange={(e) => setSectionName(e.target.value)} // Update state on change
             fullWidth
