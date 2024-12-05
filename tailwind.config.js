@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       lineClamp: {
-        3: "3", // Create a utility for clamping to 3 lines
+        3: "3",
       },
     },
   },
