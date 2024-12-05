@@ -96,6 +96,8 @@ const Assignment = ({ subjectId, userId }) => {
         }
       );
 
+      console.log("Submit Response:", response.data); // Debug log
+
       const updatedAssignments = assignments.map((assignment) =>
         assignment._id === currentAssignment._id
           ? { ...assignment, score: response.data.obtainedMarks }
@@ -103,11 +105,12 @@ const Assignment = ({ subjectId, userId }) => {
       );
 
       setAssignments(updatedAssignments);
+      setAssResult(response.data); // Ensure the result is set correctly
+      setResultDialogOpen(true); // Open dialog
       setCurrentAssignment(null);
-      setSnackbarOpen(true);
-      setAssResult(response.data);
-      setResultDialogOpen(true); // Open dialog to display the result
       setTakeAssignment(false);
+      setTimerActive(false); // Stop timer
+      setSnackbarOpen(true);
     } catch (error) {
       console.error("Error submitting assignment:", error);
       setSnackbarOpen(true);
