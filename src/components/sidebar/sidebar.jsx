@@ -119,7 +119,7 @@ const Sidebar = ({ user, logout }) => {
           src={logo}
           alt="User Avatar"
           className={` rounded-full m-2 ${
-            isCollapsed ? "w-13 h-15" : "w-20 h-20 "
+            isCollapsed ? "w-12 h-12" : "w-20 h-20 "
           }`}
         />
         <Tooltip title="Profile" arrow>

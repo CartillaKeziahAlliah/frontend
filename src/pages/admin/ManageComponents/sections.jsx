@@ -234,7 +234,7 @@ const Sections = ({ handleBackToDashboard }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`${apiUrl}/api/section/${id}`)
+          .delete(`${apiUrl}/api/section/${editSection._id}`)
           .then(() => {
             setSections(sections.filter((section) => section._id !== id));
             Swal.fire("Deleted!", "The section has been deleted.", "success");
@@ -488,6 +488,7 @@ const Sections = ({ handleBackToDashboard }) => {
             fullWidth
             required
             variant="outlined" // Added variant
+            sx={{ mt: 2 }}
           />
           <FormControl fullWidth variant="outlined" margin="normal">
             {" "}

@@ -301,10 +301,23 @@ const Instructors = ({ handleBackToDashboard }) => {
         <DialogActions sx={{ padding: "16px 24px" }}>
           {" "}
           {/* Add padding for actions */}
-          <Button onClick={handleCloseModal} color="secondary">
+          <Button
+            variant="outlined"
+            onClick={handleCloseModal}
+            color="secondary"
+          >
             Close
           </Button>
-          <Button onClick={handleAddInstructor} color="primary">
+          <Button
+            variant="contained"
+            onClick={handleAddInstructor}
+            color="primary"
+            disabled={
+              !newInstructor.name ||
+              !newInstructor.email ||
+              !newInstructor.password
+            }
+          >
             Add Instructor
           </Button>
         </DialogActions>

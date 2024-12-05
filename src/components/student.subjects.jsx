@@ -85,9 +85,6 @@ const SubjectsList = () => {
                     <Typography variant="body2">
                       End: {subject.end_time}
                     </Typography>
-                    <Typography variant="body2">
-                      Schedule: {subject.schedule}
-                    </Typography>
                   </CardContent>
                 </Card>
               </Grid>

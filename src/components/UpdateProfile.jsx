@@ -148,22 +148,22 @@ const UpdateProfile = () => {
             )}
             <IconButton
               sx={{
-                width: 128,
-                height: 128,
                 position: "absolute",
                 top: "50%",
-                left: "0",
-                transform: "translateY(-50%)",
+                left: "10%",
+                transform: "translate(-50%, -50%)",
                 backgroundColor: "rgba(0, 0, 0, 0.5)",
+                width: 40,
+                height: 40,
                 "&:hover": {
                   backgroundColor: "rgba(0, 0, 0, 0.7)",
                 },
               }}
             >
-              <Button component="label" sx={{ padding: 0, minWidth: "auto" }}>
+              <Button component="label" sx={{ padding: 0 }}>
                 <Typography
                   sx={{ color: "#fff" }}
-                  variant="h4"
+                  variant="h5"
                   component="span"
                 >
                   +

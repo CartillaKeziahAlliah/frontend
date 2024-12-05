@@ -179,7 +179,11 @@ const EventCalendar = () => {
       />
 
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-        <DialogTitle>{editingEventId ? "Edit Event" : "Add Event"}</DialogTitle>
+        <DialogTitle>
+          {editingEventId
+            ? `Edit Event ${selectedDate.toLocaleString()}`
+            : "Add Event"}
+        </DialogTitle>
         <DialogContent>
           <TextField
             label="Event Title"
@@ -197,7 +201,11 @@ const EventCalendar = () => {
             margin="dense"
             type="time"
             required
+            InputLabelProps={{
+              shrink: true, // Keeps the label above the input
+            }}
           />
+
           <TextField
             label="Note"
             fullWidth
@@ -235,7 +243,7 @@ const EventCalendar = () => {
                 >
                   <div>
                     <strong className="text-black capitalize">
-                      {event.event_title}
+                      <p className="w-full break-all">{event.event_title}</p>
                     </strong>{" "}
                     -{" "}
                     {new Date(event.event_datetime).toLocaleDateString(

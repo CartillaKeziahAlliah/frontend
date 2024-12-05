@@ -255,8 +255,13 @@ const SubjectsTable = ({ handleBackToDashboard }) => {
               .map((subject) => (
                 <TableRow key={subject._id}>
                   <TableCell>{subject.subject_name}</TableCell>
-                  <TableCell>{subject.teacher.name}</TableCell>
-                  <TableCell>{subject.section.section_name}</TableCell>
+                  <TableCell>
+                    {subject.teacher?.name || "No Teacher Assigned"}
+                  </TableCell>
+                  <TableCell>
+                    {subject.section?.section_name || "No Section Assigned"}
+                  </TableCell>
+
                   <TableCell>
                     <IconButton
                       onClick={() => handleEditDialogOpen(subject)}
@@ -317,7 +322,7 @@ const SubjectsTable = ({ handleBackToDashboard }) => {
             >
               {teachers.map((teacher) => (
                 <MenuItem key={teacher._id} value={teacher._id}>
-                  {teacher.name}
+                  {teacher?.name}
                 </MenuItem>
               ))}
             </Select>
@@ -394,7 +399,7 @@ const SubjectsTable = ({ handleBackToDashboard }) => {
             >
               {teachers.map((teacher) => (
                 <MenuItem key={teacher._id} value={teacher._id}>
-                  {teacher.name}
+                  {teacher?.name}
                 </MenuItem>
               ))}
             </Select>

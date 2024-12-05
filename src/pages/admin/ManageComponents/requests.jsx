@@ -85,12 +85,11 @@ const RequestPage = ({ handleBackToDashboard }) => {
   };
 
   const handleSaveLRN = async () => {
-    if (!newLRN.trim()) {
-      Swal.fire("Error", "LRN cannot be empty", "error");
+    if (!newLRN.trim() || newLRN.length !== 12) {
+      Swal.fire("Error", "LRN must be exactly 12 characters", "error");
       return;
     }
 
-    // Confirm before saving
     Swal.fire({
       title: "Are you sure?",
       text: `Save LRN "${newLRN}" for ${selectedUser.name}?`,
@@ -208,14 +207,23 @@ const RequestPage = ({ handleBackToDashboard }) => {
             type="text"
             fullWidth
             value={newLRN}
-            onChange={(e) => setNewLRN(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 12) {
+                setNewLRN(e.target.value);
+              }
+            }}
+            helperText="LRN must be exactly 12 characters."
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleSaveLRN} color="primary">
+          <Button
+            onClick={handleSaveLRN}
+            color="primary"
+            disabled={newLRN.length !== 12}
+          >
             Save
           </Button>
         </DialogActions>

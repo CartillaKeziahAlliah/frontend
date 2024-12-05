@@ -81,38 +81,52 @@ const Student = ({ handleBackToDashboard }) => {
   const handleBlockUser = async (userId) => {
     try {
       const response = await axios.patch(
-        `${apiUrl}/api/manage/block-user/${userId}`
+        `${apiUrl}/api/manage/block-user/${selectedStudent._id}`
       );
       if (response.status === 200) {
-        setStudents(
-          students.map((student) =>
-            student._id === userId ? { ...student, status: "blocked" } : student
-          )
-        );
-        alert("student blocked successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Blocked!",
+          text: "Student blocked successfully!",
+          confirmButtonText: "OK",
+        }).then(() => {
+          window.location.reload(); // Reload the page after confirmation
+        });
       }
     } catch (error) {
       console.error("Error blocking student:", error);
-      alert("Error blocking student.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error blocking student.",
+        confirmButtonText: "OK",
+      });
     }
   };
 
   const handleUnBlockUser = async (userId) => {
     try {
       const response = await axios.patch(
-        `${apiUrl}/api/manage/unblock-user/${userId}`
+        `${apiUrl}/api/manage/unblock-user/${selectedStudent._id}`
       );
       if (response.status === 200) {
-        setStudents(
-          students.map((student) =>
-            student._id === userId ? { ...student, status: "blocked" } : student
-          )
-        );
-        alert("student unblocked successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Unblocked!",
+          text: "Student unblocked successfully!",
+          confirmButtonText: "OK",
+        }).then(() => {
+          window.location.reload(); // Reload the page after confirmation
+        });
       }
     } catch (error) {
-      console.error("Error unblocking student:", error);
-      alert("Error unblocking student.");
+      console.error("Failed unblocking student:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Failed unblocking student.",
+        confirmButtonText: "OK",
+      });
     }
   };
   useEffect(() => {
@@ -270,7 +284,7 @@ const Student = ({ handleBackToDashboard }) => {
                         open={Boolean(anchorEl)}
                         onClose={handleMenuClose}
                       >
-                        {student.status === "blocked" ? (
+                        {selectedStudent?.status === "blocked" ? (
                           <MenuItem
                             onClick={() => {
                               handleUnBlockUser(student._id);
