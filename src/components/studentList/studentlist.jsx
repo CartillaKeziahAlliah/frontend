@@ -12,7 +12,8 @@ import {
   CircularProgress,
 } from "@mui/material";
 
-const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "https://server-production-dd7a.up.railway.app";
+const apiUrl = "http://localhost:5000";
 
 const StudentsComponent = ({ sectionName }) => {
   const [students, setStudents] = useState([]);
@@ -71,7 +72,7 @@ const StudentsComponent = ({ sectionName }) => {
                 color: "white",
               }}
             >
-              Final Grade
+              Passing Rate
             </TableCell>
           </TableRow>
         </TableHead>
@@ -90,7 +91,11 @@ const StudentsComponent = ({ sectionName }) => {
                   {student.status ? student.status : <>N/A</>}
                 </TableCell>
                 <TableCell>
-                  <>N/A</>
+                  {student.passingPercentage ? (
+                    `${student.passingPercentage}%`
+                  ) : (
+                    <>N/A</>
+                  )}
                 </TableCell>
               </TableRow>
             ))
