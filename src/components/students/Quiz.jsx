@@ -84,11 +84,17 @@ const Quiz = ({ subjectId }) => {
 
   const handleSubmit = async () => {
     try {
+      const sentAnswers =
+        Object.values(answers).length > 0 ? Object.values(answers) : null;
+
+      // Log the answers being sent
+      console.log("Sent Answers:", sentAnswers);
+
       const response = await axios.post(
         `${apiUrl}/api/quiz/${currentQuiz._id}/take`,
         {
           studentId: user._id,
-          answers: Object.values(answers),
+          answers: sentAnswers,
         }
       );
 

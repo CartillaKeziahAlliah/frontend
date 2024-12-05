@@ -13,6 +13,7 @@ import {
   TablePagination,
   TextField,
 } from "@mui/material";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const UserScores = ({ userId }) => {
   const [userScores, setUserScores] = useState([]);
@@ -26,7 +27,7 @@ const UserScores = ({ userId }) => {
     const fetchUserScores = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/users/user-scores/${userId}`
+          `${apiUrl}/api/users/user-scores/${userId}`
         );
 
         const combinedScores = [

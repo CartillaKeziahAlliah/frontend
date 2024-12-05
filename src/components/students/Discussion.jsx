@@ -67,7 +67,17 @@ const Discussion = ({ subjectId, userId }) => {
       await axios.patch(`${apiUrl}/api/discussion/${discussionId}/read`, {
         studentId: userId,
       });
-      setSuccessMessage("Discussion marked as read");
+
+      // Show SweetAlert success message
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Discussion marked as read",
+        confirmButtonText: "OK",
+      }).then(() => {
+        // Reload the page after clicking OK
+        window.location.reload();
+      });
     } catch (error) {
       setError("Error marking discussion as read. Please try again.");
       console.error("Error marking discussion as read:", error);
