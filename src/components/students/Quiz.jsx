@@ -205,36 +205,50 @@ const Quiz = ({ subjectId }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {quizzes.map((quiz) => (
-                <TableRow key={quiz._id}>
-                  <TableCell>{quiz.title}</TableCell>
-                  <TableCell>{quiz.duration}</TableCell>
-                  <TableCell align="right">
-                    {quiz.scores.some(
-                      (score) => score.studentId === user._id
-                    ) ? (
-                      <Typography color="green">Completed </Typography>
-                    ) : (
-                      <>
-                        <IconButton onClick={(e) => handleOpenMenu(e, quiz)}>
-                          <MoreHorizIcon />
-                        </IconButton>
-                        <Menu
-                          anchorEl={anchorEl}
-                          open={Boolean(
-                            anchorEl && selectedQuiz?._id === quiz._id
-                          )}
-                          onClose={handleCloseMenu}
-                        >
-                          <MenuItem onClick={() => handleTakeQuiz(quiz)}>
-                            Take quiz
-                          </MenuItem>
-                        </Menu>
-                      </>
-                    )}
-                  </TableCell>{" "}
+              {quizzes.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3} align="center">
+                    <Typography variant="h6" color="textSecondary">
+                      No Records
+                    </Typography>
+                  </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                <>
+                  {quizzes.map((quiz) => (
+                    <TableRow key={quiz._id}>
+                      <TableCell>{quiz.title}</TableCell>
+                      <TableCell>{quiz.duration}</TableCell>
+                      <TableCell align="right">
+                        {quiz.scores.some(
+                          (score) => score.studentId === user._id
+                        ) ? (
+                          <Typography color="green">Completed </Typography>
+                        ) : (
+                          <>
+                            <IconButton
+                              onClick={(e) => handleOpenMenu(e, quiz)}
+                            >
+                              <MoreHorizIcon />
+                            </IconButton>
+                            <Menu
+                              anchorEl={anchorEl}
+                              open={Boolean(
+                                anchorEl && selectedQuiz?._id === quiz._id
+                              )}
+                              onClose={handleCloseMenu}
+                            >
+                              <MenuItem onClick={() => handleTakeQuiz(quiz)}>
+                                Take quiz
+                              </MenuItem>
+                            </Menu>
+                          </>
+                        )}
+                      </TableCell>{" "}
+                    </TableRow>
+                  ))}
+                </>
+              )}
             </TableBody>
           </Table>
         </TableContainer>

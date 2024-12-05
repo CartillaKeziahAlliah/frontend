@@ -187,37 +187,52 @@ const Exam = ({ subjectId, user, subject }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {exams.map((exam) => (
-                <TableRow key={exam._id}>
-                  <TableCell>{exam.title}</TableCell>
-                  <TableCell>{exam.duration} mins.</TableCell>
-                  <TableCell align="right">
-                    {exam.scores.some(
-                      (score) =>
-                        score.studentId._id.toString() === user._id.toString()
-                    ) ? (
-                      <Typography color="green">Completed</Typography>
-                    ) : (
-                      <>
-                        <IconButton onClick={(e) => handleOpenMenu(e, exam)}>
-                          <MoreHorizIcon />
-                        </IconButton>
-                        <Menu
-                          anchorEl={anchorEl}
-                          open={Boolean(
-                            anchorEl && selectedExam?._id === exam._id
-                          )}
-                          onClose={handleCloseMenu}
-                        >
-                          <MenuItem onClick={() => handleTakeExam(exam)}>
-                            Take Exam
-                          </MenuItem>
-                        </Menu>
-                      </>
-                    )}
+              {exams.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3} align="center">
+                    <Typography variant="h6" color="textSecondary">
+                      No Records
+                    </Typography>
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                <>
+                  {exams.map((exam) => (
+                    <TableRow key={exam._id}>
+                      <TableCell>{exam.title}</TableCell>
+                      <TableCell>{exam.duration} mins.</TableCell>
+                      <TableCell align="right">
+                        {exam.scores.some(
+                          (score) =>
+                            score.studentId._id.toString() ===
+                            user._id.toString()
+                        ) ? (
+                          <Typography color="green">Completed</Typography>
+                        ) : (
+                          <>
+                            <IconButton
+                              onClick={(e) => handleOpenMenu(e, exam)}
+                            >
+                              <MoreHorizIcon />
+                            </IconButton>
+                            <Menu
+                              anchorEl={anchorEl}
+                              open={Boolean(
+                                anchorEl && selectedExam?._id === exam._id
+                              )}
+                              onClose={handleCloseMenu}
+                            >
+                              <MenuItem onClick={() => handleTakeExam(exam)}>
+                                Take Exam
+                              </MenuItem>
+                            </Menu>
+                          </>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
             </TableBody>
           </Table>
         </TableContainer>

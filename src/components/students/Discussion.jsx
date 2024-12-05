@@ -45,7 +45,6 @@ const Discussion = ({ subjectId, userId }) => {
         setLoading(false); // Set loading to false after data is fetched
       } catch (error) {
         console.error("Error fetching discussions:", error);
-        Swal.fire("Error", "Failed to fetch discussions", "error");
         setLoading(false); // Set loading to false if an error occurs
       }
     };
@@ -109,34 +108,48 @@ const Discussion = ({ subjectId, userId }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {discussions.map((discussion, index) => (
-                    <TableRow key={discussion._id}>
-                      <TableCell>
-                        <Typography className="capitalize">
-                          {discussion.title}
+                  {discussions.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={3} align="center">
+                        <Typography variant="h6" color="textSecondary">
+                          No Records
                         </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography>
-                          {discussion.studentsRead.length}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <IconButton onClick={handleMenuOpen}>
-                          <MoreHoriz />
-                        </IconButton>
-                        <Menu
-                          anchorEl={anchorEl}
-                          open={Boolean(anchorEl)}
-                          onClose={handleMenuClose}
-                        >
-                          <MenuItem onClick={() => handleViewDiscussion(index)}>
-                            View Discussion
-                          </MenuItem>
-                        </Menu>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    <>
+                      {discussions.map((discussion, index) => (
+                        <TableRow key={discussion._id}>
+                          <TableCell>
+                            <Typography className="capitalize">
+                              {discussion.title}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography>
+                              {discussion.studentsRead.length}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="right">
+                            <IconButton onClick={handleMenuOpen}>
+                              <MoreHoriz />
+                            </IconButton>
+                            <Menu
+                              anchorEl={anchorEl}
+                              open={Boolean(anchorEl)}
+                              onClose={handleMenuClose}
+                            >
+                              <MenuItem
+                                onClick={() => handleViewDiscussion(index)}
+                              >
+                                View Discussion
+                              </MenuItem>
+                            </Menu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </>
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>

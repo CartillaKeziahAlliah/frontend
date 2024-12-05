@@ -212,41 +212,54 @@ const Assignment = ({ subjectId, userId }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {assignments.map((assignment) => (
-                <TableRow key={assignment._id}>
-                  <TableCell>{assignment.title}</TableCell>
-                  <TableCell>{assignment.duration}</TableCell>
-                  <TableCell align="right">
-                    {assignment.scores.some(
-                      (score) => score.studentId === userId
-                    ) ? (
-                      <Typography color="green">Completed</Typography>
-                    ) : (
-                      <>
-                        <IconButton
-                          onClick={(e) => handleOpenMenu(e, assignment)}
-                        >
-                          <MoreHorizIcon />
-                        </IconButton>
-                        <Menu
-                          anchorEl={anchorEl}
-                          open={Boolean(
-                            anchorEl &&
-                              selectedAssignment?._id === assignment._id
-                          )}
-                          onClose={handleCloseMenu}
-                        >
-                          <MenuItem
-                            onClick={() => handleTakeAssignment(assignment)}
-                          >
-                            Take assignment
-                          </MenuItem>
-                        </Menu>
-                      </>
-                    )}
+              {assignments.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3} align="center">
+                    <Typography variant="h6" color="textSecondary">
+                      No Records
+                    </Typography>
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                <>
+                  {" "}
+                  {assignments.map((assignment) => (
+                    <TableRow key={assignment._id}>
+                      <TableCell>{assignment.title}</TableCell>
+                      <TableCell>{assignment.duration}</TableCell>
+                      <TableCell align="right">
+                        {assignment.scores.some(
+                          (score) => score.studentId === userId
+                        ) ? (
+                          <Typography color="green">Completed</Typography>
+                        ) : (
+                          <>
+                            <IconButton
+                              onClick={(e) => handleOpenMenu(e, assignment)}
+                            >
+                              <MoreHorizIcon />
+                            </IconButton>
+                            <Menu
+                              anchorEl={anchorEl}
+                              open={Boolean(
+                                anchorEl &&
+                                  selectedAssignment?._id === assignment._id
+                              )}
+                              onClose={handleCloseMenu}
+                            >
+                              <MenuItem
+                                onClick={() => handleTakeAssignment(assignment)}
+                              >
+                                Take assignment
+                              </MenuItem>
+                            </Menu>
+                          </>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
