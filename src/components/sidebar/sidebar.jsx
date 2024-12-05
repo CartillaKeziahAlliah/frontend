@@ -45,19 +45,13 @@ const Sidebar = ({ user, logout }) => {
         const data = await response.json();
         if (response.ok) {
           setCourses(data.subjects);
-        } else {
-          console.error(data.message);
         }
       } catch (error) {
         console.error("Failed to fetch courses:", error);
       }
     }
   };
-  const handleAdminClick = () => {
-    setShowCourses(false);
-    setShowSections(false);
-    setActive("Admin");
-  };
+
   const handleManageClick = () => {
     setShowCourses(false);
     setShowSections(false);
