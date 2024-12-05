@@ -12,8 +12,8 @@ import {
   CircularProgress,
 } from "@mui/material";
 
-// const apiUrl = "https://server-production-dd7a.up.railway.app";
-const apiUrl = "http://localhost:5000";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "http://localhost:5000";
 
 const StudentsComponent = ({ sectionName }) => {
   const [students, setStudents] = useState([]);
