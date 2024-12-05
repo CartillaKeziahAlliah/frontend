@@ -11,5 +11,4 @@ export default {
   variants: {
     lineClamp: ["responsive"],
   },
-  plugins: [require("@tailwindcss/line-clamp")],
 };
