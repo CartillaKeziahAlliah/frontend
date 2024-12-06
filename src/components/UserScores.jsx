@@ -13,9 +13,10 @@ import {
   TablePagination,
   TextField,
 } from "@mui/material";
-const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "https://server-production-dd7a.up.railway.app";
+const apiUrl = "http://localhost:5000";
 
-const UserScores = ({ userId }) => {
+const UserScores = ({ userId, subjectId }) => {
   const [userScores, setUserScores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
@@ -27,7 +28,7 @@ const UserScores = ({ userId }) => {
     const fetchUserScores = async () => {
       try {
         const response = await axios.get(
-          `${apiUrl}/api/users/user-scores/${userId}`
+          `${apiUrl}/api/users/user-scores/${userId}/${subjectId}`
         );
 
         const combinedScores = [

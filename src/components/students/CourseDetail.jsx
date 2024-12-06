@@ -126,7 +126,9 @@ const CourseDetail = () => {
           <Assignment subjectId={subjectId} userId={user._id} />
         )}
         {section === "Quizzes" && <Quiz subjectId={subjectId} />}
-        {section === "Scores" && <UserScores userId={user._id} />}
+        {section === "Scores" && (
+          <UserScores userId={user._id} subjectId={subjectId} />
+        )}
       </div>
     </div>
   );
