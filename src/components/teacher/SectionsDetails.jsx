@@ -36,8 +36,8 @@ import StudentsComponent from "../studentList/studentlist";
 import ExamScoresView from "./exam/ExamScoresView";
 import AddIcon from "@mui/icons-material/Add";
 
-// const apiUrl = "http://localhost:5000";
-const apiUrl = "https://server-production-dd7a.up.railway.app";
+const apiUrl = "http://localhost:5000";
+// const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const SectionDetail = () => {
   const { sectionName } = useParams();
@@ -108,7 +108,9 @@ const SectionDetail = () => {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/api/subject/${user._id}`);
+        const response = await axios.get(
+          `${apiUrl}/api/subject/${user._id}/${sectionName}`
+        );
         setSubjects(response.data);
       } catch (error) {
         setError();
@@ -116,7 +118,7 @@ const SectionDetail = () => {
     };
 
     fetchSubjects();
-  }, [sectionName]);
+  }, [sectionName, user._id]);
 
   useEffect(() => {
     if (!selectedSubject) return;
@@ -318,7 +320,7 @@ const SectionDetail = () => {
           </Typography>
         )}
       </Box>
-      {!selectedSubject && (
+      {!selectedSubject && subjects.length > 0 ? (
         <div className="h-[80%]">
           <Grid container spacing={2} padding={2}>
             {subjects.map((subject) => (
@@ -348,7 +350,16 @@ const SectionDetail = () => {
             ))}
           </Grid>
         </div>
+      ) : (
+        subjects.length === 0 && (
+          <div className="h-[80%] flex justify-center items-center">
+            <Typography variant="h6" color="textSecondary">
+              No subjects available. Please check back later.
+            </Typography>
+          </div>
+        )
       )}
+
       {selectedSubject && view === "exam" && (
         <div className="subject-details mt-4">
           {action === "exam" && (

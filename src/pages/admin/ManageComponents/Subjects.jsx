@@ -27,8 +27,8 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 import Swal from "sweetalert2";
-// const apiUrl = "http://localhost:5000"; // Your API URL
-const apiUrl = "https://server-production-dd7a.up.railway.app";
+const apiUrl = "http://localhost:5000"; // Your API URL
+// const apiUrl = "https://server-production-dd7a.up.railway.app";
 const SubjectsTable = ({ handleBackToDashboard }) => {
   const [subjects, setSubjects] = useState([]);
   const [teachers, setTeachers] = useState([]);
@@ -103,7 +103,13 @@ const SubjectsTable = ({ handleBackToDashboard }) => {
               )
             );
             handleDialogClose(); // Close the dialog
-            Swal.fire("Updated!", "The subject has been updated.", "success");
+            Swal.fire(
+              "Updated!",
+              "The subject has been updated.",
+              "success"
+            ).then(() => {
+              window.location.reload(); // Reload the page after clicking OK
+            });
           })
           .catch((error) => {
             console.error("Error updating subject:", error);
@@ -170,16 +176,31 @@ const SubjectsTable = ({ handleBackToDashboard }) => {
       if (result.isConfirmed) {
         // Proceed with adding the subject if confirmed
         axios
-          .post(`${apiUrl}/api/manage/add`, newSubject)
+          .post(`${apiUrl}/api/manage/add`, newSubject, {
+            headers: { "Content-Type": "application/json" },
+          })
           .then((response) => {
             setSubjects((prevSubjects) => [
               ...prevSubjects,
               response.data.subject,
             ]);
             handleDialogClose(); // Close the dialog
-            window.location.reload();
+            Swal.fire(
+              "Added!",
+              "The subject has been added successfully.",
+              "success"
+            ).then(() => {
+              window.location.reload(); // Reload the page after clicking OK
+            });
           })
-          .catch((error) => console.error("Error adding subject:", error));
+          .catch((error) => {
+            console.error("Error adding subject:", error);
+            Swal.fire(
+              "Error!",
+              "There was an error adding the subject.",
+              "error"
+            );
+          });
       } else {
         // If cancelled, no action is taken
         console.log("Subject addition cancelled.");
