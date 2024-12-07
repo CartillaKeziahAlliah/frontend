@@ -17,8 +17,8 @@ import {
 import { logo } from "../../constants/logo";
 import axios from "axios";
 
-const apiUrl = "http://localhost:5000"; // Your API URL
-// const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 const Sidebar = ({ user, logout }) => {
   const navigate = useNavigate();
   const [active, setActive] = useState("Dashboard");

@@ -3,9 +3,9 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
 
-const apiUrl = "http://localhost:5000";
+// const apiUrl = "http://localhost:5000";
 // Default API base URL
-// const apiUrl = "https://server-production-dd7a.up.railway.app";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 const getRandomPastelColor = () => {
   const colors = [
     "#FFCCCB", // Light red
