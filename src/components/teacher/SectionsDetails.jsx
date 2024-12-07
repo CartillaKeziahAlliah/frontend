@@ -109,7 +109,7 @@ const SectionDetail = () => {
     const fetchSubjects = async () => {
       try {
         const response = await axios.get(
-          `${apiUrl}/api/subject/${user._id}/${sectionName}`
+          `${apiUrl}/api/subject/TSubject/${user._id}/${sectionName}`
         );
         setSubjects(response.data);
       } catch (error) {
