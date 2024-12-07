@@ -50,7 +50,6 @@ const SubjectsList = () => {
     }
   }, [user.sections]);
 
-  if (loading) return <p>Loading subjects...</p>;
   if (error) return <p>{error}</p>;
 
   return (
