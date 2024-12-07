@@ -39,7 +39,7 @@ const SubjectsList = () => {
         );
         setSubjects(response.data);
       } catch (err) {
-        setError(err.response ? err.response.data.message : "Server error.");
+        setError();
       } finally {
         setLoading(false);
       }
