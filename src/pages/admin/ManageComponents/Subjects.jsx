@@ -27,8 +27,8 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 import Swal from "sweetalert2";
-const apiUrl = "http://localhost:5000"; // Your API URL
-// const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "http://localhost:5000"; // Your API URL
+const apiUrl = "https://server-production-dd7a.up.railway.app";
 const SubjectsTable = ({ handleBackToDashboard }) => {
   const [subjects, setSubjects] = useState([]);
   const [teachers, setTeachers] = useState([]);
