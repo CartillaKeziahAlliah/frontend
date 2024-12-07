@@ -15,9 +15,10 @@ import {
   Person2Outlined,
 } from "@mui/icons-material";
 import { logo } from "../../constants/logo";
+import axios from "axios";
 
-// const apiUrl = "http://localhost:5000"; // Your API URL
-const apiUrl = "https://server-production-dd7a.up.railway.app";
+const apiUrl = "http://localhost:5000"; // Your API URL
+// const apiUrl = "https://server-production-dd7a.up.railway.app";
 const Sidebar = ({ user, logout }) => {
   const navigate = useNavigate();
   const [active, setActive] = useState("Dashboard");
@@ -34,21 +35,30 @@ const Sidebar = ({ user, logout }) => {
     navigate("/updateprofile");
   };
   const handleCoursesClick = async () => {
-    setShowCourses((prev) => !prev);
-    setShowSections(false);
-    setActive("Courses");
-    if (!showCourses) {
-      try {
-        const response = await fetch(
-          `${apiUrl}/api/subject/${user._id}/subjects`
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setCourses(data.subjects);
-        }
-      } catch (error) {
-        console.error("Failed to fetch courses:", error);
+    setShowCourses((prev) => {
+      const newShowCourses = !prev;
+      if (newShowCourses) {
+        setShowSections(false); // Hide sections if courses are shown
+        setActive("Courses");
+        fetchCourses();
       }
+      return newShowCourses;
+    });
+  };
+
+  const fetchCourses = async () => {
+    try {
+      const response = await axios.get(
+        `${apiUrl}/api/subject/student/${user._id}/subjects`
+      );
+      // Assuming the response is { subjects: [...] }
+      if (response.status === 200) {
+        setCourses(response.data.subjects);
+      } else {
+        console.error("Failed to fetch courses: ", response.status);
+      }
+    } catch (error) {
+      console.error("Failed to fetch courses:", error);
     }
   };
 

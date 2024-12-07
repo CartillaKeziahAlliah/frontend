@@ -3,8 +3,9 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
 
-// const apiUrl = "http://localhost:5000";
-const apiUrl = "https://server-production-dd7a.up.railway.app";
+const apiUrl = "http://localhost:5000";
+// Default API base URL
+// const apiUrl = "https://server-production-dd7a.up.railway.app";
 const getRandomPastelColor = () => {
   const colors = [
     "#FFCCCB", // Light red
@@ -18,6 +19,7 @@ const getRandomPastelColor = () => {
   ];
   return colors[Math.floor(Math.random() * colors.length)];
 };
+
 const SubjectsList = () => {
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,27 +31,31 @@ const SubjectsList = () => {
       try {
         setLoading(true);
 
-        // Use the first section if sections is an array
-        const sectionId = Array.isArray(user.sections)
-          ? user.sections[0]
-          : user.sections;
+        // Check user role and construct URL accordingly
 
-        const response = await axios.get(
-          `${apiUrl}/api/subject/section/${sectionId}`
-        );
-        setSubjects(response.data);
+        let apiUrlWithRole = `${apiUrl}/api/subject/student/${user._id}/subjects`;
+
+        const response = await axios.get(apiUrlWithRole);
+
+        // Check if the response data is an array of subjects
+        if (Array.isArray(response.data.subjects)) {
+          setSubjects(response.data.subjects);
+        } else {
+          setError("Unexpected response format");
+        }
       } catch (err) {
-        setError();
+        setError("An error occurred while fetching subjects");
       } finally {
         setLoading(false);
       }
     };
 
-    if (user.sections && user.sections.length > 0) {
+    if (user && user.sections && user.sections.length > 0) {
       fetchSubjects();
     }
-  }, [user.sections]);
+  }, [user]);
 
+  if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
   return (
@@ -69,7 +75,7 @@ const SubjectsList = () => {
           {subjects.map((subject) => {
             const cardColor = getRandomPastelColor();
             return (
-              <Grid item xs={12} sm={6} md={4} key={subject._id}>
+              <Grid item xs={12} sm={6} md={4} key={subject.subjectId}>
                 <Card
                   style={{
                     backgroundColor: cardColor,
@@ -77,12 +83,15 @@ const SubjectsList = () => {
                   }}
                 >
                   <CardContent>
-                    <Typography variant="h5">{subject.subject_name}</Typography>
+                    <Typography variant="h5">{subject.subjectName}</Typography>
                     <Typography variant="body2">
-                      Start: {subject.start_time}
+                      Start: {subject.startTime}
                     </Typography>
                     <Typography variant="body2">
-                      End: {subject.end_time}
+                      End: {subject.endTime}
+                    </Typography>
+                    <Typography variant="body2">
+                      Teacher: {subject.teacher.name}
                     </Typography>
                   </CardContent>
                 </Card>

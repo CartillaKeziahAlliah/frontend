@@ -24,7 +24,8 @@ const getRandomPastelColor = () => {
   return colors[Math.floor(Math.random() * colors.length)];
 };
 
-const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "https://server-production-dd7a.up.railway.app";
+const apiUrl = "http://localhost:5000";
 
 const SubjectsList = () => {
   const [subjects, setSubjects] = useState([]);
