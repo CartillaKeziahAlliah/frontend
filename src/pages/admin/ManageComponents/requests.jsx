@@ -185,6 +185,9 @@ const RequestPage = ({ handleBackToDashboard }) => {
               <TableCell sx={{ color: "white", fontSize: "large" }}>
                 Email
               </TableCell>
+              <TableCell sx={{ color: "white", fontSize: "large" }}>
+                LRN
+              </TableCell>
               <TableCell
                 align="right"
                 sx={{ color: "white", fontSize: "large" }}
@@ -207,6 +210,8 @@ const RequestPage = ({ handleBackToDashboard }) => {
                   <TableRow key={user._id}>
                     <TableCell>{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.LRN}</TableCell>
+
                     <TableCell
                       align="right"
                       sx={{
