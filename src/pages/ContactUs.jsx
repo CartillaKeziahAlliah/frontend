@@ -38,7 +38,7 @@ const ContactUs = () => {
 
     const { firstName, lastName, email, message, subject } = formData;
     const templateParams = {
-      name: `${firstName} ${lastName}`, // combining first and last name
+      name: `${firstName} ${lastName}`,
       email: email,
       message: message,
       subject: subject,
@@ -65,61 +65,66 @@ const ContactUs = () => {
   };
 
   return (
-    <Grid
-      container
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "90%",
-        flexDirection: "column",
-        background: "white",
-        gap: 2,
-      }}
-    >
-      <h1 className="text-4xl text-[#207E68] font-bold">CONTACT US</h1>
-      <p className="text-[#717171]">
+    <div className="flex flex-col bg-white md:h-[90%] h-full justify-center px-10 gap-10">
+      {/* Heading Section */}
+      <Typography
+        variant="h3"
+        sx={{
+          color: "#207E68",
+          textAlign: "center",
+          fontWeight: 700,
+          fontSize: { xs: "0", sm: "2rem", md: "3rem" }, // Hide for `xs` screen sizes
+        }}
+        className="w-full"
+      >
+        CONTACT US
+      </Typography>
+      <Typography
+        variant="body1"
+        className="w-full"
+        sx={{
+          textAlign: "center",
+          color: "#717171",
+          fontSize: { xs: "0", sm: "0.875rem", md: "1.125rem" },
+        }}
+      >
         Any question or remarks? Just write us a message!
-      </p>
-      {/* Contact Information Section */}
-      <div className="flex flex-row flex-wrap ">
+      </Typography>
+
+      {/* Contact Info & Form Section */}
+      <Grid container spacing={3} sx={{ width: "100%" }}>
+        {/* Left Panel (Contact Info Section) */}
         <Grid
           item
-          xs={12}
-          lg={4}
+          xs={12} // Stack vertically on mobile
+          md={4} // Side-by-side on medium and larger screens
           sx={{
             backgroundColor: "#207E68",
-            borderTopLeftRadius: "8px",
-            borderBottomLeftRadius: "8px",
-            color: "#fff",
+            color: "white",
+            padding: "16px",
+            borderRadius: "8px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            maxWidth: "lg",
-            height: "50vh",
-            padding: "2%",
+            height: "auto",
           }}
         >
-          <div>
-            <Typography variant="h5" gutterBottom>
-              Contact Information
-            </Typography>
-            <Typography variant="body1" sx={{ marginBottom: "16px" }}>
-              Say something to start a live chat!
-            </Typography>
-          </div>
-          <div className="flex flex-col gap-10">
-            <Box>
-              <Phone /> +1012 3456 789
-            </Box>
-            <Box>
-              <Email /> tnhs@gmail.com
-            </Box>
-            <Box>
-              <LocationOn /> Talamban Cebu City
-            </Box>
-          </div>
-          <Box sx={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+          <Typography variant="h6" sx={{ marginBottom: 2 }}>
+            Contact Information
+          </Typography>
+          <Typography variant="body1" sx={{ marginBottom: 2 }}>
+            Say something to start a live chat!
+          </Typography>
+          <Box sx={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <Phone sx={{ mr: 1 }} /> +1012 3456 789
+          </Box>
+          <Box sx={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <Email sx={{ mr: 1 }} /> tnhs@gmail.com
+          </Box>
+          <Box sx={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <LocationOn sx={{ mr: 1 }} /> Talamban Cebu City
+          </Box>
+          <Box sx={{ marginTop: "8px", display: "flex", gap: "8px" }}>
             <IconButton color="inherit" href="#" aria-label="Twitter">
               <Twitter />
             </IconButton>
@@ -129,31 +134,34 @@ const ContactUs = () => {
           </Box>
         </Grid>
 
-        {/* Contact Form Section */}
+        {/* Right Panel (Contact Form Section) */}
         <Grid
           item
-          xs={12}
-          lg={8}
+          xs={12} // Stack vertically on mobile
+          md={8} // Side-by-side on medium and larger screens
           sx={{
             display: "flex",
             flexDirection: "column",
-            maxWidth: "lg", // Max width for large screen (1024px)
+            padding: "8px",
+            backgroundColor: "white",
+            borderRadius: "8px",
+            boxShadow: 3,
           }}
         >
           <Box
             component="form"
             onSubmit={handleSubmit}
             sx={{
-              backgroundColor: "#fff",
-              padding: "20px",
-              borderRadius: "8px",
-              boxShadow: 3,
-              flexGrow: 1, // Allow the form to grow and fill available space
-              height: "40vh",
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+              padding: "16px",
+              minHeight: "300px",
             }}
           >
-            <Grid container spacing={4}>
-              <Grid item xs={12} md={6}>
+            {/* Form Fields */}
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   variant="standard"
                   label="First Name"
@@ -164,7 +172,7 @@ const ContactUs = () => {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   variant="standard"
                   label="Last Name"
@@ -175,7 +183,7 @@ const ContactUs = () => {
                   required
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12}>
                 <TextField
                   variant="standard"
                   label="Email"
@@ -187,7 +195,6 @@ const ContactUs = () => {
                   required
                 />
               </Grid>
-
               <Grid item xs={12}>
                 <Typography variant="subtitle1">Select Subject</Typography>
                 <RadioGroup
@@ -226,22 +233,21 @@ const ContactUs = () => {
                 />
               </Grid>
             </Grid>
-            <div className="flex flex-row justify-end w-full p-2">
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                sx={{
-                  backgroundColor: "#207E68",
-                }}
-              >
-                Send Message
-              </Button>
-            </div>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              sx={{
+                backgroundColor: "#207E68",
+                marginTop: "auto",
+              }}
+            >
+              Send Message
+            </Button>
           </Box>
         </Grid>
-      </div>
-    </Grid>
+      </Grid>
+    </div>
   );
 };
 
