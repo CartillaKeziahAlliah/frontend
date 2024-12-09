@@ -10,29 +10,34 @@ const FAQ = () => {
 
   const faqs = [
     {
-      question: "What is LMS?",
+      question: "What is a Learning Management System (LMS)?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "An LMS is a digital platform that helps manage, deliver, and track educational courses and training programs. It allows students to access course materials, submit assignments, and communicate with teachers.",
     },
     {
-      question: "What is LMS?",
+      question: "How do I log in to the LMS?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "To log in, visit the LMS website and enter your username and password provided by your school. If you have trouble logging in, check with your teacher or IT support.",
     },
     {
-      question: "What is LMS?",
+      question: "How do I update my profile information?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "To update your profile, log in and go to your account settings. Here, you can change your personal information, including your email and password.",
     },
     {
-      question: "What is LMS?",
+      question: "Can I submit assignments online?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "Yes, you can submit assignments directly through the LMS. Go to the assignment section of your course, follow the instructions, and upload your work.",
     },
     {
-      question: "What is LMS?",
+      question: "How can I manage my time effectively with online courses?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "Use the calendar or planner feature in the LMS to track assignment due dates and scheduled assessments. Set aside regular study time each week to stay on track.",
+    },
+    {
+      question: "How do I prepare for online tests and quizzes?",
+      answer:
+        "Review course materials, take practice quizzes if available, and ensure you understand the test format. Make sure to find a quiet environment and have reliable internet access during the test.",
     },
   ];
 
@@ -56,8 +61,7 @@ const FAQ = () => {
         .
       </p>
       <center>
-        {" "}
-        <div className="w-[70%]  flex gap-10 flex-col">
+        <div className="w-[70%] flex gap-10 flex-col mt-2">
           {faqs.map((faq, index) => (
             <div key={index} className="border border-[#207E68] rounded-md">
               <div
