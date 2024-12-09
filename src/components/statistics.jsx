@@ -72,6 +72,7 @@ const UserStatistics = () => {
       <div className="flex justify-around flex-row flex-wrap">
         {/* Pie Chart for Roles */}
         <div>
+          <center className="font-bold">User Roles Distribution</center>
           <PieChart width={500} height={500}>
             <Pie
               data={updatedRolesData}
@@ -95,6 +96,8 @@ const UserStatistics = () => {
 
         {/* Pie Chart for Statuses */}
         <div>
+          <center className="font-bold">User Status Distribution</center>
+
           <PieChart width={500} height={500}>
             <Pie
               data={updatedStatusesData}

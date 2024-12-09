@@ -13,6 +13,7 @@ import {
   Alert,
 } from "@mui/material";
 import Swal from "sweetalert2";
+import { Person } from "@mui/icons-material";
 const apiUrl = "https://server-production-dd7a.up.railway.app";
 
 const UpdateProfile = () => {
@@ -139,33 +140,64 @@ const UpdateProfile = () => {
         >
           {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
           {successMessage && <Alert severity="success">{successMessage}</Alert>}
-          <div className="relative mb-10">
-            {user.avatar && !preview && (
-              <Avatar src={user.avatar} sx={{ width: 128, height: 128 }} />
+          <div className="relative w-fit mb-10">
+            {user.avatar && !preview ? (
+              // Display user avatar with a border
+              <Avatar
+                src={user.avatar}
+                sx={{
+                  width: 128,
+                  height: 128,
+                  border: "2px solid #207E68",
+                  position: "relative",
+                }}
+              />
+            ) : preview ? (
+              // Display the previewed image with no custom fallback
+              <Avatar
+                src={preview}
+                sx={{
+                  width: 128,
+                  height: 128,
+                  position: "relative",
+                }}
+              />
+            ) : (
+              // Display the fallback Person Icon with a border
+              <Avatar
+                sx={{
+                  width: 128,
+                  height: 128,
+                  backgroundColor: "grey.300",
+                  border: "2px solid #207E68",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  position: "relative",
+                }}
+              >
+                <Person sx={{ color: "white", fontSize: 60 }} />
+              </Avatar>
             )}
-            {preview && (
-              <Avatar src={preview} sx={{ width: 128, height: 128 }} />
-            )}
+
+            {/* Plus IconButton centered within the Avatar */}
             <IconButton
               sx={{
                 position: "absolute",
                 top: "50%",
-                left: "10%",
-                transform: "translate(-50%, -50%)",
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-                width: 40,
-                height: 40,
+                left: "50%",
+                transform: "translate(-50%, -50%)", // Center the button perfectly
+                backgroundColor: "rgba(0, 0, 0, 0.6)",
+                color: "white",
+                width: 128,
+                height: 128,
                 "&:hover": {
-                  backgroundColor: "rgba(0, 0, 0, 0.7)",
+                  backgroundColor: "rgba(0, 0, 0, 0.8)",
                 },
               }}
             >
               <Button component="label" sx={{ padding: 0 }}>
-                <Typography
-                  sx={{ color: "#fff" }}
-                  variant="h5"
-                  component="span"
-                >
+                <Typography variant="h6" component="span">
                   +
                 </Typography>
                 <input type="file" hidden onChange={handleFileChange} />
@@ -251,6 +283,16 @@ const UpdateProfile = () => {
                   {user?.name || "Your Name"}
                 </Typography>
               </div>
+              {user.username && (
+                <div>
+                  <label htmlFor="name" className="font-bold">
+                    Username:
+                  </label>
+                  <Typography variant="body1">
+                    {user?.name || "Your Name"}
+                  </Typography>
+                </div>
+              )}
               <div>
                 <label htmlFor="name" className="font-bold">
                   Email Address:
@@ -259,6 +301,14 @@ const UpdateProfile = () => {
                   {user?.email || "your.email@example.com"}
                 </Typography>
               </div>
+              {user.idNumber && (
+                <div>
+                  <label htmlFor="name" className="font-bold">
+                    ID Number:
+                  </label>
+                  <Typography variant="body1">{user.idNumber}</Typography>
+                </div>
+              )}
               {user.role === "student" && (
                 <div>
                   <label htmlFor="LRN" className="font-bold">

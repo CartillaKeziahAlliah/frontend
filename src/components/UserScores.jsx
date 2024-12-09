@@ -13,8 +13,8 @@ import {
   TablePagination,
   TextField,
 } from "@mui/material";
-// const apiUrl = "https://server-production-dd7a.up.railway.app";
-const apiUrl = "http://localhost:5000";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "http://localhost:5000";
 
 const UserScores = ({ userId, subjectId }) => {
   const [userScores, setUserScores] = useState([]);

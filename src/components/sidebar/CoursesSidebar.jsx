@@ -8,7 +8,7 @@ const CoursesSidebar = ({
   setOpen,
 }) => (
   <div className="right-sidebar transition-all duration-300 ease-in-out bg-white shadow-2xl border-r border-t border-b border-r-black border-t-black border-b-black w-1/8 h-[95vh] flex flex-col p-4 rounded-tr-lg rounded-br-lg">
-    <p className="text-2xl font-bold mb-4">COURSES:</p>
+    <p className="text-2xl font-bold mb-4">SUBJECTS:</p>
 
     {courses.length === 0 ? (
       <p className="text-gray-500 text-center">No courses available</p>

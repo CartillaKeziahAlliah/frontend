@@ -41,7 +41,9 @@ const Instructors = ({ handleBackToDashboard }) => {
   const [newInstructor, setNewInstructor] = useState({
     email: "",
     password: "",
-    name: "", // Password field for the new instructor
+    name: "",
+    username: "", // New field
+    idNumber: "", // New field
   });
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
   const { user } = useAuth();
@@ -114,7 +116,14 @@ const Instructors = ({ handleBackToDashboard }) => {
     e.preventDefault();
     setError("");
 
-    if (!newInstructor.email.trim() || !newInstructor.password.trim()) {
+    // Ensure all fields are filled
+    if (
+      !newInstructor.email.trim() ||
+      !newInstructor.password.trim() ||
+      !newInstructor.name.trim() ||
+      !newInstructor.username.trim() ||
+      !newInstructor.idNumber.trim()
+    ) {
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -124,23 +133,34 @@ const Instructors = ({ handleBackToDashboard }) => {
     }
 
     try {
+      console.log("Attempting to send payload:", newInstructor);
+
       const response = await axios.post(
         `${apiUrl}/api/manage/addInstructor`,
         newInstructor
       );
 
+      console.log("Server Response:", response);
+
       if (response.status === 201) {
-        setTeachers([...teachers, response.data.data]);
-        setNewInstructor({ email: "", password: "", name: "" }); // Reset the form fields
-        setIsModalOpen(false); // Close the modal
+        setTeachers((prevTeachers) => [...prevTeachers, response.data.data]);
         Swal.fire({
           icon: "success",
           title: "Instructor Added",
           text: "Instructor added successfully!",
         });
+        setIsModalOpen(false);
+        setNewInstructor({
+          email: "",
+          password: "",
+          name: "",
+          username: "",
+          idNumber: "",
+        });
       }
     } catch (error) {
-      setError(error.response.data.error || "Failed to add instructor.");
+      console.error("Error adding instructor:", error.response);
+      setError(error.response?.data?.error || "Failed to add instructor.");
     }
   };
 
@@ -296,6 +316,28 @@ const Instructors = ({ handleBackToDashboard }) => {
             onChange={(e) =>
               setNewInstructor({ ...newInstructor, password: e.target.value })
             }
+          />
+          <TextField
+            label="Username"
+            variant="outlined"
+            fullWidth
+            value={newInstructor.username}
+            onChange={(e) =>
+              setNewInstructor({ ...newInstructor, username: e.target.value })
+            }
+          />
+          <TextField
+            label="ID Number"
+            variant="outlined"
+            fullWidth
+            value={newInstructor.idNumber}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Check if the input is a number and its length is less than or equal to 12
+              if (/^\d*$/.test(value) && value.length <= 12) {
+                setNewInstructor({ ...newInstructor, idNumber: value });
+              }
+            }}
           />
         </DialogContent>
         <DialogActions sx={{ padding: "16px 24px" }}>

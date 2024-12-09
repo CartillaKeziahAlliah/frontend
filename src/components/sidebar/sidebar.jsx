@@ -143,7 +143,9 @@ const Sidebar = ({ user, logout }) => {
             <div className="flex flex-col items-center justify-center">
               {!isCollapsed && (
                 <Tooltip title="User Name">
-                  <p className="capitalize text-white">{user.name}</p>
+                  <p className="capitalize text-white">
+                    {user.username ? user.username : user.name}
+                  </p>
                 </Tooltip>
               )}
               {!isCollapsed && (
@@ -182,7 +184,7 @@ const Sidebar = ({ user, logout }) => {
               } p-3 rounded-md`}
             >
               <MenuBookOutlined />
-              {!isCollapsed && <p className="capitalize">Courses</p>}
+              {!isCollapsed && <p className="capitalize">Subjects</p>}
             </div>
           )}
 
@@ -218,7 +220,7 @@ const Sidebar = ({ user, logout }) => {
           )}
         </div>
 
-        <div className="text-white w-full px-4 pb-4">
+        <div className="text-white w-full px-2 pb-4">
           <Tooltip title="Logout">
             <Logout
               onClick={handleLogout}

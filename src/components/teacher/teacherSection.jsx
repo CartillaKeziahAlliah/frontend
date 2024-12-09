@@ -24,8 +24,8 @@ const getRandomPastelColor = () => {
   return colors[Math.floor(Math.random() * colors.length)];
 };
 
-// const apiUrl = "https://server-production-dd7a.up.railway.app";
-const apiUrl = "http://localhost:5000";
+const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "http://localhost:5000";
 
 const SubjectsList = () => {
   const [subjects, setSubjects] = useState([]);
@@ -83,15 +83,6 @@ const SubjectsList = () => {
                     <Typography variant="body2">
                       Section:{" "}
                       {subject.section ? subject.section.section_name : "N/A"}{" "}
-                    </Typography>
-                    <Typography variant="body2">
-                      Start: {subject.start_time}
-                    </Typography>
-                    <Typography variant="body2">
-                      End: {subject.end_time}
-                    </Typography>
-                    <Typography variant="body2">
-                      Schedule: {subject.schedule}
                     </Typography>
                   </CardContent>
                 </Card>

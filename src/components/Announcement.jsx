@@ -58,7 +58,7 @@ const AnnouncementApp = () => {
     const announcementData = {
       title,
       content,
-      section,
+      section: section === "all" ? null : section, // Handle 'all' selection
     };
 
     try {
@@ -85,6 +85,7 @@ const AnnouncementApp = () => {
       );
     }
   };
+
   const fetchSections = async () => {
     try {
       const response = await axios.get(`${apiUrl}/api/section/${user._id}`);
@@ -326,13 +327,13 @@ const AnnouncementApp = () => {
                 },
               }}
             />
-            <FormControl fullWidth margin="normal">
+            <FormControl fullWidth margin="normal" variant="outlined">
               <InputLabel
                 id="section-select-label"
                 sx={{
-                  color: "#000", // Default label color
+                  color: "#000",
                   "&.Mui-focused": {
-                    color: "#000", // Label color when focused
+                    color: "#000",
                   },
                 }}
               >
@@ -342,6 +343,7 @@ const AnnouncementApp = () => {
                 labelId="section-select-label"
                 value={section}
                 onChange={(e) => setSection(e.target.value)}
+                label="Section" // Associate label with the Select
                 sx={{
                   "& .MuiOutlinedInput-notchedOutline": {
                     borderColor: "#000", // Default border color
@@ -360,6 +362,7 @@ const AnnouncementApp = () => {
                   },
                 }}
               >
+                <MenuItem value="all">All Sections</MenuItem>
                 {sections.map((sectionItem) => (
                   <MenuItem key={sectionItem._id} value={sectionItem._id}>
                     {sectionItem.section_name}

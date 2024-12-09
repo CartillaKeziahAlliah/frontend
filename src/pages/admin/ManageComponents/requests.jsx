@@ -47,7 +47,26 @@ const RequestPage = ({ handleBackToDashboard }) => {
       console.error("Error fetching users:", error);
     }
   };
-
+  const handleApproveUser = async (userId, userName) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: `Approve the user ${userName}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, approve it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.patch(`${apiUrl}/api/users/approve/${userId}`);
+          Swal.fire("Success", "User approved successfully!", "success");
+          fetchUsersWithoutLRN(); // Refresh the list of users
+        } catch (error) {
+          Swal.fire("Error", "Failed to approve user", "error");
+          console.error("Error approving user:", error);
+        }
+      }
+    });
+  };
   // Handle pagination
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -114,7 +133,26 @@ const RequestPage = ({ handleBackToDashboard }) => {
       }
     });
   };
+  const handleDeleteUser = async (userId) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This action will delete the user permanently.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+    });
 
+    if (result.isConfirmed) {
+      try {
+        await axios.delete(`${apiUrl}/api/manage/user/${userId}`);
+        Swal.fire("Deleted!", "The user has been deleted.", "success");
+        fetchUsersWithoutLRN();
+      } catch (error) {
+        Swal.fire("Error", "Failed to delete the user", "error");
+        console.error("Error deleting user:", error);
+      }
+    }
+  };
   return (
     <div className="w-full p-[2%]">
       <div className="flex justify-between gap-2 mb-4">
@@ -169,14 +207,29 @@ const RequestPage = ({ handleBackToDashboard }) => {
                   <TableRow key={user._id}>
                     <TableCell>{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell align="right">
+                    <TableCell
+                      align="right"
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        gap: 2,
+                        justifyContent: "flex-end",
+                      }}
+                    >
                       <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => handleOpenDialog(user)}
+                        onClick={() => handleApproveUser(user._id, user.name)}
                         sx={{ bgcolor: "#207E68" }}
                       >
-                        Add LRN
+                        Approve
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => handleDeleteUser(user._id)}
+                      >
+                        Delete
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -195,39 +248,6 @@ const RequestPage = ({ handleBackToDashboard }) => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
-
-      {/* Dialog for Adding/Updating LRN */}
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Add LRN</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="LRN"
-            type="text"
-            fullWidth
-            value={newLRN}
-            onChange={(e) => {
-              if (e.target.value.length <= 12) {
-                setNewLRN(e.target.value);
-              }
-            }}
-            helperText="LRN must be exactly 12 characters."
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSaveLRN}
-            color="primary"
-            disabled={newLRN.length !== 12}
-          >
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 };

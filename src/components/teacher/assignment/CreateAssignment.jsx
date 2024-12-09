@@ -282,6 +282,7 @@ const CreateAssignment = ({ selectedSubject, onclick }) => {
                 onChange={(e) => setDeadline(e.target.value)}
                 required
                 sx={{ mb: 2, flex: 1 }}
+                InputLabelProps={{ shrink: true }} // Fix the floating issue
               />
             </Box>
             <Typography variant="h6" sx={{ mt: 2, mb: 1 }}>
@@ -344,6 +345,7 @@ const CreateAssignment = ({ selectedSubject, onclick }) => {
                       key={optionIndex}
                     >
                       <TextField
+                        sx={{ mt: 2 }}
                         label={`Option ${optionIndex + 1}`}
                         variant="outlined"
                         fullWidth
@@ -384,37 +386,41 @@ const CreateAssignment = ({ selectedSubject, onclick }) => {
                     </div>
                   ))}
                 </div>
-                <Button
-                  variant="outlined"
-                  onClick={() => handleAddOption(questionIndex)}
-                >
-                  Add Option
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => handleRemoveQuestion(questionIndex)}
-                >
-                  Remove Question
-                </Button>
+                <div className="flex flex-row gap-2 mt-2">
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleAddOption(questionIndex)}
+                  >
+                    Add Option
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => handleRemoveQuestion(questionIndex)}
+                  >
+                    Remove Question
+                  </Button>
+                </div>
               </Box>
             ))}
-            <Button variant="contained" onClick={handleAddQuestion}>
-              Add Question
-            </Button>
+            <div className="flex flex-row gap-2">
+              <Button variant="contained" onClick={handleAddQuestion}>
+                Add Question
+              </Button>
 
-            {successMessage && (
-              <Typography color="green">{successMessage}</Typography>
-            )}
-            {questionErrors.general && (
-              <Typography color="red">{questionErrors.general}</Typography>
-            )}
+              {successMessage && (
+                <Typography color="green">{successMessage}</Typography>
+              )}
+              {questionErrors.general && (
+                <Typography color="red">{questionErrors.general}</Typography>
+              )}
 
-            <Button type="submit" variant="contained" color="primary">
-              Create Assignment
-            </Button>
-            <Button variant="outlined" onClick={handlePreviewToggle}>
-              {previewVisible ? "Hide Preview" : "Show Preview"}
-            </Button>
+              <Button type="submit" variant="contained" color="primary">
+                Create Assignment
+              </Button>
+              <Button variant="outlined" onClick={handlePreviewToggle}>
+                {previewVisible ? "Hide Preview" : "Show Preview"}
+              </Button>
+            </div>
           </form>
           {previewVisible && renderPreview()}
         </CardContent>

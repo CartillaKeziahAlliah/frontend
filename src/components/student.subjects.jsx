@@ -55,7 +55,6 @@ const SubjectsList = () => {
     }
   }, [user]);
 
-  if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
   return (
@@ -84,12 +83,7 @@ const SubjectsList = () => {
                 >
                   <CardContent>
                     <Typography variant="h5">{subject.subjectName}</Typography>
-                    <Typography variant="body2">
-                      Start: {subject.startTime}
-                    </Typography>
-                    <Typography variant="body2">
-                      End: {subject.endTime}
-                    </Typography>
+
                     <Typography variant="body2">
                       Teacher: {subject.teacher.name}
                     </Typography>

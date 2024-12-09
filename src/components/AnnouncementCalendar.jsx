@@ -18,6 +18,7 @@ import { FaPlus } from "react-icons/fa";
 import { ChevronLeft, ChevronRight, Delete, Edit } from "@mui/icons-material";
 
 const apiUrl = "https://server-production-dd7a.up.railway.app";
+// const apiUrl = "http://localhost:5000";
 
 const EventCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -50,9 +51,12 @@ const EventCalendar = () => {
   };
 
   const handleDateClick = (day) => {
-    setSelectedDate(day);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to compare dates only
+    if (day >= today) {
+      setSelectedDate(day);
+    }
   };
-
   const handleNextMonth = () => {
     const nextMonth = new Date(selectedDate);
     nextMonth.setMonth(selectedDate.getMonth() + 1);
@@ -89,11 +93,24 @@ const EventCalendar = () => {
       return;
     }
 
+    // Extract hours and minutes from eventTime
+    const [hours, minutes] = eventTime.split(":").map(Number);
+    if (isNaN(hours) || isNaN(minutes)) {
+      showSnackbar("Invalid time format", "error");
+      return;
+    }
+
+    // Create event_date and event_time
+    const eventDate = new Date(selectedDate).toISOString().split("T")[0]; // Extract YYYY-MM-DD
+    const formattedEventTime = `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}`; // Format HH:mm
+
     const eventData = {
       event_title: eventTitle,
-      event_time: eventTime,
+      event_date: eventDate, // Send date separately
+      event_time: formattedEventTime, // Send time separately
       note: note,
-      event_date: selectedDate.toISOString().split("T")[0],
     };
 
     try {
@@ -175,6 +192,7 @@ const EventCalendar = () => {
       <Calendar
         selectedDate={selectedDate}
         events={events}
+        disablePast={true}
         onDateClick={handleDateClick}
       />
 
